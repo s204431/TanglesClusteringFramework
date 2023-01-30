@@ -1,6 +1,7 @@
 public class Main {
-    //Hello 
     public static void main(String[] args) {
-        System.out.println("Hello world!");
+        BinaryQuestionnaire questionnaire = new BinaryQuestionnaire();
+        questionnaire.loadAnswersFromFile("NPI.csv", 1, -1, 1, 40);
+        questionnaire.print();
     }
 }
