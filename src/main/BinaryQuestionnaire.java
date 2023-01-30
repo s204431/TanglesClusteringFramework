@@ -1,12 +1,20 @@
+package main;
+
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.sql.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-public class BinaryQuestionnaire {
+public class BinaryQuestionnaire implements Dataset {
     private boolean[][] answers;
+
+    public int getNumberOfParticipants() {
+        return answers.length;
+    }
+
+    public int getNumberOfQuestions() {
+        return answers[0].length;
+    }
 
     public void loadAnswersFromFile(String fileName, int startRow, int endRow, int startColumn, int endColumn) {
         try {
@@ -58,4 +66,54 @@ public class BinaryQuestionnaire {
         System.out.println(answers.length + " " + answers[0].length);
     }
 
+    public boolean[][] getInitialCuts() {
+        boolean[][] result = new boolean[getNumberOfQuestions()][getNumberOfParticipants()];
+        for (int i = 0; i < result.length; i++) {
+            for (int j = 0; j < result[i].length; j++) {
+                result[i][j] = answers[j][i];
+            }
+        }
+        return result;
+    }
+
+    public int[] getCutCosts() {
+        int[] result = new int[getNumberOfQuestions()];
+        for (int i = 0; i < getNumberOfQuestions(); i++) {
+            for (int j = 0; j < getNumberOfParticipants(); j++) {
+                if (answers[j][i]) {
+                    continue; //Only look at "false" answers.
+                }
+                for (int k = 0; k < getNumberOfParticipants(); k++) {
+                    if (!answers[k][i]) {
+                        continue; //Only look at "true" answers.
+                    }
+                    result[i] += calculateSimilarity(j, k);
+                }
+            }
+            int cutSize = getCutSize(i);
+            result[i] /= cutSize*(getNumberOfParticipants()-cutSize);
+        }
+        return result;
+    }
+
+    private int calculateSimilarity(int p1, int p2) {
+        int similarity = 0;
+        for (int i = 0; i < getNumberOfQuestions(); i++) {
+            if (answers[p1][i] == answers[p2][i]) {
+                similarity++;
+            }
+        }
+        return similarity;
+    }
+
+    //Returns the number of participants on one side of a cut.
+    private int getCutSize(int cut) {
+        int size = 0;
+        for (int i = 0; i < getNumberOfParticipants(); i++) {
+            if (!answers[i][cut]) {
+                size++;
+            }
+        }
+        return size;
+    }
 }
