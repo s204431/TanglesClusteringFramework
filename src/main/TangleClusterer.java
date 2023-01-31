@@ -1,5 +1,6 @@
 package main;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import main.TangleSearchTree.Node;
@@ -7,12 +8,18 @@ import main.TangleSearchTree.Node;
 public class TangleClusterer {
 
     public static void generateClusters(Dataset dataset, int a) {
+        long time1 = new Date().getTime();
         boolean[][] initialCuts = dataset.getInitialCuts();
         int[] costs = dataset.getCutCosts();
         for (int cost : costs) {
             System.out.print(cost + " ");
         }
+        long time2 = new Date().getTime();
+        System.out.println();
+        System.out.println("Cost function time: " + (time2-time1) + " ms");
         TangleSearchTree tree = generateTangleSearchTree(initialCuts, costs, a);
+        long time3 = new Date().getTime();
+        System.out.println("Tangle search tree time: " + (time3-time2) + " ms");
         System.out.println();
         System.out.println(tree.lowestDepthNodes.size());
         System.out.println(tree.getDepth(tree.lowestDepthNodes.get(0)));
