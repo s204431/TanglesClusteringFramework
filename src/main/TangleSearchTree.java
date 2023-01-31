@@ -111,15 +111,9 @@ public class TangleSearchTree {
 
     //Computes the size of the intersection of three given sets.
     private int intersection(Set<Integer> set1, Set<Integer> set2, Set<Integer> set3) {
-        Set<Integer> intersection1 = new HashSet<>();
-        for (int i : set1) {
-            if (set2.contains(i)) {
-                intersection1.add(i);
-            }
-        }
         int count = 0;
-        for (int i : intersection1) {
-            if (set3.contains(i)) {
+        for (int i : set1) {
+            if (set2.contains(i) && set3.contains(i)) {
                 count++;
             }
         }
