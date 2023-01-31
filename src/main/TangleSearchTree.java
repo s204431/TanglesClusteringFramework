@@ -17,11 +17,10 @@ public class TangleSearchTree {
         lowestDepthNodes.add(root);
     }
 
-    public boolean addOrientation(Node node, Set<Integer> orientation) {
-        boolean leftChild = node.leftChild == null;
+    public boolean addOrientation(Node node, Set<Integer> orientation, boolean left) {
         Node newNode = new Node(orientation);
         newNode.parent = node;
-        if (leftChild) {
+        if (left) {
             node.leftChild = newNode;
         }
         else {
@@ -30,7 +29,7 @@ public class TangleSearchTree {
         boolean consistent = isConsistent(newNode);
         if (!consistent) {
             newNode.parent = null;
-            if (leftChild) {
+            if (left) {
                 node.leftChild = null;
             }
             else {
@@ -41,12 +40,9 @@ public class TangleSearchTree {
             int depth = getDepth(newNode);
             if (depth != currentDepth) {
                 lowestDepthNodes = new ArrayList<>();
-                lowestDepthNodes.add(newNode);
                 currentDepth = depth;
             }
-            else {
-                lowestDepthNodes.add(newNode);
-            }
+            lowestDepthNodes.add(newNode);
         }
         return consistent;
     }
@@ -62,9 +58,11 @@ public class TangleSearchTree {
             }
         }
         if (depth == 2) {
-            Set<Integer> copy = new HashSet<>(newNode.orientation);
-            copy.retainAll(newNode.parent.orientation);
-            if (copy.size() < a) {
+            int intersection = intersection(newNode.orientation, newNode.parent.orientation);
+            //Set<Integer> copy = new HashSet<>(newNode.orientation);
+            //copy.retainAll(newNode.parent.orientation);
+            //int intersection = copy.size();
+            if (intersection < a) {
                 return false;
             }
             else {
@@ -78,10 +76,12 @@ public class TangleSearchTree {
         }
         for (int i = 0; i < depth-1; i++) {
             for (int j = i+1; j < depth-1; j++) {
-                Set<Integer> copy = new HashSet<>(newNode.orientation);
-                copy.retainAll(otherNodes[i].orientation);
-                copy.retainAll(otherNodes[j].orientation);
-                if (copy.size() < a) {
+                int intersection = intersection(newNode.orientation, otherNodes[i].orientation, otherNodes[j].orientation);
+                //Set<Integer> copy = new HashSet<>(newNode.orientation);
+                //copy.retainAll(otherNodes[i].orientation);
+                //copy.retainAll(otherNodes[j].orientation);
+                //int intersection = copy.size();
+                if (intersection < a) {
                     return false;
                 }
             }
@@ -96,6 +96,34 @@ public class TangleSearchTree {
             depth++;
         }
         return depth;
+    }
+
+    //Computes the size of the intersection of two given sets.
+    private int intersection(Set<Integer> set1, Set<Integer> set2) {
+        int count = 0;
+        for (int i : set1) {
+            if (set2.contains(i)) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    //Computes the size of the intersection of three given sets.
+    private int intersection(Set<Integer> set1, Set<Integer> set2, Set<Integer> set3) {
+        Set<Integer> intersection1 = new HashSet<>();
+        for (int i : set1) {
+            if (set2.contains(i)) {
+                intersection1.add(i);
+            }
+        }
+        int count = 0;
+        for (int i : intersection1) {
+            if (set3.contains(i)) {
+                count++;
+            }
+        }
+        return count;
     }
 
     public class Node {

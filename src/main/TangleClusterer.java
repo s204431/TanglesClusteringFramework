@@ -37,8 +37,8 @@ public class TangleClusterer {
                         rightOrientation.add(j);
                     }
                 }
-                tree.addOrientation(node, leftOrientation);
-                tree.addOrientation(node, rightOrientation);
+                tree.addOrientation(node, leftOrientation, true);
+                tree.addOrientation(node, rightOrientation, false);
             }
         }
         return tree;
