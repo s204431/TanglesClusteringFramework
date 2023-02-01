@@ -126,7 +126,7 @@ public class BinaryQuestionnaire implements Dataset {
     public int[] kMeans(final boolean[] scoreLookupArray) {
         int K = 2;  //Amount of clusters
         int[] scores = getQuestionnaireScores(scoreLookupArray);    //Score of each participant used to calculate distance from centroid
-        int[] resultingClusters = new int[getNumberOfParticipants()];   //The resulting cluster each participant is assigned to
+        int[] resultingClustering = new int[getNumberOfParticipants()];   //The resulting cluster each participant is assigned to
 
         //Place centroids randomly
         Random r = new Random();
@@ -137,6 +137,7 @@ public class BinaryQuestionnaire implements Dataset {
             centroids[i] = n;
             tempCentroids[i] = n;
         }
+        
         while (true) {
             for (int i = 0; i < getNumberOfParticipants(); i++) {
 
@@ -151,7 +152,7 @@ public class BinaryQuestionnaire implements Dataset {
                     }
                 }
                 //Assign participant to cluster
-                resultingClusters[i] = cluster;
+                resultingClustering[i] = cluster;
             }
 
             //Update centroid means
@@ -159,7 +160,7 @@ public class BinaryQuestionnaire implements Dataset {
                 int sum = 0;
                 int count = 0;
                 for (int i = 0; i < getNumberOfParticipants(); i++) {
-                    if (resultingClusters[i] == k) {
+                    if (resultingClustering[i] == k) {
                         sum += scores[i];
                         count++;
                     }
@@ -180,7 +181,13 @@ public class BinaryQuestionnaire implements Dataset {
                 break;
             }
         }
-        return resultingClusters;
+
+        //Prints resulting centroids
+        for (int k = 0; k < K; k++) {
+            System.out.println("Centroid " + (k+1) + ": " + centroids[k]);
+        }
+
+        return resultingClustering;
     }
 
     private int[] getQuestionnaireScores(final boolean[] scoreLookupArray) {
