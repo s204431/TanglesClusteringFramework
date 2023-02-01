@@ -1,7 +1,7 @@
 package main;
 
 public interface Dataset {
-    public boolean[][] getInitialCuts();
+    public BitSet[] getInitialCuts();
 
     public int[] getCutCosts();
 }

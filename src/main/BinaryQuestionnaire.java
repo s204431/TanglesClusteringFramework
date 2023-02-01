@@ -71,11 +71,15 @@ public class BinaryQuestionnaire implements Dataset {
         System.out.println(answers.length + " " + answers[0].length);
     }
 
-    public boolean[][] getInitialCuts() {
-        boolean[][] result = new boolean[getNumberOfQuestions()][getNumberOfParticipants()];
-        for (int i = 0; i < result.length; i++) {
-            for (int j = 0; j < result[i].length; j++) {
-                result[i][j] = answers[j][i];
+    public BitSet[] getInitialCuts() {
+        //boolean[][] result = new boolean[getNumberOfQuestions()][getNumberOfParticipants()];
+        BitSet[] result = new BitSet[getNumberOfQuestions()];
+        for (int i = 0; i < getNumberOfQuestions(); i++) {
+            result[i] = new BitSet(getNumberOfParticipants());
+            for (int j = 0; j < getNumberOfParticipants(); j++) {
+                if (answers[j][i]) {
+                    result[i].add(j);
+                }
             }
         }
         return result;

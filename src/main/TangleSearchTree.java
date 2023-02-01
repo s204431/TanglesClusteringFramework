@@ -8,7 +8,7 @@ import java.util.Set;
 public class TangleSearchTree {
 
     private int a;
-    public Node root = new Node(null);
+    public Node root = new Node(null, false);
     public List<Node> lowestDepthNodes = new ArrayList<>();
     private int currentDepth = -1;
 
@@ -17,8 +17,9 @@ public class TangleSearchTree {
         lowestDepthNodes.add(root);
     }
 
-    public boolean addOrientation(Node node, Set<Integer> orientation, boolean left) {
-        Node newNode = new Node(orientation);
+    public int n;
+    public boolean addOrientation(Node node, BitSet orientation, boolean left) {
+        Node newNode = new Node(orientation, left);
         newNode.parent = node;
         if (left) {
             node.leftChild = newNode;
@@ -37,6 +38,7 @@ public class TangleSearchTree {
             }
         }
         else {
+            n++;
             int depth = getDepth(newNode);
             if (depth != currentDepth) {
                 lowestDepthNodes = new ArrayList<>();
@@ -58,7 +60,7 @@ public class TangleSearchTree {
             }
         }
         if (depth == 2) {
-            int intersection = intersection(newNode.orientation, newNode.parent.orientation);
+            int intersection = BitSet.intersection(newNode.orientation, newNode.parent.orientation, newNode.side, newNode.parent.side);
             //Set<Integer> copy = new HashSet<>(newNode.orientation);
             //copy.retainAll(newNode.parent.orientation);
             //int intersection = copy.size();
@@ -76,7 +78,7 @@ public class TangleSearchTree {
         }
         for (int i = 0; i < depth-1; i++) {
             for (int j = i+1; j < depth-1; j++) {
-                int intersection = intersection(newNode.orientation, otherNodes[i].orientation, otherNodes[j].orientation);
+                int intersection = BitSet.intersection(newNode.orientation, otherNodes[i].orientation, otherNodes[j].orientation, newNode.side, otherNodes[i].side, otherNodes[j].side);
                 //Set<Integer> copy = new HashSet<>(newNode.orientation);
                 //copy.retainAll(otherNodes[i].orientation);
                 //copy.retainAll(otherNodes[j].orientation);
@@ -120,15 +122,39 @@ public class TangleSearchTree {
         return count;
     }
 
+    //Prints the side of the cut for each node in the tree (for debugging).
+    public void printTree() {
+        List<Node> currentNodes = new ArrayList<>();
+        currentNodes.add(root);
+        while (!currentNodes.isEmpty()) {
+            for (int i = 0; i < currentNodes.size(); i++) {
+                System.out.print(currentNodes.get(i).side + "\t");
+            }
+            List<Node> newNodes = new ArrayList<>();
+            for (Node node : currentNodes) {
+                if (node.leftChild != null) {
+                    newNodes.add(node.leftChild);
+                }
+                if (node.rightChild != null) {
+                    newNodes.add(node.rightChild);
+                }
+            }
+            currentNodes = newNodes;
+            System.out.println();
+        }
+    }
+
     public class Node {
 
-        public Set<Integer> orientation = new HashSet<Integer>();
+        public BitSet orientation;
         public Node leftChild;
         public Node rightChild;
         public Node parent;
+        public boolean side;
 
-        public Node(Set<Integer> orientation) {
+        public Node(BitSet orientation, boolean side) {
             this.orientation = orientation;
+            this.side = side;
         }
     }
 }

@@ -9,7 +9,7 @@ public class TangleClusterer {
 
     public static void generateClusters(Dataset dataset, int a) {
         long time1 = new Date().getTime();
-        boolean[][] initialCuts = dataset.getInitialCuts();
+        BitSet[] initialCuts = dataset.getInitialCuts();
         int[] costs = dataset.getCutCosts();
         for (int cost : costs) {
             System.out.print(cost + " ");
@@ -23,9 +23,10 @@ public class TangleClusterer {
         System.out.println();
         System.out.println(tree.lowestDepthNodes.size());
         System.out.println(tree.getDepth(tree.lowestDepthNodes.get(0)));
+        System.out.println(tree.n);
     }
 
-    private static TangleSearchTree generateTangleSearchTree(boolean[][] initialCuts, int[] costs, int a) {
+    private static TangleSearchTree generateTangleSearchTree(BitSet[] initialCuts, int[] costs, int a) {
         TangleSearchTree tree = new TangleSearchTree(a);
         int[] indices = new int[costs.length];
         for (int i = 0; i < indices.length; i++) {
@@ -34,18 +35,9 @@ public class TangleClusterer {
         quicksort(costs, indices, 0, costs.length-1);
         for (int i = 0; i < costs.length; i++) {
             for (Node node : tree.lowestDepthNodes) {
-                Set<Integer> leftOrientation = new HashSet<>();
-                Set<Integer> rightOrientation = new HashSet<>();
-                for (int j = 0; j < initialCuts[indices[i]].length; j++) {
-                    if (initialCuts[indices[i]][j]) {
-                        leftOrientation.add(j);
-                    }
-                    else {
-                        rightOrientation.add(j);
-                    }
-                }
-                tree.addOrientation(node, leftOrientation, true);
-                tree.addOrientation(node, rightOrientation, false);
+                BitSet orientation = initialCuts[indices[i]];
+                tree.addOrientation(node, orientation, true);
+                tree.addOrientation(node, orientation, false);
             }
         }
         return tree;
