@@ -110,6 +110,35 @@ public class BinaryQuestionnaire implements Dataset {
         return result;
     }
 
+    public int[] getCutCosts2() {
+        int[] result = new int[getNumberOfQuestions()];
+        for (int i = 0; i < getNumberOfQuestions(); i++) {
+            for (int j = 0; j < getNumberOfQuestions(); j++) {
+                double answers1 = 0;
+                double answers2 = 0;
+                int count1 = 0;
+                int count2 = 0;
+                for (int k = 0; k < getNumberOfParticipants(); k++) {
+                    if (answers[k].get(i)) { //Part of one orientation.
+                        count1++;
+                        if (answers[k].get(j)) { //Participant answered "true" to question j.
+                            answers1++;
+                        }
+                    }
+                    else { //Part of other orientation.
+                        count2++;
+                        if (answers[k].get(j)) { //Participant answered "true" to question j.
+                            answers2++;
+                        }
+                    }
+                }
+                result[i] += 100 - 100*Math.abs((answers1/count1) - (answers2/count2));
+            }
+            result[i] /= getNumberOfQuestions();
+        }
+        return result;
+    }
+
     private int calculateSimilarity(int p1, int p2) {
         return BitSet.XNor(answers[p1], answers[p2]);
     }

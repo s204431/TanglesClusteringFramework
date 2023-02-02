@@ -6,8 +6,8 @@ import java.util.Random;
 public class Main {
     public static void main(String[] args) {
         BinaryQuestionnaire questionnaire = new BinaryQuestionnaire();
-        questionnaire.loadAnswersFromFile("NPI.csv", 1, 1000, 1, 40);
-        TangleClusterer.generateClusters(questionnaire, 100);
+        questionnaire.loadAnswersFromFile("NPI.csv", 1, -1, 1, 40);
+        TangleClusterer.generateClusters(questionnaire, 1500, -1);
         long time1 = new Date().getTime();
         System.out.println("\nkMeans:");
         int[] kMeansResult = questionnaire.kMeans();
