@@ -15,18 +15,42 @@ public class BitSet {
     public void add(int index) {
         int longIndex = index >> 6; //index / 64
         index = index & 63; //index % 64
-        set[longIndex] = set[longIndex] | (((long)1) << index);
+        set[longIndex] = set[longIndex] | (1L << index);
     }
 
     //Returns true if given index is part of the set.
     public boolean get(int index) {
         int longIndex = index >> 6; //index / 64
         index = index & 63; //index % 64
-        return (set[longIndex] & (((long)1) << index)) > 0;
+        return (set[longIndex] & (1L << index)) > 0;
     }
 
     public int size() {
         return size;
+    }
+
+    //Returns the amount of participants that are part of the cut.
+    public int count() {
+        int count = 0;
+        for (long l : set) {
+            count += Long.bitCount(l);
+        }
+        return count;
+    }
+
+    //Calculates the similarity of two BitSets using XNor.
+    public static int XNor(BitSet set1, BitSet set2) {
+        int count = 0;
+        for (int i = 0; i < set1.set.length; i++) {
+            count += Long.bitCount((~set1.set[i]) ^ set2.set[i]);
+            if (i == set1.set.length-1) { //Last part of last long is not part of the set.
+                int bitsInLastLong = set1.size() % 64;
+                if (bitsInLastLong > 0) {
+                    count -= 64 - bitsInLastLong;
+                }
+            }
+        }
+        return count;
     }
 
     //Requires same maximum size. partOfSet specifies if false or true means part of the set.

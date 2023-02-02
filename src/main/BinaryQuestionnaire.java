@@ -11,14 +11,15 @@ public class BinaryQuestionnaire implements Dataset {
             false,true,false,false,true,false,false,false,false,true
     };
 
-    private boolean[][] answers;
+    private BitSet[] answers;
+    private BitSet[] initialCuts;
 
     public int getNumberOfParticipants() {
         return answers.length;
     }
 
     public int getNumberOfQuestions() {
-        return answers[0].length;
+        return answers[0].size();
     }
 
     public void loadAnswersFromFile(String fileName, int startRow, int endRow, int startColumn, int endColumn) {
@@ -43,13 +44,16 @@ public class BinaryQuestionnaire implements Dataset {
                 }
                 line++;
             }
-            answers = new boolean[result.size()][result.get(0).size()];
+            answers = new BitSet[result.size()];
             for (int i = 0; i < answers.length; i++) {
-                if (result.get(i).size() != answers[i].length) { //File not valid
+                answers[i] = new BitSet(result.get(0).size());
+                if (result.get(i).size() != answers[i].size()) { //File not valid
                     throw new Exception();
                 }
-                for (int j = 0; j < answers[i].length; j++) {
-                    answers[i][j] = result.get(i).get(j);
+                for (int j = 0; j < answers[i].size(); j++) {
+                    if (result.get(i).get(j)) {
+                        answers[i].add(j);
+                    }
                 }
             }
         } catch (Exception e) {
@@ -58,17 +62,17 @@ public class BinaryQuestionnaire implements Dataset {
     }
 
     public boolean getAnswer(int r, int c) {
-        return answers[r][c];
+        return answers[r].get(c);
     }
 
     public void print() {
         for (int i = 0; i < answers.length; i++) {
-            for (int j = 0; j < answers[i].length; j++) {
-                System.out.print(answers[i][j] + " ");
+            for (int j = 0; j < answers[i].size(); j++) {
+                System.out.print(answers[i].get(j) + " ");
             }
             System.out.println();
         }
-        System.out.println(answers.length + " " + answers[0].length);
+        System.out.println(answers.length + " " + answers[0].size());
     }
 
     public BitSet[] getInitialCuts() {
@@ -77,11 +81,12 @@ public class BinaryQuestionnaire implements Dataset {
         for (int i = 0; i < getNumberOfQuestions(); i++) {
             result[i] = new BitSet(getNumberOfParticipants());
             for (int j = 0; j < getNumberOfParticipants(); j++) {
-                if (answers[j][i]) {
+                if (answers[j].get(i)) {
                     result[i].add(j);
                 }
             }
         }
+        initialCuts = result;
         return result;
     }
 
@@ -89,11 +94,11 @@ public class BinaryQuestionnaire implements Dataset {
         int[] result = new int[getNumberOfQuestions()];
         for (int i = 0; i < getNumberOfQuestions(); i++) {
             for (int j = 0; j < getNumberOfParticipants(); j++) {
-                if (answers[j][i]) {
+                if (answers[j].get(i)) {
                     continue; //Only look at "false" answers.
                 }
                 for (int k = 0; k < getNumberOfParticipants(); k++) {
-                    if (!answers[k][i]) {
+                    if (!answers[k].get(i)) {
                         continue; //Only look at "true" answers.
                     }
                     result[i] += calculateSimilarity(j, k);
@@ -106,24 +111,12 @@ public class BinaryQuestionnaire implements Dataset {
     }
 
     private int calculateSimilarity(int p1, int p2) {
-        int similarity = 0;
-        for (int i = 0; i < getNumberOfQuestions(); i++) {
-            if (answers[p1][i] == answers[p2][i]) {
-                similarity++;
-            }
-        }
-        return similarity;
+        return BitSet.XNor(answers[p1], answers[p2]);
     }
 
     //Returns the number of participants on one side of a cut.
     private int getCutSize(int cut) {
-        int size = 0;
-        for (int i = 0; i < getNumberOfParticipants(); i++) {
-            if (!answers[i][cut]) {
-                size++;
-            }
-        }
-        return size;
+        return initialCuts[cut].count();
     }
 
     //Performs the K-means clustering on a binary data set
@@ -199,7 +192,7 @@ public class BinaryQuestionnaire implements Dataset {
         int[] scores = new int[n];
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < getNumberOfQuestions(); j++) {
-                if (answers[i][j] == scoreLookupArray[j]) {
+                if (answers[i].get(j) == scoreLookupArray[j]) {
                     scores[i]++;
                 }
             }
