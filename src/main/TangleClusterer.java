@@ -20,12 +20,23 @@ public class TangleClusterer {
         System.out.println();
         System.out.println("Cost function time: " + (time3-time2) + " ms");
         TangleSearchTree tree = generateTangleSearchTree(initialCuts, costs, a, psi);
-        long time4 = new Date().getTime();
-        System.out.println("Tangle search tree time: " + (time4-time3) + " ms");
-        System.out.println();
         System.out.println(tree.lowestDepthNodes.size());
         System.out.println(tree.getDepth(tree.lowestDepthNodes.get(0)));
         System.out.println(tree.n);
+        tree.printTree();
+        tree.condenseTree(1);
+        tree.printTree();
+        tree.contractTree();
+        double[][] softClustering = tree.calculateSoftClustering(initialCuts[0].size());
+        for (double[] da : softClustering) {
+            for (double d : da) {
+                System.out.print(d + " ");
+            }
+            System.out.println();
+        }
+        long time4 = new Date().getTime();
+        System.out.println("Tangle search tree time: " + (time4-time3) + " ms");
+        System.out.println();
         tree.printTree();
     }
 

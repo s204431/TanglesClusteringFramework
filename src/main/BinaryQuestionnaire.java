@@ -4,13 +4,6 @@ import java.io.File;
 import java.util.*;
 
 public class BinaryQuestionnaire implements Dataset {
-    public static final boolean[] NIP_SCORE_LOOKUP = {
-            false,false,false,true,true,false,true,false,true,true,
-            false,false,false,false,true,false,true,true,true,true,
-            false,true,true,false,false,true,false,true,false,false,
-            false,true,false,false,true,false,false,false,false,true
-    };
-
     private BitSet[] answers;
     private BitSet[] initialCuts;
 
@@ -106,6 +99,7 @@ public class BinaryQuestionnaire implements Dataset {
             }
             int cutSize = getCutSize(i);
             result[i] /= cutSize*(getNumberOfParticipants()-cutSize);
+            initialCuts[i].cutCost = result[i];
         }
         return result;
     }
@@ -135,6 +129,7 @@ public class BinaryQuestionnaire implements Dataset {
                 result[i] += 100 - 100*Math.abs((answers1/count1) - (answers2/count2));
             }
             result[i] /= getNumberOfQuestions();
+            initialCuts[i].cutCost = result[i];
         }
         return result;
     }
