@@ -18,6 +18,13 @@ public class BitSet {
         set[longIndex] = set[longIndex] | (1L << index);
     }
 
+    //Removes participant with specific index to set (constant time complexity).
+    public void remove(int index) {
+        int longIndex = index >> 6; //index / 64
+        index = index & 63; //index % 64
+        set[longIndex] = set[longIndex] & ~(1L << index);
+    }
+
     //Returns true if given index is part of the set.
     public boolean get(int index) {
         int longIndex = index >> 6; //index / 64

@@ -120,21 +120,25 @@ public class BinaryQuestionnaire implements Dataset {
     }
 
     //Performs the K-means clustering on a binary data set
-    public int[] kMeans(final boolean[] scoreLookupArray) {
+    public int[] kMeans() {
         int K = 2;  //Amount of clusters
-        int[] scores = getQuestionnaireScores(scoreLookupArray);    //Score of each participant used to calculate distance from centroid
         int[] resultingClustering = new int[getNumberOfParticipants()];   //The resulting cluster each participant is assigned to
 
         //Place centroids randomly
         Random r = new Random();
-        int[] centroids = new int[K];
-        int[] tempCentroids = new int[K];
-        for (int i = 0; i < K; i++) {
-            int n = r.nextInt(getNumberOfQuestions());
-            centroids[i] = n;
-            tempCentroids[i] = n;
+        BitSet[] centroids = new BitSet[K]; //K randomly generated participants used as centroids
+        BitSet[] tempCentroids = new BitSet[K];
+        for (int k = 0; k < K; k++) {
+            centroids[k] = new BitSet(getNumberOfQuestions());
+            tempCentroids[k] = new BitSet(getNumberOfQuestions());
+            for (int i = 0; i < getNumberOfQuestions(); i++) {
+                if (r.nextBoolean()) {
+                    centroids[k].add(i);
+                    tempCentroids[k].add(i);
+                }
+            }
         }
-        
+
         while (true) {
             for (int i = 0; i < getNumberOfParticipants(); i++) {
 
@@ -142,7 +146,8 @@ public class BinaryQuestionnaire implements Dataset {
                 int min = Integer.MAX_VALUE;
                 int cluster = -1;
                 for (int k = 0; k < K; k++) {
-                    int dist = Math.abs(scores[i] - centroids[k]);
+                    //Calculate distance between participant and centroids
+                    int dist = getNumberOfQuestions() - BitSet.XNor(centroids[k], answers[i]);
                     if (dist < min) {
                         min = dist;
                         cluster = k;
@@ -154,23 +159,37 @@ public class BinaryQuestionnaire implements Dataset {
 
             //Update centroid means
             for (int k = 0; k < K; k++) {
-                int sum = 0;
-                int count = 0;
-                for (int i = 0; i < getNumberOfParticipants(); i++) {
-                    if (resultingClustering[i] == k) {
-                        sum += scores[i];
-                        count++;
+                for (int i = 0; i < getNumberOfQuestions(); i++) {
+                    int trueCount = 0;
+                    int count = 0;
+                    for (int j = 0; j < getNumberOfParticipants(); j++) {
+                        if (resultingClustering[j] == k) {
+                            count++;
+                            if (answers[j].get(i)) {
+                                trueCount++;
+                            }
+                        }
+                    }
+                    if (trueCount >= count/2) {
+                        centroids[k].add(i);
+                    } else {
+                        centroids[k].remove(i);
                     }
                 }
-                centroids[k] = sum / count;
             }
 
             //Break loop if centroids haven't moved; else update temporary centroids
             boolean b = true;
             for (int k = 0; k < K; k++) {
-                if (tempCentroids[k] != centroids[k]) {
-                    b = false;
-                    tempCentroids[k] = centroids[k];
+                for (int i = 0; i < getNumberOfQuestions(); i++) {
+                    if (tempCentroids[k].get(i) != centroids[k].get(i)) {
+                        b = false;
+                        if (centroids[k].get(i)) {
+                            tempCentroids[k].add(i);
+                        } else {
+                            tempCentroids[k].remove(i);
+                        }
+                    }
                 }
             }
 
@@ -181,7 +200,11 @@ public class BinaryQuestionnaire implements Dataset {
 
         //Prints resulting centroids
         for (int k = 0; k < K; k++) {
-            System.out.println("Centroid " + (k+1) + ": " + centroids[k]);
+            System.out.println("Centroid " + (k + 1) + ":");
+            for (int i = 0; i < getNumberOfQuestions(); i++) {
+                System.out.print(centroids[k].get(i) + ", ");
+            }
+            System.out.println();
         }
 
         return resultingClustering;
