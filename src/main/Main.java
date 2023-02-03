@@ -17,5 +17,14 @@ public class Main {
         long time2 = new Date().getTime();
         System.out.println();
         System.out.println("K-means time: " + (time2-time1) + " ms");
+
+        /*
+        int participants = 20;
+        int questions = 50;
+        BitSet[] answers = DatasetGenerator.generateBiasedBinaryQuestionnaireAnswers(participants, questions, 0.75);
+        for (int i = 0; i < participants; i++) {
+            answers[i].print();
+        }
+         */
     }
 }
