@@ -20,24 +20,22 @@ public class TangleClusterer {
         System.out.println();
         System.out.println("Cost function time: " + (time3-time2) + " ms");
         TangleSearchTree tree = generateTangleSearchTree(initialCuts, costs, a, psi);
-        System.out.println(tree.lowestDepthNodes.size());
-        System.out.println(tree.getDepth(tree.lowestDepthNodes.get(0)));
-        System.out.println(tree.n);
-        tree.printTree();
+        System.out.println("Nodes at lowest depth: " + tree.lowestDepthNodes.size());
+        System.out.println("Depth of tree: " + tree.getDepth(tree.lowestDepthNodes.get(0)));
+        System.out.println("Total nodes in tree: " + tree.n);
         tree.condenseTree(1);
-        tree.printTree();
         tree.contractTree();
         double[][] softClustering = tree.calculateSoftClustering(initialCuts[0].size());
-        for (double[] da : softClustering) {
+        /*for (double[] da : softClustering) {
             for (double d : da) {
                 System.out.print(d + " ");
             }
             System.out.println();
-        }
+        }*/
+        System.out.println("Number of clusters found: " + softClustering[0].length);
         long time4 = new Date().getTime();
         System.out.println("Tangle search tree time: " + (time4-time3) + " ms");
         System.out.println();
-        tree.printTree();
     }
 
     private static TangleSearchTree generateTangleSearchTree(BitSet[] initialCuts, int[] costs, int a, int psi) {

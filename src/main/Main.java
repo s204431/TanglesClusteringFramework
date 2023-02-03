@@ -4,19 +4,23 @@ import java.util.Date;
 
 public class Main {
     public static void main(String[] args) {
-        BinaryQuestionnaire questionnaire = new BinaryQuestionnaire();
-        questionnaire.loadAnswersFromFile("NPI.csv", 1, -1, 1, 40);
-        TangleClusterer.generateClusters(questionnaire, 1500, -1);
         long time1 = new Date().getTime();
+        BinaryQuestionnaire questionnaire = new BinaryQuestionnaire(DatasetGenerator.generateRandomBinaryQuestionnaireAnswers(6000000, 40));
+        //BinaryQuestionnaire questionnaire = new BinaryQuestionnaire();
+        //questionnaire.loadAnswersFromFile("NPI.csv", 1, -1, 1, 40);
+        long time2 = new Date().getTime();
+        System.out.println("File loading time: " + (time2-time1) + " ms");
+        TangleClusterer.generateClusters(questionnaire, 750000, -1);
+        long time3 = new Date().getTime();
+        System.out.println("Tangle total time: " + (time3-time2) + " ms");
         System.out.println("\nkMeans:");
         int[] kMeansResult = questionnaire.kMeans();
         System.out.println("Resulting clustering for first 50 participants: ");
         for (int i = 0; i < 50; i++) {
             System.out.print(kMeansResult[i] + " ");
         }
-        long time2 = new Date().getTime();
+        long time4 = new Date().getTime();
         System.out.println();
-        System.out.println("K-means time: " + (time2-time1) + " ms");
 
         /*
         int participants = 20;
@@ -26,5 +30,7 @@ public class Main {
             answers[i].print();
         }
          */
+        System.out.println("K-means time: " + (time4-time3) + " ms");
+        System.out.println("Total time: " + (time4-time1) + " ms");
     }
 }

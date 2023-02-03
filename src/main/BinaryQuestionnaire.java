@@ -7,6 +7,14 @@ public class BinaryQuestionnaire implements Dataset {
     private BitSet[] answers;
     private BitSet[] initialCuts;
 
+    public BinaryQuestionnaire() {
+
+    }
+
+    public BinaryQuestionnaire(BitSet[] answers) {
+        this.answers = answers;
+    }
+
     public int getNumberOfParticipants() {
         return answers.length;
     }
@@ -69,7 +77,6 @@ public class BinaryQuestionnaire implements Dataset {
     }
 
     public BitSet[] getInitialCuts() {
-        //boolean[][] result = new boolean[getNumberOfQuestions()][getNumberOfParticipants()];
         BitSet[] result = new BitSet[getNumberOfQuestions()];
         for (int i = 0; i < getNumberOfQuestions(); i++) {
             result[i] = new BitSet(getNumberOfParticipants());
@@ -97,8 +104,13 @@ public class BinaryQuestionnaire implements Dataset {
                     result[i] += calculateSimilarity(j, k);
                 }
             }
-            int cutSize = getCutSize(i);
-            result[i] /= cutSize*(getNumberOfParticipants()-cutSize);
+            long cutSize = getCutSize(i);
+            if (cutSize == 0 || getNumberOfParticipants()-cutSize == 0) {
+                result[i] = Integer.MAX_VALUE;
+            }
+            else {
+                result[i] /= cutSize*(getNumberOfParticipants()-cutSize);
+            }
             initialCuts[i].cutCost = result[i];
         }
         return result;
@@ -109,33 +121,17 @@ public class BinaryQuestionnaire implements Dataset {
         for (int i = 0; i < getNumberOfQuestions(); i++) {
             long cost = 0;
             for (int j = 0; j < getNumberOfQuestions(); j++) {
-                int trueAnswers1 = 0;
-                int trueAnswers2 = 0;
-                int falseAnswers1 = 0;
-                int falseAnswers2 = 0;
-                for (int k = 0; k < getNumberOfParticipants(); k++) {
-                    if (answers[k].get(i)) { //Part of one orientation.
-                        if (answers[k].get(j)) { //Participant answered "true" to question j.
-                            trueAnswers1++;
-                        }
-                        else {
-                            falseAnswers1++;
-                        }
-                    }
-                    else { //Part of other orientation.
-                        if (answers[k].get(j)) { //Participant answered "true" to question j.
-                            trueAnswers2++;
-                        }
-                        else {
-                            falseAnswers2++;
-                        }
-                    }
-                }
-                //result[i] += 100 - 100*Math.abs((answers1/count1) - (answers2/count2));
-                cost += trueAnswers1*trueAnswers2+falseAnswers1*falseAnswers2;
+                long intersection1 = BitSet.intersection(initialCuts[i], initialCuts[j], true, true);
+                long intersection2 = BitSet.intersection(initialCuts[i], initialCuts[j], false, true);
+                cost += intersection1*intersection2 + (initialCuts[i].count() - intersection1)*(initialCuts[i].size() - initialCuts[i].count() - intersection2);
             }
-            int cutSize = getCutSize(i);
-            cost /= cutSize*(getNumberOfParticipants()-cutSize);
+            long cutSize = getCutSize(i);
+            if (cutSize == 0 || getNumberOfParticipants()-cutSize == 0) {
+                cost = Integer.MAX_VALUE;
+            }
+            else {
+                cost /= cutSize*(getNumberOfParticipants()-cutSize);
+            }
             result[i] = (int)cost;
             initialCuts[i].cutCost = result[i];
         }
