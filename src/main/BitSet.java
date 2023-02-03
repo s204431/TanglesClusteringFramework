@@ -30,7 +30,7 @@ public class BitSet {
     public boolean get(int index) {
         int longIndex = index >> 6; //index / 64
         index = index & 63; //index % 64
-        return (set[longIndex] & (1L << index)) > 0;
+        return (set[longIndex] & (1L << index)) != 0;
     }
 
     public int size() {
@@ -59,6 +59,12 @@ public class BitSet {
             }
         }
         return count;
+    }
+
+    public void unionWith(BitSet otherSet) {
+        for (int i = 0; i < set.length; i++) {
+            set[i] = set[i] | otherSet.set[i];
+        }
     }
 
     //Requires same maximum size. partOfSet specifies if false or true means part of the set.

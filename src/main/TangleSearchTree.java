@@ -8,18 +8,24 @@ import java.util.Set;
 public class TangleSearchTree {
 
     private int a;
-    public Node root = new Node(null, false);
+    public Node root;
     public List<Node> lowestDepthNodes = new ArrayList<>();
     private int currentDepth = -1;
 
-    public TangleSearchTree(int a) {
+    private BitSet[] orientations;
+    private int[] cutCosts;
+
+    public TangleSearchTree(int a, BitSet[] orientations, int[] cutCosts) {
         this.a = a;
+        this.orientations = orientations;
+        this.cutCosts = cutCosts;
+        root = new Node();
         lowestDepthNodes.add(root);
     }
 
     public int n;
-    public boolean addOrientation(Node node, BitSet orientation, boolean left) {
-        Node newNode = new Node(orientation, left);
+    public boolean addOrientation(Node node, int orientationIndex, boolean left) {
+        Node newNode = new Node(orientationIndex, left);
         newNode.parent = node;
         if (left) {
             node.leftChild = newNode;
@@ -52,7 +58,7 @@ public class TangleSearchTree {
     public boolean isConsistent(Node newNode) {
         int depth = getDepth(newNode);
         if (depth < 2) {
-            if (newNode.originalOrientation.size() < a) {
+            if (orientations[newNode.originalOrientation].size() < a) {
                 return false;
             }
             else {
@@ -60,10 +66,7 @@ public class TangleSearchTree {
             }
         }
         if (depth == 2) {
-            int intersection = BitSet.intersection(newNode.originalOrientation, newNode.parent.originalOrientation, newNode.side, newNode.parent.side);
-            //Set<Integer> copy = new HashSet<>(newNode.orientation);
-            //copy.retainAll(newNode.parent.orientation);
-            //int intersection = copy.size();
+            int intersection = BitSet.intersection(orientations[newNode.originalOrientation], orientations[newNode.parent.originalOrientation], newNode.side, newNode.parent.side);
             if (intersection < a) {
                 return false;
             }
@@ -78,11 +81,7 @@ public class TangleSearchTree {
         }
         for (int i = 0; i < depth-1; i++) {
             for (int j = i+1; j < depth-1; j++) {
-                int intersection = BitSet.intersection(newNode.originalOrientation, otherNodes[i].originalOrientation, otherNodes[j].originalOrientation, newNode.side, otherNodes[i].side, otherNodes[j].side);
-                //Set<Integer> copy = new HashSet<>(newNode.orientation);
-                //copy.retainAll(otherNodes[i].orientation);
-                //copy.retainAll(otherNodes[j].orientation);
-                //int intersection = copy.size();
+                int intersection = BitSet.intersection(orientations[newNode.originalOrientation], orientations[otherNodes[i].originalOrientation], orientations[otherNodes[j].originalOrientation], newNode.side, otherNodes[i].side, otherNodes[j].side);
                 if (intersection < a) {
                     return false;
                 }
@@ -98,28 +97,6 @@ public class TangleSearchTree {
             depth++;
         }
         return depth;
-    }
-
-    //Computes the size of the intersection of two given sets.
-    private int intersection(Set<Integer> set1, Set<Integer> set2) {
-        int count = 0;
-        for (int i : set1) {
-            if (set2.contains(i)) {
-                count++;
-            }
-        }
-        return count;
-    }
-
-    //Computes the size of the intersection of three given sets.
-    private int intersection(Set<Integer> set1, Set<Integer> set2, Set<Integer> set3) {
-        int count = 0;
-        for (int i : set1) {
-            if (set2.contains(i) && set3.contains(i)) {
-                count++;
-            }
-        }
-        return count;
     }
 
     public double[][] calculateSoftClustering(int numberOfDataPoints) {
@@ -143,15 +120,17 @@ public class TangleSearchTree {
         else {
             double sum1 = 0;
             double sum2 = 0;
-            for (BitSet distinguished : node.distinguishedCuts) {
-                for (int i = 0; i < node.leftChild.condensedOrientations.size(); i++) {
-                    BitSet condensed = node.leftChild.condensedOrientations.get(i);
-                    if (distinguished == condensed) {
-                        sum2 += getWeight(condensed.cutCost);
-                        boolean side = node.leftChild.sides.get(i);
-                        if (side == condensed.get(datapoint)) {
-                            sum1 += getWeight(condensed.cutCost);
-                        }
+            for (int distinguished : node.distinguishedCuts) {
+                if (node.leftChild.condensedOrientations.get(distinguished)) {
+                    sum2 += getWeight(cutCosts[distinguished]);
+                    if (orientations[distinguished].get(datapoint)) {
+                        sum1 += getWeight(cutCosts[distinguished]);
+                    }
+                }
+                if (node.leftChild.condensedOrientations.get(distinguished+node.leftChild.condensedOrientations.size()/2)) {
+                    sum2 += getWeight(cutCosts[distinguished]);
+                    if (!orientations[distinguished].get(datapoint)) {
+                        sum1 += getWeight(cutCosts[distinguished]);
                     }
                 }
             }
@@ -179,20 +158,14 @@ public class TangleSearchTree {
         if (node.getChildCount() > 0) { //This is not a leaf.
             contractTree(node.leftChild);
             contractTree(node.rightChild);
-            for (int i = 0; i < node.leftChild.condensedOrientations.size(); i++) {
-                BitSet cut1 = node.leftChild.condensedOrientations.get(i);
-                boolean side1 = node.leftChild.sides.get(i);
-                for (int j = 0; j < node.rightChild.condensedOrientations.size(); j++) {
-                    BitSet cut2 = node.rightChild.condensedOrientations.get(j);
-                    boolean side2 = node.rightChild.sides.get(j);
-                    if (cut1 == cut2) {
-                        if (side1 == side2) {
-                            node.condensedOrientations.add(cut1);
-                            node.sides.add(side1);
-                        }
-                        else {
-                            node.distinguishedCuts.add(cut1);
-                        }
+            int size = node.leftChild.condensedOrientations.size();
+            for (int i = 0; i < size; i++) {
+                if (node.leftChild.condensedOrientations.get(i)) {
+                    if (node.rightChild.condensedOrientations.get(i)) { //Left and right child orient this cut the same way.
+                        node.condensedOrientations.add(i);
+                    }
+                    else if ((i < size/2 && node.rightChild.condensedOrientations.get(i+size/2)) || (i >= size/2 && node.rightChild.condensedOrientations.get(i-size/2))) { //Oriented different ways.
+                        node.distinguishedCuts.add(i < size/2 ? i : i-size/2);
                     }
                 }
             }
@@ -240,20 +213,7 @@ public class TangleSearchTree {
         else {
             root = child;
         }
-        for (int i = 0; i < node.condensedOrientations.size(); i++) {
-            BitSet cut = node.condensedOrientations.get(i);
-            boolean side = node.sides.get(i);
-            boolean found = false;
-            for (int j = 0; j < child.condensedOrientations.size(); j++) {
-                if (child.condensedOrientations.get(i) == cut && child.sides.get(i) == side) {
-                    found = true;
-                }
-            }
-            if (!found) {
-                child.condensedOrientations.add(cut);
-                child.sides.add(side);
-            }
-        }
+        child.condensedOrientations.unionWith(node.condensedOrientations);
     }
 
     private void removeInternalNodes(Node node) {
@@ -292,21 +252,24 @@ public class TangleSearchTree {
 
     public class Node {
 
-        public BitSet originalOrientation;
-        public List<BitSet> condensedOrientations = new ArrayList<>();
-        public List<BitSet> distinguishedCuts = new ArrayList<>();
-        public List<Boolean> sides = new ArrayList<>();
+        public int originalOrientation;
+        public BitSet condensedOrientations;
+        public List<Integer> distinguishedCuts = new ArrayList<>();
         public Node leftChild;
         public Node rightChild;
         public Node parent;
         public boolean side;
         public int originalDepth = 1;
 
-        public Node(BitSet orientation, boolean side) {
-            this.originalOrientation = orientation;
+        public Node() {
+            condensedOrientations = new BitSet(orientations.length*2);
+        }
+
+        public Node(int orientationIndex, boolean side) {
+            this.originalOrientation = orientationIndex;
             this.side = side;
-            condensedOrientations.add(orientation);
-            sides.add(side);
+            condensedOrientations = new BitSet(orientations.length*2);
+            condensedOrientations.add(side ? orientationIndex : orientationIndex+condensedOrientations.size()/2);
         }
 
         public int getChildCount() {
