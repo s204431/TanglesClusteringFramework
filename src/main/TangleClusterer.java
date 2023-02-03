@@ -26,8 +26,15 @@ public class TangleClusterer {
         tree.condenseTree(1);
         tree.contractTree();
         double[][] softClustering = tree.calculateSoftClustering(initialCuts[0].size());
-        /*for (double[] da : softClustering) {
-            for (double d : da) {
+        /*for (int i = 0; i < 50; i++) {
+            for (double d : softClustering[i]) {
+                System.out.print(d + " ");
+            }
+            System.out.println();
+        }
+        System.out.println();
+        for (int i = softClustering.length/2-10; i < softClustering.length/2+40; i++) {
+            for (double d : softClustering[i]) {
                 System.out.print(d + " ");
             }
             System.out.println();

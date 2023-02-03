@@ -5,7 +5,7 @@ import java.util.Date;
 public class Main {
     public static void main(String[] args) {
         long time1 = new Date().getTime();
-        BinaryQuestionnaire questionnaire = new BinaryQuestionnaire(DatasetGenerator.generateRandomBinaryQuestionnaireAnswers(6000000, 40));
+        BinaryQuestionnaire questionnaire = new BinaryQuestionnaire(DatasetGenerator.generateBiasedBinaryQuestionnaireAnswers(6000000, 40));
         //BinaryQuestionnaire questionnaire = new BinaryQuestionnaire();
         //questionnaire.loadAnswersFromFile("NPI.csv", 1, -1, 1, 40);
         long time2 = new Date().getTime();
