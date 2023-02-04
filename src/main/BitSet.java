@@ -61,12 +61,14 @@ public class BitSet {
         return count;
     }
 
+    //Unions this bitset with otherSet.
     public void unionWith(BitSet otherSet) {
         for (int i = 0; i < set.length; i++) {
             set[i] = set[i] | otherSet.set[i];
         }
     }
 
+    //Returns the size of the intersection between two bitsets.
     //Requires same maximum size. partOfSet specifies if false or true means part of the set.
     public static int intersection(BitSet set1, BitSet set2, boolean partOfSet1, boolean partOfSet2) {
         int count = 0;
@@ -93,6 +95,7 @@ public class BitSet {
         return count;
     }
 
+    //Returns the size of the intersection between three bitsets.
     public static int intersection(BitSet set1, BitSet set2, BitSet set3, boolean partOfSet1, boolean partOfSet2, boolean partOfSet3) {
         int count = 0;
         for (int i = 0; i < set1.set.length; i++) {

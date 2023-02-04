@@ -147,7 +147,7 @@ public class BinaryQuestionnaire implements Dataset {
         return initialCuts[cut].count();
     }
 
-    //Performs the K-means clustering on a binary data set
+    //Performs K-means clustering on a binary dataset
     public int[] kMeans() {
         int K = 2;  //Amount of clusters
         int[] resultingClustering = new int[getNumberOfParticipants()];   //The resulting cluster each participant is assigned to
@@ -237,19 +237,5 @@ public class BinaryQuestionnaire implements Dataset {
 
         return resultingClustering;
     }
-
-    private int[] getQuestionnaireScores(final boolean[] scoreLookupArray) {
-        int n = getNumberOfParticipants();
-        int[] scores = new int[n];
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < getNumberOfQuestions(); j++) {
-                if (answers[i].get(j) == scoreLookupArray[j]) {
-                    scores[i]++;
-                }
-            }
-        }
-        return scores;
-    }
-
 
 }
