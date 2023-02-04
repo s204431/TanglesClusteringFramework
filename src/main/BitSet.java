@@ -26,6 +26,24 @@ public class BitSet {
         set[longIndex] = set[longIndex] & ~(1L << index);
     }
 
+    public void flip(int index) {
+        if (get(index)) {
+            remove(index);
+        }
+        else {
+            add(index);
+        }
+    }
+
+    public void setValue(int index, boolean value) {
+        if (value) {
+            add(index);
+        }
+        else {
+            remove(index);
+        }
+    }
+
     //Returns true if given index is part of the set.
     public boolean get(int index) {
         int longIndex = index >> 6; //index / 64

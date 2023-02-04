@@ -55,6 +55,39 @@ public class DatasetGenerator {
         return generateBiasedBinaryQuestionnaireAnswers(numberOfAnswers, numberOfQuestions, 0.5);
     }
 
+    //Generates biased binary questionnaire answers with a specific number of clusters.
+    public static BitSet[] generateBiasedBinaryQuestionnaireAnswers(int numberOfAnswers, int numberOfQuestions, int numberOfClusters) {
+        BitSet[] result = new BitSet[numberOfAnswers];
+        Random r = new Random();
+        int index = 0;
+        for (int i = 0; i < numberOfClusters; i++) {
+            int extra = numberOfAnswers % numberOfClusters;
+            BitSet center = new BitSet(numberOfQuestions);
+            for (int j = 0; j < numberOfQuestions; j++) {
+                if (r.nextBoolean()) {
+                    center.add(j);
+                }
+            }
+            for (int j = 0; j < numberOfAnswers/numberOfClusters+1; j++) {
+                if (j == numberOfAnswers/numberOfClusters) {
+                    if (extra == 0) {
+                        continue;
+                    }
+                    extra--;
+                }
+                result[index] = new BitSet(numberOfQuestions);
+                for (int k = 0; k < numberOfQuestions; k++) {
+                    result[index].setValue(k, center.get(k));
+                    if (r.nextDouble() >= 0.9) {
+                        result[index].flip(k);
+                    }
+                }
+                index++;
+            }
+        }
+        return result;
+    }
+
     //Generates an array of points based on a Gaussian Mixture function and returns the result
     public static Point[] generateGaussianMixturePoints(int numberOfPoints, int numberOfClusters) {
         Point[] result = new Point[numberOfPoints];

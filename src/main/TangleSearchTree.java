@@ -1,12 +1,10 @@
 package main;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class TangleSearchTree {
 
+    private static final boolean USE_HASHING = false; //Determines if hashing of intersections is used.
     private int a;
     public Node root;
     public List<Node> lowestDepthNodes = new ArrayList<>();
@@ -14,11 +12,14 @@ public class TangleSearchTree {
 
     private BitSet[] orientations;
     private int[] cutCosts;
+    private int integerBits; //Number of bits to represent the index of an orientation.
+    private Hashtable<Long, Integer> hashtable = new Hashtable();
 
     public TangleSearchTree(int a, BitSet[] orientations, int[] cutCosts) {
         this.a = a;
         this.orientations = orientations;
         this.cutCosts = cutCosts;
+        integerBits = (int)(Math.log(cutCosts.length)/Math.log(2))+1;
         root = new Node();
         lowestDepthNodes.add(root);
     }
@@ -81,7 +82,20 @@ public class TangleSearchTree {
         }
         for (int i = 0; i < depth-1; i++) {
             for (int j = i+1; j < depth-1; j++) {
-                int intersection = BitSet.intersectionEarlyStop(orientations[newNode.originalOrientation], orientations[otherNodes[i].originalOrientation], orientations[otherNodes[j].originalOrientation], newNode.side, otherNodes[i].side, otherNodes[j].side, a);
+                int intersection;
+                if (USE_HASHING) {
+                    int hashed = getHashValue(newNode.originalOrientation, otherNodes[i].originalOrientation, otherNodes[j].originalOrientation, newNode.side, otherNodes[i].side, otherNodes[j].side);
+                    if (hashed >= 0) {
+                        intersection = hashed;
+                    }
+                    else {
+                        intersection = BitSet.intersectionEarlyStop(orientations[newNode.originalOrientation], orientations[otherNodes[i].originalOrientation], orientations[otherNodes[j].originalOrientation], newNode.side, otherNodes[i].side, otherNodes[j].side, a);
+                        addToHash(newNode.originalOrientation, otherNodes[i].originalOrientation, otherNodes[j].originalOrientation, newNode.side, otherNodes[i].side, otherNodes[j].side, intersection);
+                    }
+                }
+                else {
+                    intersection = BitSet.intersectionEarlyStop(orientations[newNode.originalOrientation], orientations[otherNodes[i].originalOrientation], orientations[otherNodes[j].originalOrientation], newNode.side, otherNodes[i].side, otherNodes[j].side, a);
+                }
                 if (intersection < a) {
                     return false;
                 }
@@ -248,6 +262,27 @@ public class TangleSearchTree {
             currentNodes = newNodes;
             System.out.println();
         }
+    }
+
+    private void addToHash(long cut1, long cut2, long cut3, boolean side1, boolean side2, boolean side3, int value) {
+        long hashKey = getHashKey(cut1, cut2, cut3, side1, side2, side3);
+        hashtable.put(hashKey, value);
+    }
+
+    public int getHashValue(long cut1, long cut2, long cut3, boolean side1, boolean side2, boolean side3) {
+        long hashKey = getHashKey(cut1, cut2, cut3, side1, side2, side3);
+        Integer hashValue = hashtable.get(hashKey);
+        if (hashValue != null) {
+            return hashValue;
+        }
+        return -1;
+    }
+
+    public long getHashKey(long cut1, long cut2, long cut3, boolean side1, boolean side2, boolean side3) {
+        long l1 = ((side1 ? 0L : 1L) << ((integerBits+1)*3-1)) | (cut1 << (integerBits+1)*2);
+        long l2 = ((side2 ? 0L : 1L) << ((integerBits+1)*2-1)) | (cut2 << (integerBits+1));
+        long l3 = ((side3 ? 0L : 1L) << integerBits) | cut3;
+        return l1 | l2 | l3;
     }
 
     public class Node {

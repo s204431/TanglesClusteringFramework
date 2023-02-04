@@ -25,7 +25,7 @@ public class TangleClusterer {
         System.out.println("Nodes at lowest depth: " + tree.lowestDepthNodes.size());
         System.out.println("Depth of tree: " + tree.getDepth(tree.lowestDepthNodes.get(0)));
         System.out.println("Total nodes in tree: " + tree.n);
-        tree.condenseTree(1);
+        tree.condenseTree(2);
         long time5 = new Date().getTime();
         System.out.println("Condensing time: " + (time5-time4) + " ms");
         tree.contractTree();
@@ -75,9 +75,13 @@ public class TangleClusterer {
             if (psi > 0 && costs[i] > psi) {
                 break;
             }
+            boolean consistent = false;
             for (Node node : tree.lowestDepthNodes) {
-                tree.addOrientation(node, indices[i], true);
-                tree.addOrientation(node, indices[i], false);
+                consistent = tree.addOrientation(node, indices[i], true) || consistent;
+                consistent = tree.addOrientation(node, indices[i], false) || consistent;
+            }
+            if (!consistent) { //Stop if no nodes were added to the tree.
+                break;
             }
         }
         return tree;
