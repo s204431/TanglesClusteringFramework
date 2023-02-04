@@ -71,6 +71,16 @@ public class BitSet {
     //Returns the size of the intersection between two bitsets.
     //Requires same maximum size. partOfSet specifies if false or true means part of the set.
     public static int intersection(BitSet set1, BitSet set2, boolean partOfSet1, boolean partOfSet2) {
+        return intersectionEarlyStop(set1, set2, partOfSet1, partOfSet2, Integer.MAX_VALUE);
+    }
+
+    //Returns the size of the intersection between three bitsets.
+    public static int intersection(BitSet set1, BitSet set2, BitSet set3, boolean partOfSet1, boolean partOfSet2, boolean partOfSet3) {
+        return intersectionEarlyStop(set1, set2, set3, partOfSet1, partOfSet2, partOfSet3, Integer.MAX_VALUE);
+    }
+
+    //Intersection that stops when greater than a.
+    public static int intersectionEarlyStop(BitSet set1, BitSet set2, boolean partOfSet1, boolean partOfSet2, int a) {
         int count = 0;
         for (int i = 0; i < set1.set.length; i++) {
             int amountFlipped = 0;
@@ -91,12 +101,15 @@ public class BitSet {
                     count -= 64 - bitsInLastLong;
                 }
             }
+            if (count >= a) {
+                return count;
+            }
         }
         return count;
     }
 
-    //Returns the size of the intersection between three bitsets.
-    public static int intersection(BitSet set1, BitSet set2, BitSet set3, boolean partOfSet1, boolean partOfSet2, boolean partOfSet3) {
+
+    public static int intersectionEarlyStop(BitSet set1, BitSet set2, BitSet set3, boolean partOfSet1, boolean partOfSet2, boolean partOfSet3, int a) {
         int count = 0;
         for (int i = 0; i < set1.set.length; i++) {
             int amountFlipped = 0;
@@ -121,6 +134,9 @@ public class BitSet {
                 if (bitsInLastLong > 0) {
                     count -= 64 - bitsInLastLong;
                 }
+            }
+            if (count >= a) {
+                return count;
             }
         }
         return count;

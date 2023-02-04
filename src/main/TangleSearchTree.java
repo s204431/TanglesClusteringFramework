@@ -66,7 +66,7 @@ public class TangleSearchTree {
             }
         }
         if (depth == 2) {
-            int intersection = BitSet.intersection(orientations[newNode.originalOrientation], orientations[newNode.parent.originalOrientation], newNode.side, newNode.parent.side);
+            int intersection = BitSet.intersectionEarlyStop(orientations[newNode.originalOrientation], orientations[newNode.parent.originalOrientation], newNode.side, newNode.parent.side, a);
             if (intersection < a) {
                 return false;
             }
@@ -81,7 +81,7 @@ public class TangleSearchTree {
         }
         for (int i = 0; i < depth-1; i++) {
             for (int j = i+1; j < depth-1; j++) {
-                int intersection = BitSet.intersection(orientations[newNode.originalOrientation], orientations[otherNodes[i].originalOrientation], orientations[otherNodes[j].originalOrientation], newNode.side, otherNodes[i].side, otherNodes[j].side);
+                int intersection = BitSet.intersectionEarlyStop(orientations[newNode.originalOrientation], orientations[otherNodes[i].originalOrientation], orientations[otherNodes[j].originalOrientation], newNode.side, otherNodes[i].side, otherNodes[j].side, a);
                 if (intersection < a) {
                     return false;
                 }
