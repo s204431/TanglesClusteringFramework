@@ -6,12 +6,12 @@ public class Main {
     public static void main(String[] args) {
         long time1 = new Date().getTime();
         //BinaryQuestionnaire questionnaire = new BinaryQuestionnaire(DatasetGenerator.generateBiasedBinaryQuestionnaireAnswers(6000000, 40));
-        BinaryQuestionnaire questionnaire = new BinaryQuestionnaire(DatasetGenerator.generateBiasedBinaryQuestionnaireAnswers(6000, 1000,4));
+        BinaryQuestionnaire questionnaire = new BinaryQuestionnaire(DatasetGenerator.generateBiasedBinaryQuestionnaireAnswers(6000, 40,4));
         //BinaryQuestionnaire questionnaire = new BinaryQuestionnaire();
         //questionnaire.loadAnswersFromFile("NPI.csv", 1, -1, 1, 40);
         long time2 = new Date().getTime();
         System.out.println("File loading time: " + (time2-time1) + " ms");
-        TangleClusterer.generateClusters(questionnaire, 1000, -1);
+        TangleClusterer.generateClusters(questionnaire, 1000, 530);
         long time3 = new Date().getTime();
         System.out.println("Tangle total time: " + (time3-time2) + " ms");
         System.out.println("\nkMeans:");

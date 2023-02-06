@@ -121,8 +121,8 @@ public class BinaryQuestionnaire implements Dataset {
         for (int i = 0; i < getNumberOfQuestions(); i++) {
             long cost = 0;
             for (int j = 0; j < getNumberOfQuestions(); j++) {
-                long intersection1 = BitSet.intersection(initialCuts[i], initialCuts[j], true, true);
-                long intersection2 = BitSet.intersection(initialCuts[i], initialCuts[j], false, true);
+                long intersection1 = BitSet.intersection(initialCuts[i], initialCuts[j], true, true); //Number of people who answered "true" on one side of cut.
+                long intersection2 = BitSet.intersection(initialCuts[i], initialCuts[j], false, true); //Number of people who answered "true" on other side of cut.
                 cost += intersection1*intersection2 + (initialCuts[i].count() - intersection1)*(initialCuts[i].size() - initialCuts[i].count() - intersection2);
             }
             long cutSize = getCutSize(i);
