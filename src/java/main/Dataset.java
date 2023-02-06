@@ -5,5 +5,4 @@ public interface Dataset {
 
     public int[] getCutCosts();
 
-    public int[] getCutCosts2();
 }

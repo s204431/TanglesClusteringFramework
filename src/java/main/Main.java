@@ -6,7 +6,8 @@ public class Main {
     public static void main(String[] args) {
         long time1 = new Date().getTime();
         //main.BinaryQuestionnaire questionnaire = new main.BinaryQuestionnaire(main.DatasetGenerator.generateBiasedBinaryQuestionnaireAnswers(6000000, 40));
-        BinaryQuestionnaire questionnaire = new BinaryQuestionnaire(DatasetGenerator.generateBiasedBinaryQuestionnaireAnswers(6000, 40,4));
+        //main.BinaryQuestionnaire questionnaire = new main.BinaryQuestionnaire(main.DatasetGenerator.generateBiasedBinaryQuestionnaireAnswers(6000000, 40));
+        BinaryQuestionnaire questionnaire = new BinaryQuestionnaire(DatasetGenerator.generateBiasedBinaryQuestionnaireAnswers(6000, 1000,4));
         //main.BinaryQuestionnaire questionnaire = new main.BinaryQuestionnaire();
         //questionnaire.loadAnswersFromFile("NPI.csv", 1, -1, 1, 40);
         long time2 = new Date().getTime();

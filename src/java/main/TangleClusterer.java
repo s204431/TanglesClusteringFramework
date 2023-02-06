@@ -3,6 +3,7 @@ package main;
 import java.util.Date;
 
 import main.TangleSearchTree.Node;
+import main.Util.Tuple;
 
 public class TangleClusterer {
 
@@ -11,10 +12,13 @@ public class TangleClusterer {
         BitSet[] initialCuts = dataset.getInitialCuts();
         long time2 = new Date().getTime();
         System.out.println("Initial cuts time: " + (time2-time1) + " ms");
-        int[] costs = dataset.getCutCosts2();
+        int[] costs = dataset.getCutCosts();
         for (int cost : costs) {
             System.out.print(cost + " ");
         }
+        Tuple<BitSet[], int[]> redundancyRemoved = removeRedundantCuts(initialCuts, costs, 0.825);
+        initialCuts = redundancyRemoved.x;
+        costs = redundancyRemoved.y;
         long time3 = new Date().getTime();
         System.out.println();
         System.out.println("Cost function time: " + (time3-time2) + " ms");
@@ -84,6 +88,37 @@ public class TangleClusterer {
             }
         }
         return tree;
+    }
+
+    //Removes redundant cuts that agree on factor% of their elements.
+    private static Tuple<BitSet[], int[]> removeRedundantCuts(BitSet[] initialCuts, int[] costs, double factor) {
+        boolean[] toBeRemoved = new boolean[initialCuts.length]; //true indicates that the corresponding cut should be removed.
+        for (int i = 0; i < initialCuts.length; i++) {
+            for (int j = 0; j < initialCuts.length; j++) {
+                if (i != j && !toBeRemoved[i] && !toBeRemoved[j] && BitSet.XNor(initialCuts[i], initialCuts[j]) > initialCuts[i].size()*factor) {
+                    //Remove cut with largest cost.
+                    int largest = costs[i] > costs[j] ? i : j;
+                    toBeRemoved[largest] = true;
+                }
+            }
+        }
+        int count = 0;
+        for (boolean b : toBeRemoved) {
+            if (!b) {
+                count++;
+            }
+        }
+        int[] newCosts = new int[count];
+        BitSet[] newInitialCuts = new BitSet[count];
+        int index = 0;
+        for (int i = 0; i < initialCuts.length; i++) {
+            if (!toBeRemoved[i]) {
+                newCosts[index] = costs[i];
+                newInitialCuts[index] = initialCuts[i];
+                index++;
+            }
+        }
+        return new Tuple(newInitialCuts, newCosts);
     }
 
     private static void quicksort(int[] costs, int[] indices, int l, int h) {

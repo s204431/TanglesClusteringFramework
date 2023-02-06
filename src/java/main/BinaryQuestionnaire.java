@@ -93,32 +93,6 @@ public class BinaryQuestionnaire implements Dataset {
     public int[] getCutCosts() {
         int[] result = new int[getNumberOfQuestions()];
         for (int i = 0; i < getNumberOfQuestions(); i++) {
-            for (int j = 0; j < getNumberOfParticipants(); j++) {
-                if (answers[j].get(i)) {
-                    continue; //Only look at "false" answers.
-                }
-                for (int k = 0; k < getNumberOfParticipants(); k++) {
-                    if (!answers[k].get(i)) {
-                        continue; //Only look at "true" answers.
-                    }
-                    result[i] += calculateSimilarity(j, k);
-                }
-            }
-            long cutSize = getCutSize(i);
-            if (cutSize == 0 || getNumberOfParticipants()-cutSize == 0) {
-                result[i] = Integer.MAX_VALUE;
-            }
-            else {
-                result[i] /= cutSize*(getNumberOfParticipants()-cutSize);
-            }
-            initialCuts[i].cutCost = result[i];
-        }
-        return result;
-    }
-
-    public int[] getCutCosts2() {
-        int[] result = new int[getNumberOfQuestions()];
-        for (int i = 0; i < getNumberOfQuestions(); i++) {
             long cost = 0;
             for (int j = 0; j < getNumberOfQuestions(); j++) {
                 long intersection1 = BitSet.intersection(initialCuts[i], initialCuts[j], true, true); //Number of people who answered "true" on one side of cut.
