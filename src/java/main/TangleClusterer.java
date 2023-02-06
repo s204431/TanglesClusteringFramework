@@ -1,8 +1,7 @@
 package main;
 
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+
 import main.TangleSearchTree.Node;
 
 public class TangleClusterer {

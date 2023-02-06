@@ -4,7 +4,7 @@ import java.util.Random;
 
 public class DatasetGenerator {
 
-    //Generates a random BitSet of answers to a binary questionnaire and returns the result
+    //Generates a random main.BitSet of answers to a binary questionnaire and returns the result
     public static BitSet[] generateRandomBinaryQuestionnaireAnswers(int numberOfAnswers, int numberOfQuestions) {
         BitSet[] result = new BitSet[numberOfAnswers];
         Random r = new Random();
@@ -19,7 +19,7 @@ public class DatasetGenerator {
         return result;
     }
 
-    //Generates a biased BitSet of answers to a binary questionnaire and returns the result
+    //Generates a biased main.BitSet of answers to a binary questionnaire and returns the result
     public static BitSet[] generateBiasedBinaryQuestionnaireAnswers(int numberOfAnswers, int numberOfQuestions, double distributionPercentage) {
         if (distributionPercentage < 0 || distributionPercentage > 1) {
             return null;

@@ -5,13 +5,13 @@ import java.util.Date;
 public class Main {
     public static void main(String[] args) {
         long time1 = new Date().getTime();
-        //BinaryQuestionnaire questionnaire = new BinaryQuestionnaire(DatasetGenerator.generateBiasedBinaryQuestionnaireAnswers(6000000, 40));
+        //main.BinaryQuestionnaire questionnaire = new main.BinaryQuestionnaire(main.DatasetGenerator.generateBiasedBinaryQuestionnaireAnswers(6000000, 40));
         BinaryQuestionnaire questionnaire = new BinaryQuestionnaire(DatasetGenerator.generateBiasedBinaryQuestionnaireAnswers(6000, 40,4));
-        //BinaryQuestionnaire questionnaire = new BinaryQuestionnaire();
+        //main.BinaryQuestionnaire questionnaire = new main.BinaryQuestionnaire();
         //questionnaire.loadAnswersFromFile("NPI.csv", 1, -1, 1, 40);
         long time2 = new Date().getTime();
         System.out.println("File loading time: " + (time2-time1) + " ms");
-        TangleClusterer.generateClusters(questionnaire, 1000, 530);
+        TangleClusterer.generateClusters(questionnaire, 1000, -1);
         long time3 = new Date().getTime();
         System.out.println("Tangle total time: " + (time3-time2) + " ms");
         System.out.println("\nkMeans:");
@@ -27,25 +27,25 @@ public class Main {
         System.out.println("Total time: " + (time4-time1) + " ms");
 
         /*
-        // Tests of the DatasetGenerator
+        // Tests of the main.DatasetGenerator
 
         int participants = 20;
         int questions = 50;
-        BitSet[] answers = DatasetGenerator.generateBiasedBinaryQuestionnaireAnswers(participants, questions, 0.75);
+        main.BitSet[] answers = main.DatasetGenerator.generateBiasedBinaryQuestionnaireAnswers(participants, questions, 0.75);
         for (int i = 0; i < participants; i++) {
             answers[i].print();
         }
 
-        Point[] points = DatasetGenerator.generateGaussianMixturePoints(1000, 5);
+        main.Point[] points = main.DatasetGenerator.generateGaussianMixturePoints(1000, 5);
         System.out.println("Copy-paste the following into Maple:");
         System.out.println("with(plots):");
         System.out.print("pointplot([");
-        for (Point point : points) {
+        for (main.Point point : points) {
             System.out.print(point.getX() + ", ");
         }
         System.out.print("], [");
 
-        for (Point point : points) {
+        for (main.Point point : points) {
             System.out.print(point.getY() + ", ");
         }
         System.out.println("])");
