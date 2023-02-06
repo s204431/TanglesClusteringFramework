@@ -40,7 +40,12 @@ public class BinaryQuestionnaire implements Dataset {
                 }
                 int column = startColumn;
                 while (lineScanner.hasNextInt() && (endColumn < 0 || column <= endColumn)) {
-                    result.get(result.size()-1).add(lineScanner.nextInt() == 1 ? false : true);
+                    int nextInt = lineScanner.nextInt();
+                    if (nextInt == 0) {
+                        result.remove(result.size()-1);
+                        break;
+                    }
+                    result.get(result.size()-1).add(nextInt == 1 ? false : true);
                     column++;
                 }
                 line++;
