@@ -9,9 +9,15 @@ import java.util.Scanner;
 public class FeatureBasedDataset implements Dataset {
 
     private double[][] dataPoints;
+    private BitSet[] initialCuts;
     private int a;
 
     public FeatureBasedDataset(int a) {
+        this.a = a;
+    }
+
+    public FeatureBasedDataset(double[][] dataPoints, int a) {
+        this.dataPoints = dataPoints;
         this.a = a;
     }
 
@@ -50,6 +56,7 @@ public class FeatureBasedDataset implements Dataset {
         for (int i = 0; i < cuts.size(); i++) {
             result[i] = cuts.get(i);
         }
+        initialCuts = result;
         return result;
     }
 
@@ -93,8 +100,32 @@ public class FeatureBasedDataset implements Dataset {
     }
 
     @Override
-    public int[] getCutCosts() {
-        return new int[0];
+    public double[] getCutCosts() {
+        double[] costs = new double[initialCuts.length];
+        for (int i = 0; i < initialCuts.length; i++) {
+            double cost = 0;
+            for (int j = 0; j < dataPoints.length; j++) {
+                if (initialCuts[i].get(j)) {
+                    continue;
+                }
+                for (int k = 0; k < dataPoints.length; k++) {
+                    if (!initialCuts[i].get(k)) {
+                        continue;
+                    }
+                    cost += Math.exp(-getDistance(dataPoints[j], dataPoints[k]));
+                }
+            }
+            costs[i] = cost/(initialCuts[i].count()*(initialCuts[i].size()-initialCuts[i].count()));
+        }
+        return costs;
+    }
+
+    private double getDistance(double[] point1, double[] point2) {
+        double length = 0;
+        for (int i = 0; i < point1.length; i++) {
+            length += (point1[i]-point2[i])*(point1[i]-point2[i]);
+        }
+        return Math.sqrt(length);
     }
 
     public void loadDataFromFile(String fileName, int startRow, int endRow, int startColumn, int endColumn) {
@@ -116,6 +147,10 @@ public class FeatureBasedDataset implements Dataset {
                 int column = startColumn;
                 while (lineScanner.hasNextDouble() && (endColumn < 0 || column <= endColumn)) {
                     double nextDouble = lineScanner.nextDouble();
+                    if (Double.isNaN(nextDouble)) {
+                        result.remove(result.size()-1);
+                        break;
+                    }
                     result.get(result.size()-1).add(nextDouble);
                     column++;
                 }

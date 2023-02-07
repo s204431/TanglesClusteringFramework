@@ -95,8 +95,8 @@ public class BinaryQuestionnaire implements Dataset {
         return result;
     }
 
-    public int[] getCutCosts() {
-        int[] result = new int[getNumberOfQuestions()];
+    public double[] getCutCosts() {
+        double[] result = new double[getNumberOfQuestions()];
         for (int i = 0; i < getNumberOfQuestions(); i++) {
             long cost = 0;
             for (int j = 0; j < getNumberOfQuestions(); j++) {

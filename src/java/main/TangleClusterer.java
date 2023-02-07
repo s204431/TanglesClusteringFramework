@@ -12,11 +12,11 @@ public class TangleClusterer {
         BitSet[] initialCuts = dataset.getInitialCuts();
         long time2 = new Date().getTime();
         System.out.println("Initial cuts time: " + (time2-time1) + " ms");
-        int[] costs = dataset.getCutCosts();
-        for (int cost : costs) {
+        double[] costs = dataset.getCutCosts();
+        for (double cost : costs) {
             System.out.print(cost + " ");
         }
-        Tuple<BitSet[], int[]> redundancyRemoved = removeRedundantCuts(initialCuts, costs, 0.83);
+        Tuple<BitSet[], double[]> redundancyRemoved = removeRedundantCuts(initialCuts, costs, 0.83);
         initialCuts = redundancyRemoved.x;
         costs = redundancyRemoved.y;
         long time3 = new Date().getTime();
@@ -67,7 +67,7 @@ public class TangleClusterer {
         System.out.println();
     }
 
-    private static TangleSearchTree generateTangleSearchTree(BitSet[] initialCuts, int[] costs, int a, int psi) {
+    private static TangleSearchTree generateTangleSearchTree(BitSet[] initialCuts, double[] costs, int a, int psi) {
         int[] indices = new int[costs.length];
         for (int i = 0; i < indices.length; i++) {
             indices[i] = i;
@@ -91,7 +91,7 @@ public class TangleClusterer {
     }
 
     //Removes redundant cuts that agree on factor% of their elements.
-    private static Tuple<BitSet[], int[]> removeRedundantCuts(BitSet[] initialCuts, int[] costs, double factor) {
+    private static Tuple<BitSet[], double[]> removeRedundantCuts(BitSet[] initialCuts, double[] costs, double factor) {
         boolean[] toBeRemoved = new boolean[initialCuts.length]; //true indicates that the corresponding cut should be removed.
         for (int i = 0; i < initialCuts.length; i++) {
             for (int j = 0; j < initialCuts.length; j++) {
@@ -108,7 +108,7 @@ public class TangleClusterer {
                 count++;
             }
         }
-        int[] newCosts = new int[count];
+        double[] newCosts = new double[count];
         BitSet[] newInitialCuts = new BitSet[count];
         int index = 0;
         for (int i = 0; i < initialCuts.length; i++) {
@@ -121,7 +121,7 @@ public class TangleClusterer {
         return new Tuple(newInitialCuts, newCosts);
     }
 
-    private static void quicksort(int[] costs, int[] indices, int l, int h) {
+    private static void quicksort(double[] costs, int[] indices, int l, int h) {
         if (l >= h || l < 0) {
             return;
         }
@@ -130,27 +130,27 @@ public class TangleClusterer {
         quicksort(costs, indices, p+1, h);
     }
 
-    private static int partition(int[] costs, int[] indices, int l, int h) {
-        int pivot = costs[h];
+    private static int partition(double[] costs, int[] indices, int l, int h) {
+        double pivot = costs[h];
         int i = l-1;
         for (int j = l; j < h; j++) {
             if (costs[j] <= pivot) {
                 i = i + 1;
-                int temp = costs[i];
+                double temp = costs[i];
                 costs[i] = costs[j];
                 costs[j] = temp;
-                temp = indices[i];
+                int temp2 = indices[i];
                 indices[i] = indices[j];
-                indices[j] = temp;
+                indices[j] = temp2;
             }
         }
         i = i + 1;
-        int temp = costs[i];
+        double temp = costs[i];
         costs[i] = costs[h];
         costs[h] = temp;
-        temp = indices[i];
+        int temp2 = indices[i];
         indices[i] = indices[h];
-        indices[h] = temp;
+        indices[h] = temp2;
         return i;
     }
 

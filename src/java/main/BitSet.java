@@ -4,7 +4,7 @@ package main;
 public class BitSet {
     protected long[] set;
     private int size = 0;
-    public int cutCost;
+    public double cutCost;
 
     //Creates main.BitSet with specified maximum size.
     public BitSet(int maxSize) {

@@ -11,11 +11,11 @@ public class TangleSearchTree {
     private int currentDepth = -1;
 
     private BitSet[] orientations;
-    private int[] cutCosts;
+    private double[] cutCosts;
     private int integerBits; //Number of bits to represent the index of an orientation.
     private Hashtable<Long, Integer> hashtable = new Hashtable();
 
-    public TangleSearchTree(int a, BitSet[] orientations, int[] cutCosts) {
+    public TangleSearchTree(int a, BitSet[] orientations, double[] cutCosts) {
         this.a = a;
         this.orientations = orientations;
         this.cutCosts = cutCosts;
@@ -122,7 +122,7 @@ public class TangleSearchTree {
         return result;
     }
 
-    private double getWeight(int cost) {
+    private double getWeight(double cost) {
         return 1.0/cost;
     }
 
