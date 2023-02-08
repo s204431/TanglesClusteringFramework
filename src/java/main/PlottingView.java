@@ -158,6 +158,8 @@ public class PlottingView extends JPanel implements MouseMotionListener {
                         c = changeTranslucencyOfColor(c, softClustering[i][clusters[i]]);
                     }
                     g2d.setColor(c);
+                } else {
+                    g2d.setColor(Color.BLACK);
                 }
                 g2d.fillOval(coor[0], coor[1], POINT_SIZE, POINT_SIZE);
                 //g2d.setColor(Color.BLACK);
