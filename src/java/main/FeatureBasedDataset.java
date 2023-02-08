@@ -12,6 +12,8 @@ public class FeatureBasedDataset implements Dataset {
     private BitSet[] initialCuts;
     private int a;
 
+    private static int precision = 10; //Determines the number of cuts generated.
+
     public FeatureBasedDataset(int a) {
         this.a = a;
     }
@@ -39,10 +41,10 @@ public class FeatureBasedDataset implements Dataset {
             //cuts.add(first);
             BitSet currentBitSet = new BitSet(dataPoints.length);
             cuts.add(currentBitSet);
-            for (int j = 0; j < dataPoints.length; j++) {
+            for (int j = 0; j < dataPoints.length-1; j++) {
                 currentBitSet.add(originalIndices[j]);
-                if (j % a == 0) {
-                    if (dataPoints.length - j <= a - 1) {
+                if (j > 0 && j % (a/precision) == 0) {
+                    if (dataPoints.length - j <= (a/precision) - 1) {
                         break;
                     }
                     BitSet newBitSet = new BitSet(dataPoints.length);
@@ -57,6 +59,17 @@ public class FeatureBasedDataset implements Dataset {
             result[i] = cuts.get(i);
         }
         initialCuts = result;
+        int[] hardClustering = new int[result[0].size()];
+        double[][] softClustering = new double[result[0].size()][result.length];
+        //BEGIN TEST
+        /*int n = 0;
+        for (int j = 0; j < result[n].size(); j++) {
+            hardClustering[j] = result[n].get(j) ? 0 : 1;
+            softClustering[j][0] = result[n].get(j) ? 1 : 0;
+            softClustering[j][1] = result[n].get(j) ? 0 : 1;
+        }
+        new PlottingView().loadPointsWithClustering(dataPoints, hardClustering, softClustering);*/
+        //END TEST
         return result;
     }
 
@@ -101,6 +114,10 @@ public class FeatureBasedDataset implements Dataset {
 
     @Override
     public double[] getCutCosts() {
+        return distanceToMeanCostFunction();
+    }
+
+    private double[] pairwiseDistanceCostFunction() {
         double[] costs = new double[initialCuts.length];
         for (int i = 0; i < initialCuts.length; i++) {
             double cost = 0;
@@ -117,6 +134,34 @@ public class FeatureBasedDataset implements Dataset {
             }
             costs[i] = cost/(initialCuts[i].count()*(initialCuts[i].size()-initialCuts[i].count()));
             //costs[i] = cost;
+        }
+        return costs;
+    }
+
+    public double[] distanceToMeanCostFunction() {
+        double[] costs = new double[initialCuts.length];
+        for (int i = 0; i < initialCuts.length; i++) {
+            double[] mean1 = new double[dataPoints[0].length];
+            double[] mean2 = new double[dataPoints[0].length];
+            //Calculate means of the two sides of the cut.
+            for (int j = 0; j < initialCuts[i].size(); j++) {
+                for (int k = 0; k < dataPoints[0].length; k++) {
+                    if (initialCuts[i].get(j)) {
+                        mean1[k] += dataPoints[j][k];
+                    }
+                    else {
+                        mean2[k] += dataPoints[j][k];
+                    }
+                }
+            }
+            for (int j = 0; j < mean1.length; j++) {
+                mean1[j] /= initialCuts[i].count();
+                mean2[j] /= initialCuts[i].size() - initialCuts[i].count();
+            }
+            //Sum up distances from the means.
+            for (int j = 0; j < initialCuts[i].size(); j++) {
+                costs[i] += Math.exp(-Math.pow(10,-3)*getDistance(dataPoints[j], initialCuts[i].get(j) ? mean2 : mean1));
+            }
         }
         return costs;
     }

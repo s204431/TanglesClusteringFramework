@@ -143,6 +143,16 @@ public class TangleSearchTree {
         return result;
     }
 
+    //Generates a default clustering with one cluster.
+    public double[][] generateDefaultClustering() {
+        double[][] result = new double[orientations[0].size()][1];
+        for (int i = 0; i < orientations[0].size(); i++) {
+            result[i][0] = 1;
+        }
+        softClustering = result;
+        return result;
+    }
+
     private double getWeight(double cost) {
         return 1.0/cost;
     }
