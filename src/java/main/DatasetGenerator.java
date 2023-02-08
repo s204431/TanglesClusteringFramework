@@ -96,7 +96,7 @@ public class DatasetGenerator {
 
         //Generate means of clusters
         double[][] meanPoints = new double[K][2];
-        double dist = numberOfPoints * 0.1;
+        double dist = numberOfPoints * 0.15;
         double rad = Math.PI / K;
         for (int i = 0; i < K; i++) {
             meanPoints[i] = new double[] { dist * Math.cos(rad + 2*rad*i), dist * Math.sin(rad + 2*rad*i) };
