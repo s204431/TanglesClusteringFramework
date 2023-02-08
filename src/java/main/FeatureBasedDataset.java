@@ -8,7 +8,7 @@ import java.util.Scanner;
 
 public class FeatureBasedDataset implements Dataset {
 
-    private double[][] dataPoints;
+    public double[][] dataPoints;
     private BitSet[] initialCuts;
     private int a;
 
@@ -34,12 +34,12 @@ public class FeatureBasedDataset implements Dataset {
         }
         for (int i = 0; i < dataPoints[0].length; i++) {
             mergeSort(copy, originalIndices, i, 0, dataPoints.length-1);
-            BitSet first = new BitSet(dataPoints.length);
-            first.add(originalIndices[0]);
-            cuts.add(first);
+            //BitSet first = new BitSet(dataPoints.length);
+            //first.add(originalIndices[0]);
+            //cuts.add(first);
             BitSet currentBitSet = new BitSet(dataPoints.length);
             cuts.add(currentBitSet);
-            for (int j = 1; j < dataPoints.length; j++) {
+            for (int j = 0; j < dataPoints.length; j++) {
                 currentBitSet.add(originalIndices[j]);
                 if (j % a == 0) {
                     if (dataPoints.length - j <= a - 1) {
@@ -116,6 +116,7 @@ public class FeatureBasedDataset implements Dataset {
                 }
             }
             costs[i] = cost/(initialCuts[i].count()*(initialCuts[i].size()-initialCuts[i].count()));
+            //costs[i] = cost;
         }
         return costs;
     }

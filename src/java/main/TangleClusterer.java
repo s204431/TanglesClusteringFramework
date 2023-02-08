@@ -7,6 +7,8 @@ import main.Util.Tuple;
 
 public class TangleClusterer {
 
+    private static TangleSearchTree tangleSearchTree;
+
     public static void generateClusters(Dataset dataset, int a, int psi) {
         long time1 = new Date().getTime();
         BitSet[] initialCuts = dataset.getInitialCuts();
@@ -16,13 +18,14 @@ public class TangleClusterer {
         for (double cost : costs) {
             System.out.print(cost + " ");
         }
-        Tuple<BitSet[], double[]> redundancyRemoved = removeRedundantCuts(initialCuts, costs, 0.83);
-        initialCuts = redundancyRemoved.x;
-        costs = redundancyRemoved.y;
+        //Tuple<BitSet[], double[]> redundancyRemoved = removeRedundantCuts(initialCuts, costs, 1);
+        //initialCuts = redundancyRemoved.x;
+        //costs = redundancyRemoved.y;
         long time3 = new Date().getTime();
         System.out.println();
         System.out.println("Cost function time: " + (time3-time2) + " ms");
         TangleSearchTree tree = generateTangleSearchTree(initialCuts, costs, a, psi);
+        tangleSearchTree = tree;
         long time4 = new Date().getTime();
         System.out.println("Tree generation time: " + (time4-time3) + " ms");
         System.out.println("Nodes at lowest depth: " + tree.lowestDepthNodes.size());
@@ -34,7 +37,7 @@ public class TangleClusterer {
         tree.contractTree();
         long time6 = new Date().getTime();
         System.out.println("Contracting time: " + (time6-time5) + " ms");
-        double[][] softClustering = tree.calculateSoftClustering(initialCuts[0].size());
+        double[][] softClustering = tree.calculateSoftClustering();
         long time7 = new Date().getTime();
         System.out.println("Clustering time: " + (time7-time6) + " ms");
         for (int i = softClustering.length/2-10; i < softClustering.length/2+40; i++) {
@@ -65,6 +68,17 @@ public class TangleClusterer {
         System.out.println("Wrong clusterings: " + count + " Percentage correct: " + (((double)softClustering.length-count)/softClustering.length));
         System.out.println("Total tangle search tree time: " + (time8-time3) + " ms");
         System.out.println();
+    }
+
+    public static double[][] getSoftClustering() {
+        return tangleSearchTree.softClustering;
+    }
+
+    public static int[] getHardClustering() {
+        if (tangleSearchTree.softClustering == null) {
+            tangleSearchTree.calculateSoftClustering();
+        }
+        return tangleSearchTree.calculateHardClustering();
     }
 
     private static TangleSearchTree generateTangleSearchTree(BitSet[] initialCuts, double[] costs, int a, int psi) {

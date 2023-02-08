@@ -14,6 +14,7 @@ public class TangleSearchTree {
     private double[] cutCosts;
     private int integerBits; //Number of bits to represent the index of an orientation.
     private Hashtable<Long, Integer> hashtable = new Hashtable();
+    public double[][] softClustering;
 
     public TangleSearchTree(int a, BitSet[] orientations, double[] cutCosts) {
         this.a = a;
@@ -113,12 +114,32 @@ public class TangleSearchTree {
         return depth;
     }
 
-    public double[][] calculateSoftClustering(int numberOfDataPoints) {
+    public int[] calculateHardClustering() {
+        if (softClustering == null) {
+            calculateSoftClustering();
+        }
+        int[] hardClustering = new int[softClustering.length];
+        for (int i = 0; i < softClustering.length; i++) {
+            int maxCluster = -1;
+            double max = 0;
+            for (int j = 0; j < softClustering[i].length; j++) {
+                if (softClustering[i][j] > max) {
+                    max = softClustering[i][j];
+                    maxCluster = j;
+                }
+            }
+            hardClustering[i] = maxCluster;
+        }
+        return hardClustering;
+    }
+
+    public double[][] calculateSoftClustering() {
         int clusters = getNumberOfClusters(root);
-        double[][] result = new double[numberOfDataPoints][clusters];
-        for (int i = 0; i < numberOfDataPoints; i++) {
+        double[][] result = new double[orientations[0].size()][clusters];
+        for (int i = 0; i < orientations[0].size(); i++) {
             getSoftClustering(root, i, 0, 1, result[i]);
         }
+        softClustering = result;
         return result;
     }
 
