@@ -154,7 +154,7 @@ public class TangleSearchTree {
     }
 
     private double getWeight(double cost) {
-        return 1.0/cost;
+        return 1/(Math.pow(cost,4));
     }
 
     private int getSoftClustering(Node node, int datapoint, int index, double accumulated, double[] result) {
@@ -168,13 +168,13 @@ public class TangleSearchTree {
             for (int distinguished : node.distinguishedCuts) {
                 if (node.leftChild.condensedOrientations.get(distinguished)) {
                     sum2 += getWeight(cutCosts[distinguished]);
-                    if (orientations[distinguished].get(datapoint)) {
+                    if (!orientations[distinguished].get(datapoint)) {
                         sum1 += getWeight(cutCosts[distinguished]);
                     }
                 }
                 if (node.leftChild.condensedOrientations.get(distinguished+node.leftChild.condensedOrientations.size()/2)) {
                     sum2 += getWeight(cutCosts[distinguished]);
-                    if (!orientations[distinguished].get(datapoint)) {
+                    if (orientations[distinguished].get(datapoint)) {
                         sum1 += getWeight(cutCosts[distinguished]);
                     }
                 }

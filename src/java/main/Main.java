@@ -4,10 +4,10 @@ import java.util.Date;
 
 public class Main {
     public static void main(String[] args) {
-        int a = 15000;
+        int a = 10000;
         //new PlottingView().loadPoints(dataset.dataPoints);
         long time1 = new Date().getTime();
-        FeatureBasedDataset dataset = new FeatureBasedDataset(DatasetGenerator.generateGaussianMixturePoints(100000, 4), a);
+        FeatureBasedDataset dataset = new FeatureBasedDataset(DatasetGenerator.generateGaussianMixturePoints(100000, 6), a);
         //FeatureBasedDataset dataset = new FeatureBasedDataset(900);
         //dataset.loadDataFromFile("LyngbyWeatherData.csv", 4, 5000, 1, -1);
         //BinaryQuestionnaire dataset = new main.BinaryQuestionnaire(main.DatasetGenerator.generateBiasedBinaryQuestionnaireAnswers(6000000, 40));

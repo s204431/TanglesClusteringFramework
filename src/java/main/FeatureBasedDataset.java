@@ -12,7 +12,7 @@ public class FeatureBasedDataset implements Dataset {
     private BitSet[] initialCuts;
     private int a;
 
-    private static int precision = 10; //Determines the number of cuts generated.
+    private static int precision = 1; //Determines the number of cuts generated.
 
     public FeatureBasedDataset(int a) {
         this.a = a;
@@ -23,8 +23,7 @@ public class FeatureBasedDataset implements Dataset {
         this.a = a;
     }
 
-    @Override
-    public BitSet[] getInitialCuts() {
+    public BitSet[] getInitialCutsOld() {
         List<BitSet> cuts = new ArrayList<>();
         double[][] copy = new double[dataPoints.length][dataPoints[0].length];
         int[] originalIndices = new int[dataPoints.length];
@@ -62,7 +61,68 @@ public class FeatureBasedDataset implements Dataset {
         int[] hardClustering = new int[result[0].size()];
         double[][] softClustering = new double[result[0].size()][result.length];
         //BEGIN TEST
-        /*int n = 0;
+        /*int n = 1;
+        for (int j = 0; j < result[n].size(); j++) {
+            hardClustering[j] = result[n].get(j) ? 0 : 1;
+            softClustering[j][0] = result[n].get(j) ? 1 : 0;
+            softClustering[j][1] = result[n].get(j) ? 0 : 1;
+        }
+        new PlottingView().loadPointsWithClustering(dataPoints, hardClustering, softClustering);*/
+        //END TEST
+        return result;
+    }
+
+    public BitSet[] getInitialCuts() {
+        List<BitSet> cuts = new ArrayList<>();
+        double[][] copy = new double[dataPoints.length][dataPoints[0].length];
+        int[] originalIndices = new int[dataPoints.length];
+        for (int i = 0; i < dataPoints.length; i++) {
+            originalIndices[i] = i;
+            for (int j = 0; j < dataPoints[0].length; j++) {
+                copy[i][j] = dataPoints[i][j];
+            }
+        }
+        for (int i = 0; i < dataPoints[0].length; i++) {
+            mergeSort(copy, originalIndices, i, 0, dataPoints.length-1);
+            //BitSet first = new BitSet(dataPoints.length);
+            //first.add(originalIndices[0]);
+            //cuts.add(first);
+            BitSet currentBitSet = new BitSet(dataPoints.length);
+            cuts.add(currentBitSet);
+            BitSet accumulated = new BitSet(dataPoints.length);
+            int cutIndex = 0;
+            for (int j = 0; j < dataPoints.length-1; j++) {
+                accumulated.add(originalIndices[j]);
+                if (j <= cutIndex) {
+                    currentBitSet.add(originalIndices[j]);
+                }
+                if (j > 0 && j % (a/precision) == 0) {
+                    if (dataPoints.length - j <= (a/precision) - 1) {
+                        break;
+                    }
+                    currentBitSet = new BitSet(dataPoints.length);
+                    currentBitSet.unionWith(accumulated);
+                    cuts.add(currentBitSet);
+                    //Find where to put the cut.
+                    double maxRange = -1;
+                    for (int k = j+1; k < j+a/precision-1; k++) {
+                        if (copy[k+1][i] - copy[k][i] > maxRange) {
+                            maxRange = copy[k+1][i] - copy[k][i];
+                            cutIndex = k;
+                        }
+                    }
+                }
+            }
+        }
+        BitSet[] result = new BitSet[cuts.size()];
+        for (int i = 0; i < cuts.size(); i++) {
+            result[i] = cuts.get(i);
+        }
+        initialCuts = result;
+        int[] hardClustering = new int[result[0].size()];
+        double[][] softClustering = new double[result[0].size()][result.length];
+        //BEGIN TEST
+        /*int n = 10;
         for (int j = 0; j < result[n].size(); j++) {
             hardClustering[j] = result[n].get(j) ? 0 : 1;
             softClustering[j][0] = result[n].get(j) ? 1 : 0;
