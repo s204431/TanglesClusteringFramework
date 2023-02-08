@@ -55,5 +55,16 @@ public class Main {
         System.out.println("])");
 
          */
+
+        int n = 1000;
+        int clusters = 4;
+
+        double[][] points = DatasetGenerator.generateGaussianMixturePoints(n, clusters);
+        int[] clustering = new int[n];
+        for (int i = 0; i < n; i++) {
+            clustering[i] = i%clusters;
+        }
+
+        new PlottingView().loadPointsWithClustering(points, clustering);
     }
 }

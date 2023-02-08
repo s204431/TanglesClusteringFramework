@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.util.Random;
 
 public class PlottingView extends JPanel {
     public static final int POINT_SIZE = 10;
@@ -19,7 +20,8 @@ public class PlottingView extends JPanel {
     private int lines;
 
     private double[][] points;
-    private double[][] clusters;    //Cluster of each point
+    private int[] clusters;    //Cluster of each point
+    private Color[] colors;
 
     //Often used strokes
     private final BasicStroke stroke1 = new BasicStroke(1);
@@ -134,7 +136,12 @@ public class PlottingView extends JPanel {
         if (points != null) {
             for (int i = 0; i < points.length; i++) {
                 int[] coor = convertToPointOnScreen(points[i]);
+                if (clusters != null) {
+                    g2d.setColor(colors[clusters[i]]);
+                }
                 g2d.fillOval(coor[0], coor[1], POINT_SIZE, POINT_SIZE);
+                g2d.setColor(Color.BLACK);
+                g2d.drawOval(coor[0], coor[1], POINT_SIZE, POINT_SIZE);
             }
         }
     }
@@ -147,10 +154,29 @@ public class PlottingView extends JPanel {
         return null;
     }
 
+    public void loadPointsWithClustering(double[][] points, int[] clusters) {
+        loadPoints(points);
+        loadClusters(clusters);
+    }
+
     public void loadPoints(double[][] points) {
         double[] bounds = findBounds(points);
         configureAxes(bounds);
         this.points = points;
+        repaint();
+    }
+
+    public void loadClusters(int[] clusters) {
+        this.clusters = clusters;
+        this.colors = new Color[clusters.length];
+        Random random = new Random();
+        for (int i = 0; i < clusters.length; i++) {
+            float r = random.nextFloat();
+            float g = random.nextFloat();
+            float b = random.nextFloat();
+            Color randomColor = new Color(r,g,b);
+            this.colors[i] = randomColor;
+        }
         repaint();
     }
 
