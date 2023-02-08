@@ -18,9 +18,9 @@ public class TangleClusterer {
         for (double cost : costs) {
             System.out.print(cost + " ");
         }
-        //Tuple<BitSet[], double[]> redundancyRemoved = removeRedundantCuts(initialCuts, costs, 1);
-        //initialCuts = redundancyRemoved.x;
-        //costs = redundancyRemoved.y;
+        Tuple<BitSet[], double[]> redundancyRemoved = removeRedundantCuts(initialCuts, costs, 1); //Set factor to 1 to turn it off.
+        initialCuts = redundancyRemoved.x;
+        costs = redundancyRemoved.y;
         long time3 = new Date().getTime();
         System.out.println();
         System.out.println("Cost function time: " + (time3-time2) + " ms");
@@ -31,7 +31,11 @@ public class TangleClusterer {
         System.out.println("Nodes at lowest depth: " + tree.lowestDepthNodes.size());
         System.out.println("Depth of tree: " + tree.getDepth(tree.lowestDepthNodes.get(0)));
         System.out.println("Total nodes in tree: " + tree.n);
-        tree.condenseTree(2);
+        try {
+            tree.condenseTree(2);
+        } catch (NullPointerException e) {
+            tree.generateDefaultClustering();
+        }
         long time5 = new Date().getTime();
         System.out.println("Condensing time: " + (time5-time4) + " ms");
         tree.contractTree();

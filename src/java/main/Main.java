@@ -4,18 +4,19 @@ import java.util.Date;
 
 public class Main {
     public static void main(String[] args) {
+        int a = 15000;
         //new PlottingView().loadPoints(dataset.dataPoints);
         long time1 = new Date().getTime();
-        //FeatureBasedDataset dataset = new FeatureBasedDataset(DatasetGenerator.generateGaussianMixturePoints(5000, 4), 600);
-        FeatureBasedDataset dataset = new FeatureBasedDataset(300);
-        dataset.loadDataFromFile("LyngbyWeatherData.csv", 4, 5000, 1, -1);
+        FeatureBasedDataset dataset = new FeatureBasedDataset(DatasetGenerator.generateGaussianMixturePoints(100000, 4), a);
+        //FeatureBasedDataset dataset = new FeatureBasedDataset(900);
+        //dataset.loadDataFromFile("LyngbyWeatherData.csv", 4, 5000, 1, -1);
         //BinaryQuestionnaire dataset = new main.BinaryQuestionnaire(main.DatasetGenerator.generateBiasedBinaryQuestionnaireAnswers(6000000, 40));
         //BinaryQuestionnaire dataset = new BinaryQuestionnaire(DatasetGenerator.generateBiasedBinaryQuestionnaireAnswers(6000, 40,4));
         //BinaryQuestionnaire dataset = new main.BinaryQuestionnaire();
         //dataset.loadAnswersFromFile("NPI.csv", 1, -1, 1, 40);
         long time2 = new Date().getTime();
         System.out.println("File loading time: " + (time2-time1) + " ms");
-        TangleClusterer.generateClusters(dataset, 300, -1);
+        TangleClusterer.generateClusters(dataset, a, -1);
         long time3 = new Date().getTime();
         System.out.println("Tangle total time: " + (time3-time2) + " ms");
         new PlottingView().loadPointsWithClustering(dataset.dataPoints, TangleClusterer.getHardClustering(), TangleClusterer.getSoftClustering());
@@ -32,9 +33,9 @@ public class Main {
         System.out.println("Total time: " + (time4-time1) + " ms");
 
 
-
+/*
         //Tests of PlottingView
-        int n = 11000;
+        int n = 5000;
         int clusters = 7;
 
         double[][] points = DatasetGenerator.generateGaussianMixturePoints(n, clusters);
@@ -53,7 +54,7 @@ public class Main {
 
         new PlottingView().loadPointsWithClustering(points, clustering, softClustering);
 
-
+ */
 
     }
 }
