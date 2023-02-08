@@ -17,6 +17,7 @@ public class PlottingView extends JPanel implements MouseMotionListener {
 
     private double[][] points;
     private int[] clusters;
+    private double[][] softClustering;
     private Color[] colors;
 
     private int xOrig = (int)(windowWidth * 0.5);
@@ -152,13 +153,21 @@ public class PlottingView extends JPanel implements MouseMotionListener {
             for (int i = 0; i < points.length; i++) {
                 int[] coor = convertPointToCoordinateOnScreen(points[i]);
                 if (clusters != null) {
-                    g2d.setColor(colors[clusters[i]]);
+                    Color c = colors[clusters[i]];
+                    if (softClustering != null) {
+                        c = changeTranslucencyOfColor(c, softClustering[i][clusters[i]]);
+                    }
+                    g2d.setColor(c);
                 }
                 g2d.fillOval(coor[0], coor[1], POINT_SIZE, POINT_SIZE);
-                g2d.setColor(Color.BLACK);
+                g2d.setColor(Color.GRAY);
                 g2d.drawOval(coor[0], coor[1], POINT_SIZE, POINT_SIZE);
             }
         }
+    }
+
+    private Color changeTranslucencyOfColor(Color color, double percentage) {
+        return new Color(color.getRed(), color.getGreen(), color.getBlue(), (int)(percentage * 255));
     }
 
     public int[] convertPointToCoordinateOnScreen(double[] coor) {
@@ -174,6 +183,11 @@ public class PlottingView extends JPanel implements MouseMotionListener {
         loadClusters(clusters);
     }
 
+    public void loadPointsWithClustering(double[][] points, int[] clusters, double[][] softClustering) {
+        loadPoints(points);
+        loadClusters(clusters, softClustering);
+    }
+
     public void loadPoints(double[][] points) {
         double[] bounds = findBounds(points);
         configureAxes(bounds);
@@ -183,6 +197,21 @@ public class PlottingView extends JPanel implements MouseMotionListener {
 
     public void loadClusters(int[] clusters) {
         this.clusters = clusters;
+        this.colors = new Color[clusters.length];
+        Random random = new Random();
+        for (int i = 0; i < clusters.length; i++) {
+            float r = random.nextFloat();
+            float g = random.nextFloat();
+            float b = random.nextFloat();
+            Color randomColor = new Color(r,g,b);
+            this.colors[i] = randomColor;
+        }
+        repaint();
+    }
+
+    public void loadClusters(int[] clusters, double[][] softClustering) {
+        this.clusters = clusters;
+        this.softClustering = softClustering;
         this.colors = new Color[clusters.length];
         Random random = new Random();
         for (int i = 0; i < clusters.length; i++) {

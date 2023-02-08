@@ -18,7 +18,7 @@ public class Main {
         TangleClusterer.generateClusters(dataset, 300, -1);
         long time3 = new Date().getTime();
         System.out.println("Tangle total time: " + (time3-time2) + " ms");
-        new PlottingView().loadPointsWithClustering(dataset.dataPoints, TangleClusterer.getHardClustering());
+        new PlottingView().loadPointsWithClustering(dataset.dataPoints, TangleClusterer.getHardClustering(), TangleClusterer.getSoftClustering());
         System.out.println("\nkMeans:");
         /*int[] kMeansResult = dataset.kMeans();
         System.out.println("Resulting clustering for first 50 participants: ");
@@ -31,41 +31,28 @@ public class Main {
         System.out.println("K-means time: " + (time4-time3) + " ms");
         System.out.println("Total time: " + (time4-time1) + " ms");
 
+
         /*
-        // Tests of the main.DatasetGenerator
-
-        int participants = 20;
-        int questions = 50;
-        main.BitSet[] answers = main.DatasetGenerator.generateBiasedBinaryQuestionnaireAnswers(participants, questions, 0.75);
-        for (int i = 0; i < participants; i++) {
-            answers[i].print();
-        }
-
-        main.Point[] points = main.DatasetGenerator.generateGaussianMixturePoints(1000, 5);
-        System.out.println("Copy-paste the following into Maple:");
-        System.out.println("with(plots):");
-        System.out.print("pointplot([");
-        for (main.Point point : points) {
-            System.out.print(point.getX() + ", ");
-        }
-        System.out.print("], [");
-
-        for (main.Point point : points) {
-            System.out.print(point.getY() + ", ");
-        }
-        System.out.println("])");
-
-         */
-/*
+        //Tests of PlottingView
         int n = 1000;
         int clusters = 4;
 
         double[][] points = DatasetGenerator.generateGaussianMixturePoints(n, clusters);
+
         int[] clustering = new int[n];
         for (int i = 0; i < n; i++) {
-            clustering[i] = i%clusters;
+            clustering[i] = i % clusters;
         }
 
-        new PlottingView().loadPointsWithClustering(points, clustering);*/
+        double[][] softClustering = new double[n][clusters];
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < clusters; j++) {
+                softClustering[i][j] = i % (clusters - 1) * 0.4;
+            }
+        }
+
+        new PlottingView().loadPointsWithClustering(points, clustering, softClustering);
+
+         */
     }
 }
