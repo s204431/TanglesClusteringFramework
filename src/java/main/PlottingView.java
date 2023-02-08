@@ -4,24 +4,30 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
 import java.util.Random;
 
-public class PlottingView extends JPanel {
+public class PlottingView extends JPanel implements MouseMotionListener {
     public static final int POINT_SIZE = 10;
 
     public JFrame frame;
 
     public int windowWidth, windowHeight;
 
+    private double[][] points;
+    private int[] clusters;
+    private Color[] colors;
+
     private int xOrig = (int)(windowWidth * 0.5);
     private int yOrig = (int)(windowHeight * 0.5);
-    private int factor = 1; //Used to expand x- or y-axis to fit largest datapoint
+    private int factor = 1; //Used to expand x- or y-axis to capture largest datapoint
     private int lineGap;
     private int lines;
 
-    private double[][] points;
-    private int[] clusters;    //Cluster of each point
-    private Color[] colors;
+    private int mouseX, mouseY;
+
+    private JTextField coordinates = new JTextField();
 
     //Often used strokes
     private final BasicStroke stroke1 = new BasicStroke(1);
@@ -34,6 +40,7 @@ public class PlottingView extends JPanel {
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         setPreferredSize(new Dimension(screenSize.width, screenSize.height));
         setBounds(0, 0, getPreferredSize().width, getPreferredSize().height);
+        setLayout(null);
 
         windowWidth = screenSize.width - screenSize.width / 4;
         windowHeight = screenSize.height - screenSize.height / 4;
@@ -50,6 +57,12 @@ public class PlottingView extends JPanel {
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
 
+        //Components
+        coordinates.setBounds(5, 5, 100, 30);
+        coordinates.setFont(new Font("TimesRoman", Font.PLAIN, 15));
+        add(coordinates);
+
+
         frame.addComponentListener(new ComponentAdapter()
         {
             public void componentResized(ComponentEvent evt) {
@@ -59,6 +72,8 @@ public class PlottingView extends JPanel {
                 repaint();
             }
         });
+
+        addMouseMotionListener(this);
     }
 
     //Draws everything on screen.
@@ -135,7 +150,7 @@ public class PlottingView extends JPanel {
         //Plot points
         if (points != null) {
             for (int i = 0; i < points.length; i++) {
-                int[] coor = convertToPointOnScreen(points[i]);
+                int[] coor = convertPointToCoordinateOnScreen(points[i]);
                 if (clusters != null) {
                     g2d.setColor(colors[clusters[i]]);
                 }
@@ -146,12 +161,12 @@ public class PlottingView extends JPanel {
         }
     }
 
-    public int[] convertToPointOnScreen(double[] coor) {
+    public int[] convertPointToCoordinateOnScreen(double[] coor) {
         return new int[] { (int)(xOrig + (coor[0] * lineGap / factor) - POINT_SIZE / 2),  (int)(yOrig - (coor[1] * lineGap / factor) - POINT_SIZE / 2)};
     }
 
-    public double[][] convertToCoordinates(double[][] point) {
-        return null;
+    private int[] convertScreenPositionToCoordinate(int x, int y) {
+        return new int[] { (x - xOrig) * factor / lineGap, (yOrig - y) * factor / lineGap };
     }
 
     public void loadPointsWithClustering(double[][] points, int[] clusters) {
@@ -207,6 +222,19 @@ public class PlottingView extends JPanel {
         factor = Math.max((int)(max / 6), 1);
         xOrig = windowWidth / 2 + (int)(bounds[0] + bounds[2]) / factor;
         yOrig = windowHeight / 2 - (int)(bounds[1] + bounds[3]) / factor;
+    }
+
+    @Override
+    public void mouseDragged(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseMoved(MouseEvent e) {
+        mouseX = e.getX();
+        mouseY = e.getY();
+        int[] coor = convertScreenPositionToCoordinate(mouseX, mouseY);
+        coordinates.setText(coor[0] + ", " + coor[1]);
     }
 }
 
