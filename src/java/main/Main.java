@@ -32,10 +32,10 @@ public class Main {
         System.out.println("Total time: " + (time4-time1) + " ms");
 
 
-        /*
+/*
         //Tests of PlottingView
-        int n = 1000;
-        int clusters = 4;
+        int n = 5000;
+        int clusters = 7;
 
         double[][] points = DatasetGenerator.generateGaussianMixturePoints(n, clusters);
 
@@ -47,12 +47,13 @@ public class Main {
         double[][] softClustering = new double[n][clusters];
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < clusters; j++) {
-                softClustering[i][j] = i % (clusters - 1) * 0.4;
+                softClustering[i][j] = i % 3 * 0.4;
             }
         }
 
         new PlottingView().loadPointsWithClustering(points, clustering, softClustering);
 
-         */
+ */
+
     }
 }

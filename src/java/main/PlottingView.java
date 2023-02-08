@@ -20,7 +20,7 @@ public class PlottingView extends JPanel implements MouseMotionListener {
     private double[][] points;
     private int[] clusters;
     private double[][] softClustering;
-    private Color[] colors;
+    private Color[] colors = new Color[] { Color.RED, Color.BLUE, Color.YELLOW, Color.GREEN, Color.ORANGE, Color.PINK, Color.GRAY };  //Default colors
 
     private int xOrig = (int)(windowWidth * 0.5);
     private int yOrig = (int)(windowHeight * 0.5);
@@ -198,31 +198,30 @@ public class PlottingView extends JPanel implements MouseMotionListener {
 
     public void loadClusters(int[] clusters) {
         this.clusters = clusters;
-        this.colors = new Color[clusters.length];
-        Random random = new Random();
+        int amountOfColors = 0;
         for (int i = 0; i < clusters.length; i++) {
-            float r = random.nextFloat();
-            float g = random.nextFloat();
-            float b = random.nextFloat();
-            Color randomColor = new Color(r,g,b);
-            this.colors[i] = randomColor;
+            if (clusters[i] > amountOfColors) {
+                amountOfColors = clusters[i];
+            }
+        }
+        amountOfColors++;
+        if (amountOfColors > colors.length) {
+            Random random = new Random();
+            this.colors = new Color[amountOfColors];
+            for (int i = 0; i < amountOfColors; i++) {
+                float r = random.nextFloat();
+                float g = random.nextFloat();
+                float b = random.nextFloat();
+                Color randomColor = new Color(r, g, b);
+                this.colors[i] = randomColor;
+            }
         }
         repaint();
     }
 
     public void loadClusters(int[] clusters, double[][] softClustering) {
-        this.clusters = clusters;
         this.softClustering = softClustering;
-        this.colors = new Color[clusters.length];
-        Random random = new Random();
-        for (int i = 0; i < clusters.length; i++) {
-            float r = random.nextFloat();
-            float g = random.nextFloat();
-            float b = random.nextFloat();
-            Color randomColor = new Color(r,g,b);
-            this.colors[i] = randomColor;
-        }
-        repaint();
+        loadClusters(clusters);
     }
 
     private double[] findBounds(double[][] points) {
