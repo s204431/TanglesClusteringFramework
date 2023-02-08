@@ -6,10 +6,12 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Random;
 
 public class PlottingView extends JPanel implements MouseMotionListener {
-    public static final int POINT_SIZE = 10;
+    public static final int POINT_SIZE = 8;
 
     public JFrame frame;
 
@@ -25,8 +27,6 @@ public class PlottingView extends JPanel implements MouseMotionListener {
     private int factor = 1; //Used to expand x- or y-axis to capture largest datapoint
     private int lineGap;
     private int lines;
-
-    private int mouseX, mouseY;
 
     private JTextField coordinates = new JTextField();
 
@@ -59,7 +59,7 @@ public class PlottingView extends JPanel implements MouseMotionListener {
         frame.setVisible(true);
 
         //Components
-        coordinates.setBounds(5, 5, 100, 30);
+        coordinates.setBounds(5, 5, 150, 30);
         coordinates.setFont(new Font("TimesRoman", Font.PLAIN, 15));
         add(coordinates);
 
@@ -160,7 +160,8 @@ public class PlottingView extends JPanel implements MouseMotionListener {
                     g2d.setColor(c);
                 }
                 g2d.fillOval(coor[0], coor[1], POINT_SIZE, POINT_SIZE);
-                g2d.setColor(Color.GRAY);
+                //g2d.setColor(Color.BLACK);
+                g2d.setColor(new Color(0,0,0,50));
                 g2d.drawOval(coor[0], coor[1], POINT_SIZE, POINT_SIZE);
             }
         }
@@ -174,8 +175,8 @@ public class PlottingView extends JPanel implements MouseMotionListener {
         return new int[] { (int)(xOrig + (coor[0] * lineGap / factor) - POINT_SIZE / 2),  (int)(yOrig - (coor[1] * lineGap / factor) - POINT_SIZE / 2)};
     }
 
-    private int[] convertScreenPositionToCoordinate(int x, int y) {
-        return new int[] { (x - xOrig) * factor / lineGap, (yOrig - y) * factor / lineGap };
+    private double[] convertScreenPositionToCoordinate(int x, int y) {
+        return new double[] { (x - xOrig) * factor / (double)lineGap, (yOrig - y) * factor / (double)lineGap };
     }
 
     public void loadPointsWithClustering(double[][] points, int[] clusters) {
@@ -260,10 +261,15 @@ public class PlottingView extends JPanel implements MouseMotionListener {
 
     @Override
     public void mouseMoved(MouseEvent e) {
-        mouseX = e.getX();
-        mouseY = e.getY();
-        int[] coor = convertScreenPositionToCoordinate(mouseX, mouseY);
-        coordinates.setText(coor[0] + ", " + coor[1]);
+        int mouseX = e.getX();
+        int mouseY = e.getY();
+        double[] coor = convertScreenPositionToCoordinate(mouseX, mouseY);
+        String text = round(coor[0], 2) + ", " + round(coor[1], 2);
+        coordinates.setText(text);
+    }
+
+    private double round(double d, int decimalPlaces) {
+        return new BigDecimal(d).setScale(decimalPlaces, RoundingMode.HALF_UP).doubleValue();
     }
 }
 
