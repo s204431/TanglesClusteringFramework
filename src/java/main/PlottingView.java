@@ -2,33 +2,36 @@ package main;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionListener;
+import java.awt.event.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Random;
 
-public class PlottingView extends JPanel implements MouseMotionListener {
+public class PlottingView extends JPanel implements MouseListener, MouseMotionListener, MouseWheelListener {
     public static final int POINT_SIZE = 8;
 
     public JFrame frame;
 
-    public int windowWidth, windowHeight;
+    public int windowWidth, windowHeight, windowMax;
+
+    private boolean close = false;
 
     private double[][] points;
     private int[] clusters;
     private double[][] softClustering;
     private Color[] colors = new Color[] { Color.RED, Color.BLUE, Color.YELLOW, Color.GREEN, Color.ORANGE, Color.PINK, Color.GRAY };  //Default colors
 
+    private int[] mouseOrigVector;
+    private boolean dragging = false;
+
     private int xOrig = (int)(windowWidth * 0.5);
     private int yOrig = (int)(windowHeight * 0.5);
-    private int factor = 1; //Used to expand x- or y-axis to capture largest datapoint
+    private double factor = 1; //Used to expand x- or y-axis to capture largest datapoint
+    private int zoomFactor = 1;
     private int lineGap;
     private int lines;
 
-    private JTextField coordinates = new JTextField();
+    private JLabel coordinates = new JLabel();
 
     //Often used strokes
     private final BasicStroke stroke1 = new BasicStroke(1);
@@ -61,7 +64,7 @@ public class PlottingView extends JPanel implements MouseMotionListener {
         //Components
         coordinates.setBounds(5, 5, 150, 30);
         coordinates.setFont(new Font("TimesRoman", Font.PLAIN, 15));
-        add(coordinates);
+        frame.add(coordinates);
 
 
         frame.addComponentListener(new ComponentAdapter()
@@ -74,7 +77,10 @@ public class PlottingView extends JPanel implements MouseMotionListener {
             }
         });
 
+        addMouseListener(this);
         addMouseMotionListener(this);
+        addMouseWheelListener(this);
+        (new Thread(new BoardDragger())).start();
     }
 
     //Draws everything on screen.
@@ -91,14 +97,16 @@ public class PlottingView extends JPanel implements MouseMotionListener {
         g2d.drawLine(xOrig, 0, xOrig, windowHeight);
 
         //Draw lines, grid lines and numbers on axes
-        int windowMax = Math.max(windowHeight, windowWidth);
+        windowMax = Math.max(windowHeight, windowWidth);
         int lineSize1 = windowMax/150;
         int lineSize2 = windowMax/75;
-        g2d.setStroke(stroke2);
         int fontSize = windowMax / 70;
         g.setFont(new Font("TimesRoman", Font.BOLD, Math.max(fontSize, 12)));
-        lineGap = windowMax/30;
-        lines = windowMax/lineGap;
+        g2d.setStroke(stroke2);
+        if (lineGap == 0) {
+            lineGap = windowMax / 30;
+        }
+        lines = (windowMax + windowMax * zoomFactor * 4) / lineGap;
         int lineSize;
         boolean drawNumber;
         for (int i = 1; i < lines; i++) {
@@ -135,8 +143,8 @@ public class PlottingView extends JPanel implements MouseMotionListener {
 
             //Draw number on axes
             if (drawNumber) {
-                String posText = "" + i * factor;
-                String negText = "-" + i * factor;
+                String posText = "" + (int)(i * factor);
+                String negText = "-" + (int)(i * factor);
                 int fontHeight = g2d.getFontMetrics().getHeight();
                 int fontWidth = g2d.getFontMetrics().stringWidth(posText);
                 g2d.drawString(posText, posX - fontWidth / 2, yOrig + lineSize + fontHeight); //Positive direction on x-axis
@@ -174,7 +182,7 @@ public class PlottingView extends JPanel implements MouseMotionListener {
     }
 
     public int[] convertPointToCoordinateOnScreen(double[] coor) {
-        return new int[] { (int)(xOrig + (coor[0] * lineGap / factor) - POINT_SIZE / 2),  (int)(yOrig - (coor[1] * lineGap / factor) - POINT_SIZE / 2)};
+        return new int[] { (int)(xOrig + (coor[0] * (lineGap) / factor) - POINT_SIZE / 2),  (int)(yOrig - (coor[1] * (lineGap) / factor) - POINT_SIZE / 2)};
     }
 
     private double[] convertScreenPositionToCoordinate(int x, int y) {
@@ -251,8 +259,12 @@ public class PlottingView extends JPanel implements MouseMotionListener {
             max = Math.max(Math.abs(bound), max);
         }
         factor = Math.max((int)(max / 6), 1);
-        xOrig = windowWidth / 2 + (int)(bounds[0] + bounds[2]) / factor;
-        yOrig = windowHeight / 2 - (int)(bounds[1] + bounds[3]) / factor;
+        xOrig = windowWidth / 2 + (int)((bounds[0] + bounds[2]) / factor);
+        yOrig = windowHeight / 2 - (int)((bounds[1] + bounds[3]) / factor);
+    }
+
+    private double round(double d, int decimalPlaces) {
+        return new BigDecimal(d).setScale(decimalPlaces, RoundingMode.HALF_UP).doubleValue();
     }
 
     @Override
@@ -262,15 +274,96 @@ public class PlottingView extends JPanel implements MouseMotionListener {
 
     @Override
     public void mouseMoved(MouseEvent e) {
-        int mouseX = e.getX();
-        int mouseY = e.getY();
-        double[] coor = convertScreenPositionToCoordinate(mouseX, mouseY);
-        String text = round(coor[0], 2) + ", " + round(coor[1], 2);
-        coordinates.setText(text);
+        Point mousePos = getMousePosition();
+        if (mousePos != null) {
+            double[] coor = convertScreenPositionToCoordinate(mousePos.x, mousePos.y);
+            String text = round(coor[0], 2) + ", " + round(coor[1], 2);
+            coordinates.setText(text);
+        }
     }
 
-    private double round(double d, int decimalPlaces) {
-        return new BigDecimal(d).setScale(decimalPlaces, RoundingMode.HALF_UP).doubleValue();
+    @Override
+    public void mouseClicked(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+        Point mousePos = getMousePosition();
+        if (mousePos != null) {
+            mouseOrigVector = new int[]{xOrig - mousePos.x, yOrig - mousePos.y};
+            dragging = true;
+        }
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+        dragging = false;
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+
+    }
+
+    //Zooms in/out when scrolling.
+    @Override
+    public void mouseWheelMoved(MouseWheelEvent e) {
+        int lineGapReset = windowMax / 30;
+        int nZoom = lineGap / 70;
+        double tempFactor = factor;
+        boolean factorChanged = false;
+        double origWidthDist = ((e.getX() - xOrig) / (double)lineGap);
+        double origHeightDist = ((e.getY() - yOrig) / (double)lineGap);
+        if (e.getPreciseWheelRotation() > 0.0 && lineGap > lineGapReset / 6) {
+            lineGap -= nZoom > 0 ? nZoom : 1;
+            if (lineGap < lineGapReset / 5 && zoomFactor >= 1) {
+                lineGap = lineGapReset;
+                factor *= 5;
+                zoomFactor--;
+                factorChanged = true;
+            }
+        } else if (e.getPreciseWheelRotation() < 0.0) {
+            if (zoomFactor >= 0) {
+                lineGap += nZoom > 0 ? nZoom : 1;
+                if (lineGap > lineGapReset * 5) {
+                    lineGap = lineGapReset;
+                    factor /= 5;
+                    zoomFactor++;
+                    factorChanged = true;
+                }
+            }
+        }
+        xOrig -= (origWidthDist - (e.getX() - xOrig) / (double)lineGap) * (double)lineGap;
+        yOrig -= (origHeightDist - (e.getY() - yOrig) / (double)lineGap) * (double)lineGap;
+        repaint();
+    }
+
+    //Concurrent thread that moves the graph when dragging.
+    private class BoardDragger implements Runnable {
+        @Override
+        public void run() {
+            while (!close) {
+                if (dragging) {
+                    Point mousePos = getMousePosition();
+                    if (mousePos != null) {
+                        xOrig = mousePos.x + mouseOrigVector[0];
+                        yOrig = mousePos.y + mouseOrigVector[1];
+                        repaint();
+                    }
+                }
+                try {
+                    Thread.sleep(10);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 }
 
