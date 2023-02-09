@@ -1,6 +1,9 @@
 package main;
 
 import test.ClusteringTester;
+import main.Util.Tuple;
+
+import smile.validation.metric.NormalizedMutualInformation;
 
 import java.util.Date;
 
@@ -10,7 +13,9 @@ public class Main {
         int a = 10000;
         //new PlottingView().loadPoints(dataset.dataPoints);
         long time1 = new Date().getTime();
-        FeatureBasedDataset dataset = new FeatureBasedDataset(DatasetGenerator.generateGaussianMixturePoints(100000, 6).x, a);
+        Tuple<double[][], int[]> generated = DatasetGenerator.generateGaussianMixturePoints(100000, 4);
+        FeatureBasedDataset dataset = new FeatureBasedDataset(generated.x, a);
+        int[] groundTruth = generated.y;
         //FeatureBasedDataset dataset = new FeatureBasedDataset(900);
         //dataset.loadDataFromFile("LyngbyWeatherData.csv", 4, 5000, 1, -1);
         //BinaryQuestionnaire dataset = new main.BinaryQuestionnaire(main.DatasetGenerator.generateBiasedBinaryQuestionnaireAnswers(6000000, 40));
@@ -22,6 +27,8 @@ public class Main {
         TangleClusterer.generateClusters(dataset, a, -1);
         long time3 = new Date().getTime();
         System.out.println("Tangle total time: " + (time3-time2) + " ms");
+        double nmiScore = NormalizedMutualInformation.joint(groundTruth, TangleClusterer.getHardClustering());
+        System.out.println("NMI score: " + nmiScore);
         new PlottingView().loadPointsWithClustering(dataset.dataPoints, TangleClusterer.getHardClustering(), TangleClusterer.getSoftClustering());
         System.out.println("\nkMeans:");
         /*int[] kMeansResult = dataset.kMeans();

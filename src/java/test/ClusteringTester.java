@@ -13,16 +13,21 @@ public class ClusteringTester {
     public static void testTangleClusterer() {
         System.out.println("Testing tangle clusterer...");
         long time1 = new Date().getTime();
-        testTangleClustererFeatureBased();
+        double[] result1 = testTangleClustererFeatureBased();
         System.out.println();
-        testTangleClustererBinaryQuestionnaire();
+        double[] result2 = testTangleClustererBinaryQuestionnaire();
         long time2 = new Date().getTime();
-        System.out.println("Tests finished. Total time: " + (time2 - time1) + " ms.");
+        System.out.println();
+        System.out.println("Feature based average NMI score: " + result1[0]/result1[1]);
+        System.out.println("Questionnaire average NMI score: " + result2[0]/result2[1]);
+        System.out.println("Tests finished. Total time: " + (time2 - time1) + " ms. Average NMI score: " + (result1[0]+result2[0])/(result1[1]+result2[1]));
     }
 
-    public static void testTangleClustererFeatureBased() {
+    public static double[] testTangleClustererFeatureBased() {
         long totalTime1 = new Date().getTime();
         int totalCount = 0;
+        int totalCountWithoutNaN = 0;
+        double NMISum = 0;
         for (int i = 1000; i <= 1000000; i *= 10) {
             totalCount++;
             long sizeTime1 = new Date().getTime();
@@ -39,40 +44,56 @@ public class ClusteringTester {
                 int[] hardClustering = TangleClusterer.getHardClustering();
                 long time2 = new Date().getTime();
                 double nmiScore = NormalizedMutualInformation.joint(hardClustering, groundTruth);
-                System.out.println("Feature based test with " + i + " datapoints and " + j + " clusters took " + (time2 - time1) + " ms. NMI score: " + nmiScore + ".");
+                if (!Double.isNaN(nmiScore)) {
+                    totalCountWithoutNaN++;
+                    NMISum += nmiScore;
+                }
+                System.out.println("Feature based test with " + i + " datapoints and " + j + " clusters took " + (time2 - time1) + " ms. NMI score: " + nmiScore);
             }
             long sizeTime2 = new Date().getTime();
             System.out.println("Feature based tests with " + i + " datapoints finished. Total time: " + (sizeTime2 - sizeTime1) + " ms. Average time: " + (sizeTime2-sizeTime1)/sizeCount + " ms.");
         }
         long totalTime2 = new Date().getTime();
-        System.out.println("Feature based tests finished in " + (totalTime2-totalTime1) + " ms.");
+        System.out.println("Feature based tests finished in " + (totalTime2-totalTime1) + " ms. Average NMI score: " + NMISum/totalCountWithoutNaN);
+        return new double[] {NMISum, totalCountWithoutNaN};
     }
 
-    public static void testTangleClustererBinaryQuestionnaire() {
+    //Returns sum of NMI scores and total datasets tested with NMI score.
+    public static double[] testTangleClustererBinaryQuestionnaire() {
         long totalTime1 = new Date().getTime();
         int totalCount = 0;
+        int totalCountWithoutNaN = 0;
+        double NMISum = 0;
         for (int i = 1000; i <= 1000000; i *= 10) {
             totalCount++;
             long sizeTime1 = new Date().getTime();
             int sizeCount = 0;
-            for (int j = 1; j < 42; j+=5) {
+            for (int j = 10; j < 41; j+=5) {
                 for (int k = 1; k <= 6; k++) {
                     sizeCount++;
                     long time1 = new Date().getTime();
                     int a = (int)((i/k)*(2.0/3.0));
-                    Dataset dataset = new BinaryQuestionnaire(DatasetGenerator.generateBiasedBinaryQuestionnaireAnswers(i, j, k).x);
+                    Tuple<BitSet[], int[]> generated = DatasetGenerator.generateBiasedBinaryQuestionnaireAnswers(i, j, k);
+                    Dataset dataset = new BinaryQuestionnaire(generated.x);
+                    int[] groundTruth = generated.y;
                     TangleClusterer.generateClusters(dataset, a, -1);
                     TangleClusterer.getSoftClustering();
                     int[] hardClustering = TangleClusterer.getHardClustering();
                     long time2 = new Date().getTime();
-                    System.out.println("Questionnaire test with " + i + " datapoints, " + j + " questions and " + k + " clusters took " + (time2 - time1) + " ms.");
+                    double nmiScore = NormalizedMutualInformation.joint(hardClustering, groundTruth);
+                    if (!Double.isNaN(nmiScore)) {
+                        totalCountWithoutNaN++;
+                        NMISum += nmiScore;
+                    }
+                    System.out.println("Questionnaire test with " + i + " datapoints, " + j + " questions and " + k + " clusters took " + (time2 - time1) + " ms. NMI score: " + nmiScore);
                 }
             }
             long sizeTime2 = new Date().getTime();
             System.out.println("Questionnaire tests with " + i + " datapoints finished. Total time: " + (sizeTime2 - sizeTime1) + " ms. Average time: " + (sizeTime2-sizeTime1)/sizeCount + " ms.");
         }
         long totalTime2 = new Date().getTime();
-        System.out.println("Questionnaire tests finished in " + (totalTime2-totalTime1) + " ms.");
+        System.out.println("Questionnaire tests finished in " + (totalTime2-totalTime1) + " ms. Average NMI score: " + NMISum/totalCountWithoutNaN);
+        return new double[] {NMISum, totalCountWithoutNaN};
     }
 
 
