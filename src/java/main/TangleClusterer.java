@@ -8,8 +8,10 @@ import main.Util.Tuple;
 public class TangleClusterer {
 
     private static TangleSearchTree tangleSearchTree;
+    private static FeatureBasedDataset data;
 
     public static void generateClusters(Dataset dataset, int a, int psi) {
+        data = (FeatureBasedDataset) dataset;
         long time1 = new Date().getTime();
         BitSet[] initialCuts = dataset.getInitialCuts();
         long time2 = new Date().getTime();
@@ -91,6 +93,17 @@ public class TangleClusterer {
             indices[i] = i;
         }
         quicksort(costs, indices, 0, costs.length-1);
+        /*int n = 8;
+        for (int i = 0; i < n; i++) {
+            int[] hardClustering = new int[initialCuts[indices[i]].size()];
+            double[][] softClustering = new double[initialCuts[indices[n]].size()][initialCuts.length];
+            for (int j = 0; j < initialCuts[indices[i]].size(); j++) {
+                hardClustering[j] = initialCuts[indices[i]].get(j) ? 0 : 1;
+                softClustering[j][0] = initialCuts[indices[i]].get(j) ? 1 : 0;
+                softClustering[j][1] = initialCuts[indices[i]].get(j) ? 0 : 1;
+            }
+            new PlottingView().loadPointsWithClustering(data.dataPoints, hardClustering, softClustering);
+        }*/
         TangleSearchTree tree = new TangleSearchTree(a, initialCuts, costs);
         for (int i = 0; i < costs.length; i++) {
             if (psi > 0 && costs[i] > psi) {

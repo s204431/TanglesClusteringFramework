@@ -154,7 +154,7 @@ public class TangleSearchTree {
     }
 
     private double getWeight(double cost) {
-        return 1/(Math.pow(cost,4));
+        return 1/(cost);
     }
 
     private int getSoftClustering(Node node, int datapoint, int index, double accumulated, double[] result) {

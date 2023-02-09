@@ -119,10 +119,10 @@ public class FeatureBasedDataset implements Dataset {
             result[i] = cuts.get(i);
         }
         initialCuts = result;
-        int[] hardClustering = new int[result[0].size()];
-        double[][] softClustering = new double[result[0].size()][result.length];
         //BEGIN TEST
-        /*int n = 10;
+        /*int[] hardClustering = new int[result[0].size()];
+        double[][] softClustering = new double[result[0].size()][result.length];
+        int n = 6;
         for (int j = 0; j < result[n].size(); j++) {
             hardClustering[j] = result[n].get(j) ? 0 : 1;
             softClustering[j][0] = result[n].get(j) ? 1 : 0;
@@ -220,8 +220,11 @@ public class FeatureBasedDataset implements Dataset {
             }
             //Sum up distances from the means.
             for (int j = 0; j < initialCuts[i].size(); j++) {
-                costs[i] += Math.exp(-Math.pow(10,-3)*getDistance(dataPoints[j], initialCuts[i].get(j) ? mean2 : mean1));
+                double[] mean = initialCuts[i].get(j) ? mean2 : mean1;
+                int otherSideSize = initialCuts[i].get(j) ? initialCuts[i].size() - initialCuts[i].count() : initialCuts[i].count();
+                costs[i] += Math.exp(-Math.pow(10,-3)*getDistance(dataPoints[j], mean))*otherSideSize;
             }
+            costs[i] /= initialCuts[i].count()*(initialCuts[i].size() - initialCuts[i].count());
         }
         return costs;
     }
