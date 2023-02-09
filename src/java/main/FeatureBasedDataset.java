@@ -201,6 +201,7 @@ public class FeatureBasedDataset implements Dataset {
     public double[] distanceToMeanCostFunction() {
         double[] costs = new double[initialCuts.length];
         for (int i = 0; i < initialCuts.length; i++) {
+            int cutCount = initialCuts[i].count();
             double[] mean1 = new double[dataPoints[0].length];
             double[] mean2 = new double[dataPoints[0].length];
             //Calculate means of the two sides of the cut.
@@ -215,13 +216,13 @@ public class FeatureBasedDataset implements Dataset {
                 }
             }
             for (int j = 0; j < mean1.length; j++) {
-                mean1[j] /= initialCuts[i].count();
-                mean2[j] /= initialCuts[i].size() - initialCuts[i].count();
+                mean1[j] /= cutCount;
+                mean2[j] /= initialCuts[i].size() - cutCount;
             }
             //Sum up distances from the means.
             for (int j = 0; j < initialCuts[i].size(); j++) {
                 double[] mean = initialCuts[i].get(j) ? mean2 : mean1;
-                int otherSideSize = initialCuts[i].get(j) ? initialCuts[i].size() - initialCuts[i].count() : initialCuts[i].count();
+                int otherSideSize = initialCuts[i].get(j) ? initialCuts[i].size() - cutCount : cutCount;
                 costs[i] += Math.exp(-Math.pow(10,-3)*getDistance(dataPoints[j], mean))*otherSideSize;
             }
             costs[i] /= initialCuts[i].count()*(initialCuts[i].size() - initialCuts[i].count());

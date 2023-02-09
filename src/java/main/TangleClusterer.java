@@ -8,44 +8,42 @@ import main.Util.Tuple;
 public class TangleClusterer {
 
     private static TangleSearchTree tangleSearchTree;
-    private static FeatureBasedDataset data;
 
     public static void generateClusters(Dataset dataset, int a, int psi) {
-        data = (FeatureBasedDataset) dataset;
         long time1 = new Date().getTime();
         BitSet[] initialCuts = dataset.getInitialCuts();
         long time2 = new Date().getTime();
-        System.out.println("Initial cuts time: " + (time2-time1) + " ms");
+        //System.out.println("Initial cuts time: " + (time2-time1) + " ms");
         double[] costs = dataset.getCutCosts();
-        for (double cost : costs) {
+        /*for (double cost : costs) {
             System.out.print(cost + " ");
-        }
+        }*/
         Tuple<BitSet[], double[]> redundancyRemoved = removeRedundantCuts(initialCuts, costs, 1); //Set factor to 1 to turn it off.
         initialCuts = redundancyRemoved.x;
         costs = redundancyRemoved.y;
         long time3 = new Date().getTime();
-        System.out.println();
-        System.out.println("Cost function time: " + (time3-time2) + " ms");
+        //System.out.println();
+        //System.out.println("Cost function time: " + (time3-time2) + " ms");
         TangleSearchTree tree = generateTangleSearchTree(initialCuts, costs, a, psi);
         tangleSearchTree = tree;
         long time4 = new Date().getTime();
-        System.out.println("Tree generation time: " + (time4-time3) + " ms");
-        System.out.println("Nodes at lowest depth: " + tree.lowestDepthNodes.size());
-        System.out.println("Depth of tree: " + tree.getDepth(tree.lowestDepthNodes.get(0)));
-        System.out.println("Total nodes in tree: " + tree.n);
+        //System.out.println("Tree generation time: " + (time4-time3) + " ms");
+        //System.out.println("Nodes at lowest depth: " + tree.lowestDepthNodes.size());
+        //System.out.println("Depth of tree: " + tree.getDepth(tree.lowestDepthNodes.get(0)));
+        //System.out.println("Total nodes in tree: " + tree.n);
         try {
             tree.condenseTree(2);
         } catch (NullPointerException e) {
             tree.generateDefaultClustering();
         }
         long time5 = new Date().getTime();
-        System.out.println("Condensing time: " + (time5-time4) + " ms");
+        //System.out.println("Condensing time: " + (time5-time4) + " ms");
         tree.contractTree();
         long time6 = new Date().getTime();
-        System.out.println("Contracting time: " + (time6-time5) + " ms");
+        //System.out.println("Contracting time: " + (time6-time5) + " ms");
         double[][] softClustering = tree.calculateSoftClustering();
         long time7 = new Date().getTime();
-        System.out.println("Clustering time: " + (time7-time6) + " ms");
+        /*System.out.println("Clustering time: " + (time7-time6) + " ms");
         for (int i = softClustering.length/2-10; i < softClustering.length/2+40; i++) {
             for (double d : softClustering[i]) {
                 System.out.print(d + " ");
@@ -73,7 +71,7 @@ public class TangleClusterer {
         }
         System.out.println("Wrong clusterings: " + count + " Percentage correct: " + (((double)softClustering.length-count)/softClustering.length));
         System.out.println("Total tangle search tree time: " + (time8-time3) + " ms");
-        System.out.println();
+        System.out.println();*/
     }
 
     public static double[][] getSoftClustering() {
