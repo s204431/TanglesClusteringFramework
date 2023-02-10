@@ -320,7 +320,6 @@ public class PlottingView extends JPanel implements MouseListener, MouseMotionLi
         double tempLineGap = lineGap;
         double origWidthDist = ((double)(e.getX() - xOrig) / (double)lineGap);
         double origHeightDist = ((double)(e.getY() - yOrig) / (double)lineGap);
-        System.out.println(origWidthDist + ", " + origHeightDist);
 
         if (e.getPreciseWheelRotation() > 0.0 && lineGap > lineGapReset / 6) {
             lineGap -= nZoom > 0 ? nZoom : 1;
