@@ -315,18 +315,19 @@ public class PlottingView extends JPanel implements MouseListener, MouseMotionLi
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
         int lineGapReset = windowMax / 30;
-        int nZoom = lineGap / 70;
+        double nZoom = lineGap / 70;
         double tempFactor = factor;
-        boolean factorChanged = false;
-        double origWidthDist = ((e.getX() - xOrig) / (double)lineGap);
-        double origHeightDist = ((e.getY() - yOrig) / (double)lineGap);
+        double tempLineGap = lineGap;
+        double origWidthDist = ((double)(e.getX() - xOrig) / (double)lineGap);
+        double origHeightDist = ((double)(e.getY() - yOrig) / (double)lineGap);
+        System.out.println(origWidthDist + ", " + origHeightDist);
+
         if (e.getPreciseWheelRotation() > 0.0 && lineGap > lineGapReset / 6) {
             lineGap -= nZoom > 0 ? nZoom : 1;
             if (lineGap < lineGapReset / 5 && zoomFactor >= 1) {
                 lineGap = lineGapReset;
                 factor *= 5;
                 zoomFactor--;
-                factorChanged = true;
             }
         } else if (e.getPreciseWheelRotation() < 0.0) {
             if (zoomFactor >= 0) {
@@ -335,12 +336,21 @@ public class PlottingView extends JPanel implements MouseListener, MouseMotionLi
                     lineGap = lineGapReset;
                     factor /= 5;
                     zoomFactor++;
-                    factorChanged = true;
                 }
             }
         }
+
         xOrig -= (origWidthDist - (e.getX() - xOrig) / (double)lineGap) * (double)lineGap;
         yOrig -= (origHeightDist - (e.getY() - yOrig) / (double)lineGap) * (double)lineGap;
+
+        if (tempFactor > factor) {
+            xOrig -= (origWidthDist) * 4 * (double) lineGap;
+            yOrig -= (origHeightDist) * 4 * (double) lineGap;
+        } else if (tempFactor < factor) {
+            xOrig += (origWidthDist) * 4 * (tempLineGap + 0.5);
+            yOrig += (origHeightDist) * 4 * (tempLineGap + 0.5);
+        }
+
         repaint();
     }
 
