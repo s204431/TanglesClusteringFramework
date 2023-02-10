@@ -88,27 +88,27 @@ public class BitSet {
 
     //Returns the size of the intersection between two bitsets.
     //Requires same maximum size. partOfSet specifies if false or true means part of the set.
-    public static int intersection(BitSet set1, BitSet set2, boolean partOfSet1, boolean partOfSet2) {
-        return intersectionEarlyStop(set1, set2, partOfSet1, partOfSet2, Integer.MAX_VALUE);
+    public static int intersection(BitSet set1, BitSet set2, boolean flip1, boolean flip2) {
+        return intersectionEarlyStop(set1, set2, flip1, flip2, Integer.MAX_VALUE);
     }
 
     //Returns the size of the intersection between three bitsets.
-    public static int intersection(BitSet set1, BitSet set2, BitSet set3, boolean partOfSet1, boolean partOfSet2, boolean partOfSet3) {
-        return intersectionEarlyStop(set1, set2, set3, partOfSet1, partOfSet2, partOfSet3, Integer.MAX_VALUE);
+    public static int intersection(BitSet set1, BitSet set2, BitSet set3, boolean flip1, boolean flip2, boolean flip3) {
+        return intersectionEarlyStop(set1, set2, set3, flip1, flip2, flip3, Integer.MAX_VALUE);
     }
 
     //Intersection that stops when greater than a.
-    public static int intersectionEarlyStop(BitSet set1, BitSet set2, boolean partOfSet1, boolean partOfSet2, int a) {
+    public static int intersectionEarlyStop(BitSet set1, BitSet set2, boolean flip1, boolean flip2, int a) {
         int count = 0;
         for (int i = 0; i < set1.set.length; i++) {
             int amountFlipped = 0;
             long long1 = set1.set[i];
             long long2 = set2.set[i];
-            if (!partOfSet1) {
+            if (flip1) {
                 long1 = ~long1;
                 amountFlipped++;
             }
-            if (!partOfSet2) {
+            if (flip2) {
                 long2 = ~long2;
                 amountFlipped++;
             }
@@ -127,22 +127,22 @@ public class BitSet {
     }
 
 
-    public static int intersectionEarlyStop(BitSet set1, BitSet set2, BitSet set3, boolean partOfSet1, boolean partOfSet2, boolean partOfSet3, int a) {
+    public static int intersectionEarlyStop(BitSet set1, BitSet set2, BitSet set3, boolean flip1, boolean flip2, boolean flip3, int a) {
         int count = 0;
         for (int i = 0; i < set1.set.length; i++) {
             int amountFlipped = 0;
             long long1 = set1.set[i];
             long long2 = set2.set[i];
             long long3 = set3.set[i];
-            if (!partOfSet1) {
+            if (flip1) {
                 long1 = ~long1;
                 amountFlipped++;
             }
-            if (!partOfSet2) {
+            if (flip2) {
                 long2 = ~long2;
                 amountFlipped++;
             }
-            if (!partOfSet3) {
+            if (flip3) {
                 long3 = ~long3;
                 amountFlipped++;
             }

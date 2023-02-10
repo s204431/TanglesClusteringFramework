@@ -192,7 +192,7 @@ public class FeatureBasedDataset implements Dataset {
                     cost += Math.exp(-getDistance(dataPoints[j], dataPoints[k]));
                 }
             }
-            costs[i] = cost/(initialCuts[i].count()*(initialCuts[i].size()-initialCuts[i].count()));
+            costs[i] = cost;///(initialCuts[i].count()*(initialCuts[i].size()-initialCuts[i].count()));
             //costs[i] = cost;
         }
         return costs;
@@ -223,9 +223,9 @@ public class FeatureBasedDataset implements Dataset {
             for (int j = 0; j < initialCuts[i].size(); j++) {
                 double[] mean = initialCuts[i].get(j) ? mean2 : mean1;
                 int otherSideSize = initialCuts[i].get(j) ? initialCuts[i].size() - cutCount : cutCount;
-                costs[i] += Math.exp(-Math.pow(10,-3)*getDistance(dataPoints[j], mean))*otherSideSize;
+                costs[i] += Math.exp(-(1.0/initialCuts[i].size())*getDistance(dataPoints[j], mean));//*otherSideSize;
             }
-            costs[i] /= initialCuts[i].count()*(initialCuts[i].size() - initialCuts[i].count());
+            //costs[i] /= initialCuts[i].count()*(initialCuts[i].size() - initialCuts[i].count());
         }
         return costs;
     }

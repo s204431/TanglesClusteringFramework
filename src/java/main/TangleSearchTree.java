@@ -154,7 +154,7 @@ public class TangleSearchTree {
     }
 
     private double getWeight(double cost) {
-        return 1/(cost);
+        return 1.0/cost;
     }
 
     private int getSoftClustering(Node node, int datapoint, int index, double accumulated, double[] result) {
@@ -274,24 +274,49 @@ public class TangleSearchTree {
     }
 
     //Prints the side of the cut for each node in the tree (for debugging).
-    public void printTree() {
+    public void printTree(boolean asGraphviz, boolean contracted) {
+        if (asGraphviz) {
+            System.out.println("digraph G {");
+        }
         List<Node> currentNodes = new ArrayList<>();
         currentNodes.add(root);
+        int depth = 0;
         while (!currentNodes.isEmpty()) {
             for (int i = 0; i < currentNodes.size(); i++) {
-                System.out.print(currentNodes.get(i).side + " " + currentNodes.get(i).getChildCount());
+                if (!asGraphviz) {
+                    System.out.print(currentNodes.get(i).side + " " + currentNodes.get(i).getChildCount());
+                }
             }
+            int index1 = 0;
+            int index2 = 0;
             List<Node> newNodes = new ArrayList<>();
             for (Node node : currentNodes) {
                 if (node.leftChild != null) {
                     newNodes.add(node.leftChild);
+                    if (asGraphviz) {
+                        String extra1 = contracted ? "/" + node.distinguishedCuts.size() + "/" + node.condensedOrientations.count() : "";
+                        String extra2 = contracted ? "/" + node.leftChild.distinguishedCuts.size() + "/" + node.leftChild.condensedOrientations.count() : "";
+                        System.out.println("\""+depth+"/"+index1+"/"+(node.side ? "L" : "R")+extra1+"\""+" -> "+"\""+(depth+1)+"/"+index2+"/"+(node.leftChild.side ? "L" : "R")+extra2+"\"");
+                    }
+                    index2++;
                 }
                 if (node.rightChild != null) {
                     newNodes.add(node.rightChild);
+                    if (asGraphviz) {
+                        String extra1 = contracted ? "/" + node.distinguishedCuts.size() + "/" + node.condensedOrientations.count() : "";
+                        String extra2 = contracted ? "/" + node.rightChild.distinguishedCuts.size() + "/" + node.rightChild.condensedOrientations.count() : "";
+                        System.out.println("\""+depth+"/"+index1+"/"+(node.side ? "L" : "R")+extra1+"\""+" -> "+"\""+(depth+1)+"/"+index2+"/"+(node.rightChild.side ? "L" : "R")+extra2+"\"");
+                    }
+                    index2++;
                 }
+                index1++;
             }
             currentNodes = newNodes;
+            depth++;
             System.out.println();
+        }
+        if (asGraphviz) {
+            System.out.println("}");
         }
     }
 

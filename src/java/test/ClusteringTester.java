@@ -35,7 +35,7 @@ public class ClusteringTester {
             for (int j = 1; j <= 10; j++) {
                 sizeCount++;
                 long time1 = new Date().getTime();
-                int a = (int)((i/j)*(2.0/3.0));
+                int a = (int)((i/j)*(1.0/2.0));
                 Tuple<double[][], int[]> generated = DatasetGenerator.generateGaussianMixturePoints(i, j);
                 Dataset dataset = new FeatureBasedDataset(generated.x, a);
                 int[] groundTruth = generated.y;
@@ -72,7 +72,7 @@ public class ClusteringTester {
                 for (int k = 1; k <= 6; k++) {
                     sizeCount++;
                     long time1 = new Date().getTime();
-                    int a = (int)((i/k)*(2.0/3.0));
+                    int a = (int)((i/k)*(1.0/2.0));
                     Tuple<BitSet[], int[]> generated = DatasetGenerator.generateBiasedBinaryQuestionnaireAnswers(i, j, k);
                     Dataset dataset = new BinaryQuestionnaire(generated.x);
                     int[] groundTruth = generated.y;

@@ -10,10 +10,10 @@ import java.util.Date;
 public class Main {
     public static void main(String[] args) {
         ClusteringTester.testTangleClusterer();
-        int a = 10000;
+        int a = 1250;
         //new PlottingView().loadPoints(dataset.dataPoints);
         long time1 = new Date().getTime();
-        Tuple<double[][], int[]> generated = DatasetGenerator.generateGaussianMixturePoints(100000, 4);
+        Tuple<double[][], int[]> generated = DatasetGenerator.generateGaussianMixturePoints(10000, 4);
         FeatureBasedDataset dataset = new FeatureBasedDataset(generated.x, a);
         int[] groundTruth = generated.y;
         //FeatureBasedDataset dataset = new FeatureBasedDataset(900);

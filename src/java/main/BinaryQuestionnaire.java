@@ -5,6 +5,7 @@ import java.util.*;
 
 public class BinaryQuestionnaire implements Dataset {
     private BitSet[] answers;
+
     private BitSet[] initialCuts;
 
     public BinaryQuestionnaire() {

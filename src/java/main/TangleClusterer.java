@@ -1,5 +1,6 @@
 package main;
 
+import java.awt.*;
 import java.util.Date;
 
 import main.TangleSearchTree.Node;
@@ -8,8 +9,10 @@ import main.Util.Tuple;
 public class TangleClusterer {
 
     private static TangleSearchTree tangleSearchTree;
+    //private static FeatureBasedDataset data;
 
     public static void generateClusters(Dataset dataset, int a, int psi) {
+        //data = (FeatureBasedDataset) dataset;
         long time1 = new Date().getTime();
         BitSet[] initialCuts = dataset.getInitialCuts();
         long time2 = new Date().getTime();
@@ -25,6 +28,7 @@ public class TangleClusterer {
         //System.out.println();
         //System.out.println("Cost function time: " + (time3-time2) + " ms");
         TangleSearchTree tree = generateTangleSearchTree(initialCuts, costs, a, psi);
+        //tree.printTree(true, false);
         tangleSearchTree = tree;
         long time4 = new Date().getTime();
         //System.out.println("Tree generation time: " + (time4-time3) + " ms");
@@ -32,13 +36,15 @@ public class TangleClusterer {
         //System.out.println("Depth of tree: " + tree.getDepth(tree.lowestDepthNodes.get(0)));
         //System.out.println("Total nodes in tree: " + tree.n);
         try {
-            tree.condenseTree(2);
+            tree.condenseTree(1);
         } catch (NullPointerException e) {
             tree.generateDefaultClustering();
         }
+        //tree.printTree(true, true);
         long time5 = new Date().getTime();
         //System.out.println("Condensing time: " + (time5-time4) + " ms");
         tree.contractTree();
+        //tree.printTree(true, true);
         long time6 = new Date().getTime();
         //System.out.println("Contracting time: " + (time6-time5) + " ms");
         double[][] softClustering = tree.calculateSoftClustering();
@@ -52,24 +58,6 @@ public class TangleClusterer {
         }
         System.out.println("Number of clusters found: " + softClustering[0].length);
         long time8 = new Date().getTime();
-        int count = 0;
-        for (int i = 0; i < softClustering.length; i++) {
-            double max = 0;
-            int cluster = -1;
-            for (int j = 0; j < softClustering[i].length; j++) {
-                if (softClustering[i][j] > max) {
-                    max = softClustering[i][j];
-                    cluster = j;
-                }
-            }
-            if (i < softClustering.length/2 && cluster == 0) {
-                count++;
-            }
-            else if (i >= softClustering.length/2 && cluster == 1) {
-                count++;
-            }
-        }
-        System.out.println("Wrong clusterings: " + count + " Percentage correct: " + (((double)softClustering.length-count)/softClustering.length));
         System.out.println("Total tangle search tree time: " + (time8-time3) + " ms");
         System.out.println();*/
     }
@@ -91,7 +79,7 @@ public class TangleClusterer {
             indices[i] = i;
         }
         quicksort(costs, indices, 0, costs.length-1);
-        /*int n = 8;
+        /*int n = 5;
         for (int i = 0; i < n; i++) {
             int[] hardClustering = new int[initialCuts[indices[i]].size()];
             double[][] softClustering = new double[initialCuts[indices[n]].size()][initialCuts.length];
