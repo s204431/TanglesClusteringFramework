@@ -24,7 +24,7 @@ public class SidePanel extends JPanel {
         setLayout(null);
 
         aSlider = new JSlider(JSlider.HORIZONTAL, 0, 80, 50);
-        aSlider.setBounds(50, 100, 100, 50);
+        aSlider.setBounds(50, 200, 100, 50);
         aSlider.setMinorTickSpacing(100);
         aSlider.setMajorTickSpacing(100);
         aSlider.addChangeListener(new ChangeListener() {
@@ -41,7 +41,7 @@ public class SidePanel extends JPanel {
         add(aSlider);
 
         aValue = new JTextField("No data points");
-        aValue.setBounds(50, 150, 100, 30);
+        aValue.setBounds(50, 250, 100, 30);
         aValue.setHorizontalAlignment(JTextField.CENTER);
         add(aValue);
 
@@ -78,10 +78,12 @@ public class SidePanel extends JPanel {
         Graphics2D g2d = (Graphics2D) g;
 
         g2d.setColor(Color.BLACK);
-        g2d.setFont(new Font("TimesRoman", Font.BOLD, 20));
+        g2d.setFont(new Font("TimesRoman", Font.BOLD, 18));
         g2d.drawString("NMI score:", 50, 30);
         g2d.drawString(""+((int)(view.getNMIScore()*100000)/100000.0), 50, 50);
-        g2d.drawString("a", 50, 100);
+        g2d.drawString("Clustering time:", 50, 80);
+        g2d.drawString(view.getClusteringTime() + " ms", 50, 100);
+        g2d.drawString("a", 50, 200);
     }
 
     protected void update() {

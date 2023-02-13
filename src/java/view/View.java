@@ -142,4 +142,8 @@ public class View extends JFrame {
     protected double getNMIScore() {
         return model.getNMIScore();
     }
+
+    protected long getClusteringTime() {
+        return model.getClusteringTime();
+    }
 }

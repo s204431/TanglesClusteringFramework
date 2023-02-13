@@ -6,6 +6,7 @@ import datasets.FeatureBasedDataset;
 import util.BitSet;
 import view.View;
 import smile.validation.metric.NormalizedMutualInformation;
+import java.util.Date;
 
 public class Model {
     private TangleClusterer tangleClusterer = new TangleClusterer();
@@ -13,6 +14,7 @@ public class Model {
     private View view;
     private int a;
     private int psi;
+    private long clusteringTime = 0;
 
     public Model() {
 
@@ -23,16 +25,20 @@ public class Model {
     }
 
     public void generateClusters(Dataset dataset, int a, int psi) {
+        long time = new Date().getTime();
         this.dataset = dataset;
         this.a = a;
         this.psi = psi;
         tangleClusterer.generateClusters(dataset, a, psi);
+        clusteringTime = new Date().getTime() - time;
     }
 
     public void regenerateClusters(int a) {
+        long time = new Date().getTime();
         this.a = a;
         tangleClusterer.generateClusters(dataset, a, psi);
         double[][] softClustering = tangleClusterer.getSoftClustering();
+        clusteringTime = new Date().getTime() - time;
         view.loadClusters(tangleClusterer.getHardClustering(), softClustering);
     }
 
@@ -60,6 +66,10 @@ public class Model {
             return -1;
         }
         return NormalizedMutualInformation.joint(getHardClustering(), dataset.getGroundTruth());
+    }
+
+    public long getClusteringTime() {
+        return clusteringTime;
     }
 
 }
