@@ -5,14 +5,20 @@ import java.awt.*;
 import java.awt.event.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.DecimalFormat;
+import java.text.FieldPosition;
+import java.text.NumberFormat;
+import java.text.ParsePosition;
 import java.util.Random;
 
 public class PlottingView extends JPanel implements MouseListener, MouseMotionListener, MouseWheelListener {
     public static final int POINT_SIZE = 8;
 
-    public JFrame frame;
+    private View view;
 
-    public int windowWidth, windowHeight, windowMax;
+    private int windowMax;
+
+    public JFrame frame;
 
     private boolean close = false;
 
@@ -24,8 +30,8 @@ public class PlottingView extends JPanel implements MouseListener, MouseMotionLi
     private int[] mouseOrigVector;
     private boolean dragging = false;
 
-    private int xOrig = (int)(windowWidth * 0.5);
-    private int yOrig = (int)(windowHeight * 0.5);
+    private int xOrig;
+    private int yOrig;
     private double factor = 1; //Used to expand x- or y-axis to capture largest datapoint
     private int zoomFactor = 1;
     private int lineGap;
@@ -39,16 +45,17 @@ public class PlottingView extends JPanel implements MouseListener, MouseMotionLi
     private final BasicStroke stroke3 = new BasicStroke(3);
     private final BasicStroke stroke4 = new BasicStroke(4);
 
-    public PlottingView() {
+    public PlottingView(View view) {
+        this.view = view;
+
         //Initialize
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         setPreferredSize(new Dimension(screenSize.width, screenSize.height));
-        setBounds(0, 0, getPreferredSize().width, getPreferredSize().height);
-        setLayout(null);
 
-        windowWidth = screenSize.width - screenSize.width / 4;
-        windowHeight = screenSize.height - screenSize.height / 4;
+        xOrig = (int)(view.getWindowWidth() * 0.5);
+        yOrig = (int)(view.getWindowHeight() * 0.5);
 
+        /*
         //Create frame
         frame = new JFrame("PlottingView");
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -61,12 +68,6 @@ public class PlottingView extends JPanel implements MouseListener, MouseMotionLi
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
 
-        //Components
-        coordinates.setBounds(5, 5, 150, 30);
-        coordinates.setFont(new Font("TimesRoman", Font.PLAIN, 15));
-        frame.add(coordinates);
-
-
         frame.addComponentListener(new ComponentAdapter()
         {
             public void componentResized(ComponentEvent evt) {
@@ -77,6 +78,12 @@ public class PlottingView extends JPanel implements MouseListener, MouseMotionLi
             }
         });
 
+         */
+
+        coordinates.setBounds(5, 5, 150, 30);
+        coordinates.setFont(new Font("TimesRoman", Font.PLAIN, 15));
+        add(coordinates);
+
         addMouseListener(this);
         addMouseMotionListener(this);
         addMouseWheelListener(this);
@@ -85,19 +92,19 @@ public class PlottingView extends JPanel implements MouseListener, MouseMotionLi
 
     //Draws everything on screen.
     @Override
-    public void paint(Graphics g) {
-        super.paint(g);
+    public void paintComponent(Graphics g) {
+        super.paintComponent(g);
 
         Graphics2D g2d = (Graphics2D) g;
 
         //Draw axes
         g2d.setStroke(stroke4);
         g2d.setColor(Color.BLACK);
-        g2d.drawLine(0, yOrig, windowWidth, yOrig);
-        g2d.drawLine(xOrig, 0, xOrig, windowHeight);
+        g2d.drawLine(0, yOrig, view.getWindowWidth(), yOrig);
+        g2d.drawLine(xOrig, 0, xOrig, view.getWindowHeight());
 
         //Draw lines, grid lines and numbers on axes
-        windowMax = Math.max(windowHeight, windowWidth);
+        windowMax = Math.max(view.getWindowHeight(), view.getWindowWidth());
         int lineSize1 = windowMax/150;
         int lineSize2 = windowMax/75;
         int fontSize = windowMax / 70;
@@ -129,10 +136,10 @@ public class PlottingView extends JPanel implements MouseListener, MouseMotionLi
             //Draw gridlines
             g2d.setColor(Color.LIGHT_GRAY);
             g2d.setStroke(stroke1);
-            g2d.drawLine(posX, 0, posX, windowHeight); //Positive direction on x-axis
-            g2d.drawLine(0, posY, windowWidth, posY); //Positive direction on y-axis
-            g2d.drawLine(negX, 0, negX, windowHeight); //Negative direction on x-axis
-            g2d.drawLine(0, negY, windowWidth, negY); //Negative direction on y-axis
+            g2d.drawLine(posX, 0, posX, view.getWindowHeight()); //Positive direction on x-axis
+            g2d.drawLine(0, posY, view.getWindowWidth(), posY); //Positive direction on y-axis
+            g2d.drawLine(negX, 0, negX, view.getWindowHeight()); //Negative direction on x-axis
+            g2d.drawLine(0, negY, view.getWindowWidth(), negY); //Negative direction on y-axis
 
             //Draw lines on axes
             g2d.setColor(Color.BLACK);
@@ -141,10 +148,21 @@ public class PlottingView extends JPanel implements MouseListener, MouseMotionLi
             g2d.drawLine(negX, yOrig - lineSize, negX, yOrig + lineSize); //Negative direction on x-axis
             g2d.drawLine(xOrig - lineSize, negY, xOrig + lineSize, negY); //Negative direction on y-axis
 
-            //Draw number on axes
+            //Draw numbers on axes
             if (drawNumber) {
-                String posText = "" + (int)(i * factor);
-                String negText = "-" + (int)(i * factor);
+                double num = i * factor;
+                String posText;
+                String negText;
+                if (num < 10) {
+                    posText = "" + round(num, 2);
+                    negText = "-" + round(num, 2);
+                } else if (num > 9999) {
+                    posText = "" + convertNumberToScientificNotation(num);
+                    negText = "-" + convertNumberToScientificNotation(num);
+                } else {
+                    posText = "" + (int)(num);
+                    negText = "-" + (int)(num);
+                }
                 int fontHeight = g2d.getFontMetrics().getHeight();
                 int fontWidth = g2d.getFontMetrics().stringWidth(posText);
                 g2d.drawString(posText, posX - fontWidth / 2, yOrig + lineSize + fontHeight); //Positive direction on x-axis
@@ -175,6 +193,11 @@ public class PlottingView extends JPanel implements MouseListener, MouseMotionLi
                 g2d.drawOval(coor[0], coor[1], POINT_SIZE, POINT_SIZE);
             }
         }
+
+        //Box behind coordinate text
+        g2d.setColor(new Color(255, 255, 255, 200));
+        g2d.fillRect(5, 5, 150, 30);
+        updateCoordinateText();
     }
 
     private Color changeTranslucencyOfColor(Color color, double percentage) {
@@ -259,12 +282,38 @@ public class PlottingView extends JPanel implements MouseListener, MouseMotionLi
             max = Math.max(Math.abs(bound), max);
         }
         factor = Math.max((int)(max / 6), 1);
-        xOrig = windowWidth / 2 + (int)((bounds[0] + bounds[2]) / factor);
-        yOrig = windowHeight / 2 - (int)((bounds[1] + bounds[3]) / factor);
+        xOrig = view.getWindowWidth() / 2 + (int)((bounds[0] + bounds[2]) / factor);
+        yOrig = view.getWindowHeight() / 2 - (int)((bounds[1] + bounds[3]) / factor);
     }
 
     private double round(double d, int decimalPlaces) {
         return new BigDecimal(d).setScale(decimalPlaces, RoundingMode.HALF_UP).doubleValue();
+    }
+
+    private void updateCoordinateText() {
+        Point mousePos = getMousePosition();
+        if (mousePos != null) {
+            double[] coor = convertScreenPositionToCoordinate(mousePos.x, mousePos.y);
+            String text = " ";
+            if (coor[0] > 9999 || coor[0] < -9999) {
+                text += convertNumberToScientificNotation(coor[0]) + ", ";
+            } else {
+                text += round(coor[0], 2) + ", ";
+            }
+
+            if (coor[1] > 9999 || coor[1] < -9999) {
+                text += convertNumberToScientificNotation(coor[1]);
+            } else {
+                text += round(coor[1], 2);
+            }
+
+            coordinates.setText(text);
+        }
+    }
+
+    private String convertNumberToScientificNotation(double n) {
+        NumberFormat numberFormat = new DecimalFormat("0.00E0");
+        return numberFormat.format(n);
     }
 
     @Override
@@ -274,12 +323,7 @@ public class PlottingView extends JPanel implements MouseListener, MouseMotionLi
 
     @Override
     public void mouseMoved(MouseEvent e) {
-        Point mousePos = getMousePosition();
-        if (mousePos != null) {
-            double[] coor = convertScreenPositionToCoordinate(mousePos.x, mousePos.y);
-            String text = round(coor[0], 2) + ", " + round(coor[1], 2);
-            coordinates.setText(text);
-        }
+        updateCoordinateText();
     }
 
     @Override
@@ -315,7 +359,7 @@ public class PlottingView extends JPanel implements MouseListener, MouseMotionLi
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
         int lineGapReset = windowMax / 30;
-        double nZoom = lineGap / 70;
+        double nZoom = lineGap / (double)70;
         double tempFactor = factor;
         double tempLineGap = lineGap;
         double origWidthDist = ((double)(e.getX() - xOrig) / (double)lineGap);
@@ -330,7 +374,7 @@ public class PlottingView extends JPanel implements MouseListener, MouseMotionLi
             }
         } else if (e.getPreciseWheelRotation() < 0.0) {
             if (zoomFactor >= 0) {
-                lineGap += nZoom > 0 ? nZoom : 1;
+                lineGap += nZoom > 1 ? nZoom : 1;
                 if (lineGap > lineGapReset * 5) {
                     lineGap = lineGapReset;
                     factor /= 5;
@@ -349,7 +393,6 @@ public class PlottingView extends JPanel implements MouseListener, MouseMotionLi
             xOrig += (origWidthDist) * 4 * (tempLineGap + 0.5);
             yOrig += (origHeightDist) * 4 * (tempLineGap + 0.5);
         }
-
         repaint();
     }
 
