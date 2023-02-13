@@ -1,4 +1,6 @@
-package main;
+package model;
+
+import util.BitSet;
 
 import java.util.*;
 
@@ -6,17 +8,17 @@ public class TangleSearchTree {
 
     private static final boolean USE_HASHING = false; //Determines if hashing of intersections is used.
     private int a;
-    public Node root;
-    public List<Node> lowestDepthNodes = new ArrayList<>();
+    protected Node root;
+    protected List<Node> lowestDepthNodes = new ArrayList<>();
     private int currentDepth = -1;
 
     private BitSet[] orientations;
     private double[] cutCosts;
     private int integerBits; //Number of bits to represent the index of an orientation.
     private Hashtable<Long, Integer> hashtable = new Hashtable();
-    public double[][] softClustering;
+    protected double[][] softClustering;
 
-    public TangleSearchTree(int a, BitSet[] orientations, double[] cutCosts) {
+    protected TangleSearchTree(int a, BitSet[] orientations, double[] cutCosts) {
         this.a = a;
         this.orientations = orientations;
         this.cutCosts = cutCosts;
@@ -25,8 +27,7 @@ public class TangleSearchTree {
         lowestDepthNodes.add(root);
     }
 
-    public int n;
-    public boolean addOrientation(Node node, int orientationIndex, boolean left) {
+    protected boolean addOrientation(Node node, int orientationIndex, boolean left) {
         Node newNode = new Node(orientationIndex, left);
         newNode.parent = node;
         if (left) {
@@ -46,7 +47,6 @@ public class TangleSearchTree {
             }
         }
         else {
-            n++;
             int depth = getDepth(newNode);
             if (depth != currentDepth) {
                 lowestDepthNodes = new ArrayList<>();
@@ -57,7 +57,7 @@ public class TangleSearchTree {
         return consistent;
     }
 
-    public boolean isConsistent(Node newNode) {
+    private boolean isConsistent(Node newNode) {
         int depth = getDepth(newNode);
         if (depth < 2) {
             if (orientations[newNode.originalOrientation].size() < a) {
@@ -105,7 +105,7 @@ public class TangleSearchTree {
         return true;
     }
 
-    public int getDepth(Node node) {
+    private int getDepth(Node node) {
         int depth = 0;
         while (node.parent != null) {
             node = node.parent;
@@ -114,7 +114,7 @@ public class TangleSearchTree {
         return depth;
     }
 
-    public int[] calculateHardClustering() {
+    protected int[] calculateHardClustering() {
         if (softClustering == null) {
             calculateSoftClustering();
         }
@@ -133,7 +133,7 @@ public class TangleSearchTree {
         return hardClustering;
     }
 
-    public double[][] calculateSoftClustering() {
+    protected double[][] calculateSoftClustering() {
         int clusters = getNumberOfClusters(root);
         double[][] result = new double[orientations[0].size()][clusters];
         for (int i = 0; i < orientations[0].size(); i++) {
@@ -144,7 +144,7 @@ public class TangleSearchTree {
     }
 
     //Generates a default clustering with one cluster.
-    public double[][] generateDefaultClustering() {
+    protected double[][] generateDefaultClustering() {
         double[][] result = new double[orientations[0].size()][1];
         for (int i = 0; i < orientations[0].size(); i++) {
             result[i][0] = 1;
@@ -353,7 +353,7 @@ public class TangleSearchTree {
         public int originalDepth = 1;
 
         public Node() {
-            condensedOrientations = new BitSet(orientations.length*2);
+            condensedOrientations = new util.BitSet(orientations.length*2);
         }
 
         public Node(int orientationIndex, boolean side) {

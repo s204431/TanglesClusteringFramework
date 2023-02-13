@@ -1,17 +1,18 @@
-package main;
+package model;
 
-import java.awt.*;
 import java.util.Date;
 
-import main.TangleSearchTree.Node;
-import main.Util.Tuple;
+import datasets.Dataset;
+import util.BitSet;
+import model.TangleSearchTree.Node;
+import util.Util.Tuple;
 
 public class TangleClusterer {
 
-    private static TangleSearchTree tangleSearchTree;
+    private TangleSearchTree tangleSearchTree;
     //private static FeatureBasedDataset data;
 
-    public static void generateClusters(Dataset dataset, int a, int psi) {
+    protected void generateClusters(Dataset dataset, int a, int psi) {
         //data = (FeatureBasedDataset) dataset;
         long time1 = new Date().getTime();
         BitSet[] initialCuts = dataset.getInitialCuts();
@@ -62,18 +63,18 @@ public class TangleClusterer {
         System.out.println();*/
     }
 
-    public static double[][] getSoftClustering() {
+    protected double[][] getSoftClustering() {
         return tangleSearchTree.softClustering;
     }
 
-    public static int[] getHardClustering() {
+    protected int[] getHardClustering() {
         if (tangleSearchTree.softClustering == null) {
             tangleSearchTree.calculateSoftClustering();
         }
         return tangleSearchTree.calculateHardClustering();
     }
 
-    private static TangleSearchTree generateTangleSearchTree(BitSet[] initialCuts, double[] costs, int a, int psi) {
+    private TangleSearchTree generateTangleSearchTree(BitSet[] initialCuts, double[] costs, int a, int psi) {
         int[] indices = new int[costs.length];
         for (int i = 0; i < indices.length; i++) {
             indices[i] = i;
@@ -108,7 +109,7 @@ public class TangleClusterer {
     }
 
     //Removes redundant cuts that agree on factor% of their elements.
-    private static Tuple<BitSet[], double[]> removeRedundantCuts(BitSet[] initialCuts, double[] costs, double factor) {
+    private Tuple<BitSet[], double[]> removeRedundantCuts(BitSet[] initialCuts, double[] costs, double factor) {
         boolean[] toBeRemoved = new boolean[initialCuts.length]; //true indicates that the corresponding cut should be removed.
         for (int i = 0; i < initialCuts.length; i++) {
             for (int j = 0; j < initialCuts.length; j++) {
@@ -138,7 +139,7 @@ public class TangleClusterer {
         return new Tuple(newInitialCuts, newCosts);
     }
 
-    private static void quicksort(double[] costs, int[] indices, int l, int h) {
+    private void quicksort(double[] costs, int[] indices, int l, int h) {
         if (l >= h || l < 0) {
             return;
         }
@@ -147,7 +148,7 @@ public class TangleClusterer {
         quicksort(costs, indices, p+1, h);
     }
 
-    private static int partition(double[] costs, int[] indices, int l, int h) {
+    private int partition(double[] costs, int[] indices, int l, int h) {
         double pivot = costs[h];
         int i = l-1;
         for (int j = l; j < h; j++) {

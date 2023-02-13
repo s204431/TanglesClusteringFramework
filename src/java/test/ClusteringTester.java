@@ -1,14 +1,21 @@
 package test;
 
-import main.*;
-import main.Util.Tuple;
+import datasets.DatasetGenerator;
+import util.BitSet;
+import util.Util.Tuple;
 
 import java.util.Date;
+
+import datasets.BinaryQuestionnaire;
+import datasets.Dataset;
+import datasets.FeatureBasedDataset;
+import model.Model;
 import smile.validation.metric.NormalizedMutualInformation;
 
 public class ClusteringTester {
 
     //private int[][] randomFeatureBasedTestSet = new int[][] {{1000, }}; //{nDataPoints, nClusters}
+    private static Model model = new Model();
 
     public static void testTangleClusterer() {
         System.out.println("Testing tangle clusterer...");
@@ -39,9 +46,9 @@ public class ClusteringTester {
                 Tuple<double[][], int[]> generated = DatasetGenerator.generateGaussianMixturePoints(i, j);
                 Dataset dataset = new FeatureBasedDataset(generated.x, a);
                 int[] groundTruth = generated.y;
-                TangleClusterer.generateClusters(dataset, a, -1);
-                TangleClusterer.getSoftClustering();
-                int[] hardClustering = TangleClusterer.getHardClustering();
+                model.generateClusters(dataset, a, -1);
+                model.getSoftClustering();
+                int[] hardClustering = model.getHardClustering();
                 long time2 = new Date().getTime();
                 double nmiScore = NormalizedMutualInformation.joint(hardClustering, groundTruth);
                 if (!Double.isNaN(nmiScore)) {
@@ -76,9 +83,9 @@ public class ClusteringTester {
                     Tuple<BitSet[], int[]> generated = DatasetGenerator.generateBiasedBinaryQuestionnaireAnswers(i, j, k);
                     Dataset dataset = new BinaryQuestionnaire(generated.x);
                     int[] groundTruth = generated.y;
-                    TangleClusterer.generateClusters(dataset, a, -1);
-                    TangleClusterer.getSoftClustering();
-                    int[] hardClustering = TangleClusterer.getHardClustering();
+                    model.generateClusters(dataset, a, -1);
+                    model.getSoftClustering();
+                    int[] hardClustering = model.getHardClustering();
                     long time2 = new Date().getTime();
                     double nmiScore = NormalizedMutualInformation.joint(hardClustering, groundTruth);
                     if (!Double.isNaN(nmiScore)) {

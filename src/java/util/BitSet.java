@@ -1,12 +1,12 @@
-package main;
+package util;
 
-//Custom main.BitSet implementation with fast intersection.
+//Custom BitSet implementation with fast intersection.
 public class BitSet {
     protected long[] set;
     private int size = 0;
     public double cutCost;
 
-    //Creates main.BitSet with specified maximum size.
+    //Creates BitSet with specified maximum size.
     public BitSet(int maxSize) {
         set = new long[(maxSize-1)/64+1];
         size = maxSize;

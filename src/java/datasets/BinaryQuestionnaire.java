@@ -1,4 +1,7 @@
-package main;
+package datasets;
+
+import util.BitSet;
+import util.Util.Tuple;
 
 import java.io.File;
 import java.util.*;
@@ -7,6 +10,7 @@ public class BinaryQuestionnaire implements Dataset {
     private BitSet[] answers;
 
     private BitSet[] initialCuts;
+    private int[] groundTruth;
 
     public BinaryQuestionnaire() {
 
@@ -16,11 +20,20 @@ public class BinaryQuestionnaire implements Dataset {
         this.answers = answers;
     }
 
-    public int getNumberOfParticipants() {
+    public BinaryQuestionnaire(Tuple<BitSet[], int[]> answersWithGroundTruth) {
+        answers = answersWithGroundTruth.x;
+        groundTruth = answersWithGroundTruth.y;
+    }
+
+    public int[] getGroundTruth() {
+        return groundTruth;
+    }
+
+    private int getNumberOfParticipants() {
         return answers.length;
     }
 
-    public int getNumberOfQuestions() {
+    private int getNumberOfQuestions() {
         return answers[0].size();
     }
 
@@ -51,7 +64,7 @@ public class BinaryQuestionnaire implements Dataset {
                 }
                 line++;
             }
-            answers = new BitSet[result.size()];
+            answers = new util.BitSet[result.size()];
             for (int i = 0; i < answers.length; i++) {
                 answers[i] = new BitSet(result.get(0).size());
                 if (result.get(i).size() != answers[i].size()) { //File not valid
@@ -68,7 +81,7 @@ public class BinaryQuestionnaire implements Dataset {
         }
     }
 
-    public boolean getAnswer(int r, int c) {
+    private boolean getAnswer(int r, int c) {
         return answers[r].get(c);
     }
 
@@ -102,7 +115,7 @@ public class BinaryQuestionnaire implements Dataset {
             long cost = 0;
             for (int j = 0; j < getNumberOfQuestions(); j++) {
                 long intersection1 = BitSet.intersection(initialCuts[i], initialCuts[j], true, true); //Number of people who answered "true" on one side of cut.
-                long intersection2 = BitSet.intersection(initialCuts[i], initialCuts[j], false, true); //Number of people who answered "true" on other side of cut.
+                long intersection2 = util.BitSet.intersection(initialCuts[i], initialCuts[j], false, true); //Number of people who answered "true" on other side of cut.
                 cost += intersection1*intersection2 + (initialCuts[i].count() - intersection1)*(initialCuts[i].size() - initialCuts[i].count() - intersection2);
             }
             long cutSize = getCutSize(i);
@@ -134,11 +147,11 @@ public class BinaryQuestionnaire implements Dataset {
 
         //Place centroids randomly
         Random r = new Random();
-        BitSet[] centroids = new BitSet[K]; //K randomly generated participants used as centroids
-        BitSet[] tempCentroids = new BitSet[K];
+        util.BitSet[] centroids = new BitSet[K]; //K randomly generated participants used as centroids
+        BitSet[] tempCentroids = new util.BitSet[K];
         for (int k = 0; k < K; k++) {
-            centroids[k] = new BitSet(getNumberOfQuestions());
-            tempCentroids[k] = new BitSet(getNumberOfQuestions());
+            centroids[k] = new util.BitSet(getNumberOfQuestions());
+            tempCentroids[k] = new util.BitSet(getNumberOfQuestions());
             for (int i = 0; i < getNumberOfQuestions(); i++) {
                 if (r.nextBoolean()) {
                     centroids[k].add(i);

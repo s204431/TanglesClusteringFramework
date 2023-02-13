@@ -1,4 +1,7 @@
-package main;
+package datasets;
+
+import util.BitSet;
+import util.Util.Tuple;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -10,6 +13,7 @@ public class FeatureBasedDataset implements Dataset {
 
     public double[][] dataPoints;
     private BitSet[] initialCuts;
+    private int[] groundTruth;
     private int a;
 
     private static int precision = 1; //Determines the number of cuts generated.
@@ -21,6 +25,16 @@ public class FeatureBasedDataset implements Dataset {
     public FeatureBasedDataset(double[][] dataPoints, int a) {
         this.dataPoints = dataPoints;
         this.a = a;
+    }
+
+    public FeatureBasedDataset(Tuple<double[][], int[]> dataPointsWithGroundTruth, int a) {
+        dataPoints = dataPointsWithGroundTruth.x;
+        groundTruth = dataPointsWithGroundTruth.y;
+        this.a = a;
+    }
+
+    public int[] getGroundTruth() {
+        return groundTruth;
     }
 
     public BitSet[] getInitialCutsOld() {
@@ -198,7 +212,7 @@ public class FeatureBasedDataset implements Dataset {
         return costs;
     }
 
-    public double[] distanceToMeanCostFunction() {
+    private double[] distanceToMeanCostFunction() {
         double[] costs = new double[initialCuts.length];
         for (int i = 0; i < initialCuts.length; i++) {
             int cutCount = initialCuts[i].count();
