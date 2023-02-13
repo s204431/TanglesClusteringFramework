@@ -39,11 +39,19 @@ public class View extends JFrame {
         mainComponent.setLayout(null);
 
         plottingView = new PlottingView(this);
-        plottingView.setBounds(0, 0, getPreferredSize().width, getPreferredSize().height);
-        plottingView.setLayout(null);
+        plottingView.setBounds(0, 100, windowWidth - 250, windowHeight);
+
+        SidePanel sidePanel = new SidePanel(this);
+        sidePanel.setBounds(windowWidth - 250, 100, windowWidth, windowHeight);
+
+        TopPanel topPanel = new TopPanel(this);
+        topPanel.setBounds(0, 0, windowWidth, 100);
 
         //Add components
         mainComponent.add(plottingView);
+        mainComponent.add(sidePanel);
+        mainComponent.add(topPanel);
+
         add(mainComponent);
         pack();
         setLocationByPlatform(true);

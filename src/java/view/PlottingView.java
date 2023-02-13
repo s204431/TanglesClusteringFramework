@@ -54,9 +54,8 @@ public class PlottingView extends JPanel implements MouseListener, MouseMotionLi
     public PlottingView(View view) {
         this.view = view;
 
-        //Initialize
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        setPreferredSize(new Dimension(screenSize.width, screenSize.height));
+        setPreferredSize(new Dimension(view.getWindowWidth(), view.getWindowHeight()));
+        setLayout(null);
 
         xOrig = (int)(view.getWindowWidth() * 0.5);
         yOrig = (int)(view.getWindowHeight() * 0.5);
@@ -96,7 +95,7 @@ public class PlottingView extends JPanel implements MouseListener, MouseMotionLi
         (new Thread(new BoardDragger())).start();
     }
 
-    //Draws everything on screen.
+    //Draws plottingView on screen.
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
