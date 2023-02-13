@@ -195,7 +195,7 @@ public class TangleSearchTree {
         }
     }
 
-    public void contractTree() {
+    protected void contractTree() {
         contractTree(root);
     }
 
@@ -218,7 +218,7 @@ public class TangleSearchTree {
     }
 
     //Removes branches of length "pruneDepth" or lower from the tree.
-    public void condenseTree(int pruneDepth) {
+    protected void condenseTree(int pruneDepth) {
         removeInternalNodes(root);
         pruneBranches(root, pruneDepth);
     }
@@ -274,7 +274,7 @@ public class TangleSearchTree {
     }
 
     //Prints the side of the cut for each node in the tree (for debugging).
-    public void printTree(boolean asGraphviz, boolean contracted) {
+    protected void printTree(boolean asGraphviz, boolean contracted) {
         if (asGraphviz) {
             System.out.println("digraph G {");
         }
@@ -325,7 +325,7 @@ public class TangleSearchTree {
         hashtable.put(hashKey, value);
     }
 
-    public int getHashValue(long cut1, long cut2, long cut3, boolean side1, boolean side2, boolean side3) {
+    private int getHashValue(long cut1, long cut2, long cut3, boolean side1, boolean side2, boolean side3) {
         long hashKey = getHashKey(cut1, cut2, cut3, side1, side2, side3);
         Integer hashValue = hashtable.get(hashKey);
         if (hashValue != null) {
@@ -334,36 +334,36 @@ public class TangleSearchTree {
         return -1;
     }
 
-    public long getHashKey(long cut1, long cut2, long cut3, boolean side1, boolean side2, boolean side3) {
+    private long getHashKey(long cut1, long cut2, long cut3, boolean side1, boolean side2, boolean side3) {
         long l1 = ((side1 ? 0L : 1L) << ((integerBits+1)*3-1)) | (cut1 << (integerBits+1)*2);
         long l2 = ((side2 ? 0L : 1L) << ((integerBits+1)*2-1)) | (cut2 << (integerBits+1));
         long l3 = ((side3 ? 0L : 1L) << integerBits) | cut3;
         return l1 | l2 | l3;
     }
 
-    public class Node {
+    protected class Node {
 
-        public int originalOrientation;
-        public BitSet condensedOrientations;
-        public List<Integer> distinguishedCuts = new ArrayList<>();
-        public Node leftChild;
-        public Node rightChild;
-        public Node parent;
-        public boolean side;
-        public int originalDepth = 1;
+        private int originalOrientation;
+        private BitSet condensedOrientations;
+        private List<Integer> distinguishedCuts = new ArrayList<>();
+        private Node leftChild;
+        private Node rightChild;
+        private Node parent;
+        private boolean side;
+        private int originalDepth = 1;
 
-        public Node() {
+        private Node() {
             condensedOrientations = new util.BitSet(orientations.length*2);
         }
 
-        public Node(int orientationIndex, boolean side) {
+        private Node(int orientationIndex, boolean side) {
             this.originalOrientation = orientationIndex;
             this.side = side;
             condensedOrientations = new BitSet(orientations.length*2);
             condensedOrientations.add(side ? orientationIndex : orientationIndex+condensedOrientations.size()/2);
         }
 
-        public int getChildCount() {
+        private int getChildCount() {
             int count = 0;
             if (leftChild != null) {
                 count++;

@@ -11,9 +11,9 @@ import java.util.Date;
 
 public class Main {
     public static void main(String[] args) {
+        ClusteringTester.testTangleClusterer();
         View view = new View();
         Model model = new Model(view);
-        ClusteringTester.testTangleClusterer();
         int a = 1250;
         long time1 = new Date().getTime();
         Tuple<double[][], int[]> generated = DatasetGenerator.generateGaussianMixturePoints(10000, 4);
