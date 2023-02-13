@@ -1,5 +1,13 @@
 package view;
 
+import com.jujutsu.tsne.TSneConfiguration;
+import com.jujutsu.tsne.barneshut.BHTSne;
+import com.jujutsu.tsne.barneshut.BarnesHutTSne;
+import com.jujutsu.tsne.barneshut.ParallelBHTsne;
+import com.jujutsu.utils.MatrixOps;
+import com.jujutsu.utils.MatrixUtils;
+import com.jujutsu.utils.TSneUtils;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
@@ -50,6 +58,22 @@ public class View extends JFrame {
                 repaint();
             }
         });
+    }
+
+    public double[][] TSne(double[][] dataPoints) {
+        int initial_dims = 55;
+        double perplexity = 20.0;
+        BarnesHutTSne tsne;
+        boolean parallel = false;
+        if(parallel) {
+            tsne = new ParallelBHTsne();
+        } else {
+            tsne = new BHTSne();
+        }
+        TSneConfiguration config = TSneUtils.buildConfig(dataPoints, 2, initial_dims, perplexity, 1000);
+        double [][] Y = tsne.tsne(config);
+
+        return Y;
     }
 
     public void loadPointsWithClustering(double[][] points, int[] clusters, double[][] softClustering) {
