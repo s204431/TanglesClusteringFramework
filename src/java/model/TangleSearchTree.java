@@ -120,7 +120,7 @@ public class TangleSearchTree {
         }
         int[] hardClustering = new int[softClustering.length];
         for (int i = 0; i < softClustering.length; i++) {
-            int maxCluster = -1;
+            int maxCluster = 0;
             double max = 0;
             for (int j = 0; j < softClustering[i].length; j++) {
                 if (softClustering[i][j] > max) {

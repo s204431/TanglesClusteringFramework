@@ -32,7 +32,7 @@ public class Model {
     public void regenerateClusters(int a) {
         this.a = a;
         tangleClusterer.generateClusters(dataset, a, psi);
-        plotDatapoints();
+        plotDataPoints();
     }
 
     public double[][] getSoftClustering() {
@@ -43,7 +43,7 @@ public class Model {
         return tangleClusterer.getHardClustering();
     }
 
-    public void plotDatapoints() {
+    public void plotDataPoints() {
         if (dataset instanceof BinaryQuestionnaire) {
             view.loadPointsWithClustering(((BinaryQuestionnaire) dataset).answers, tangleClusterer.getHardClustering(), tangleClusterer.getSoftClustering());
         }

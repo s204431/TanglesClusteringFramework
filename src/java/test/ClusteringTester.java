@@ -35,7 +35,7 @@ public class ClusteringTester {
         int totalCount = 0;
         int totalCountWithoutNaN = 0;
         double NMISum = 0;
-        for (int i = 1000; i <= 1000000; i *= 2) {
+        for (int i = 1000; i <= 1000000; i *= 10) {
             totalCount++;
             long sizeTime1 = new Date().getTime();
             int sizeCount = 0;

@@ -64,6 +64,10 @@ public class BitSet {
         return count;
     }
 
+    public int countFlipped(boolean flip) {
+        return flip ? size() - count() : count();
+    }
+
     //Calculates the similarity of two BitSets using XNor.
     public static int XNor(BitSet set1, BitSet set2) {
         int count = 0;

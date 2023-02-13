@@ -105,10 +105,12 @@ public class DatasetGenerator {
 
         //Generate means of clusters
         double[][] meanPoints = new double[K][2];
-        double dist = numberOfPoints * 0.15;
+        double[][] stds = new double[K][2];
+        double dist = numberOfPoints * 0.05 * numberOfClusters/1.1;
         double rad = Math.PI / K;
         for (int i = 0; i < K; i++) {
             meanPoints[i] = new double[] { dist * Math.cos(rad + 2*rad*i), dist * Math.sin(rad + 2*rad*i) };
+            stds[i] = new double[] {numberOfPoints*0.02*(r.nextDouble(0.33, 3)), numberOfPoints*0.02*(r.nextDouble(0.33, 3))};
         }
 
         //Generate points around means
@@ -117,7 +119,7 @@ public class DatasetGenerator {
             int j = i % K;
             double meanX = meanPoints[j][0];
             double meanY = meanPoints[j][1];
-            result[i] = new double[] { r.nextGaussian(meanX, std), r.nextGaussian(meanY, std) };
+            result[i] = new double[] { r.nextGaussian(meanX, stds[j][0]), r.nextGaussian(meanY, stds[j][1]) };
             groundTruth[i] = j;
         }
 
