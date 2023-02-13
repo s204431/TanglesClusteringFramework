@@ -1,5 +1,6 @@
 package main;
 
+import datasets.BinaryQuestionnaire;
 import datasets.DatasetGenerator;
 import datasets.FeatureBasedDataset;
 import model.Model;
@@ -11,13 +12,14 @@ import java.util.Date;
 
 public class Main {
     public static void main(String[] args) {
-        ClusteringTester.testTangleClusterer();
+        //ClusteringTester.testTangleClusterer();
         View view = new View();
         Model model = new Model(view);
-        int a = 1250;
+        int a = 2500;
         long time1 = new Date().getTime();
-        Tuple<double[][], int[]> generated = DatasetGenerator.generateGaussianMixturePoints(10000, 4);
+        Tuple<double[][], int[]> generated = DatasetGenerator.generateFeatureBasedDataPoints(10000, 2, 1);
         FeatureBasedDataset dataset = new FeatureBasedDataset(generated, a);
+        //BinaryQuestionnaire dataset = new BinaryQuestionnaire(DatasetGenerator.generateBiasedBinaryQuestionnaireAnswers(10000, 40, 6));
         long time2 = new Date().getTime();
         System.out.println("File loading time: " + (time2-time1) + " ms");
         model.generateClusters(dataset, a, -1);

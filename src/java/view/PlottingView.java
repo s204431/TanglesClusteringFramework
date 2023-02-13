@@ -1,5 +1,11 @@
 package view;
 
+import com.jujutsu.tsne.TSneConfiguration;
+import com.jujutsu.tsne.barneshut.BHTSne;
+import com.jujutsu.tsne.barneshut.BarnesHutTSne;
+import com.jujutsu.tsne.barneshut.ParallelBHTsne;
+import com.jujutsu.utils.TSneUtils;
+import util.BitSet;
 import view.View;
 
 import javax.swing.*;
@@ -212,21 +218,53 @@ public class PlottingView extends JPanel implements MouseListener, MouseMotionLi
         return new double[] { (x - xOrig) * factor / (double)lineGap, (yOrig - y) * factor / (double)lineGap };
     }
 
-    public void loadPointsWithClustering(double[][] points, int[] clusters) {
-        loadPoints(points);
-        loadClusters(clusters);
-    }
-
-    public void loadPointsWithClustering(double[][] points, int[] clusters, double[][] softClustering) {
-        loadPoints(points);
-        loadClusters(clusters, softClustering);
-    }
-
-    public void loadPoints(double[][] points) {
+    protected void loadPoints(double[][] points) {
+        if (points[0].length > 2) {
+            points = TSne(points);
+        }
+        else if (points[0].length == 1) {
+            points = convert1DTo2D(points);
+        }
         double[] bounds = findBounds(points);
         configureAxes(bounds);
         this.points = points;
         repaint();
+    }
+
+    protected void loadPoints(BitSet[] questionnaireAnswers) {
+        double[][] dataPoints = new double[questionnaireAnswers.length][questionnaireAnswers[0].size()];
+        for (int i = 0; i < questionnaireAnswers.length; i++) {
+            for (int j = 0; j < questionnaireAnswers[i].size(); j++) {
+                dataPoints[i][j] = questionnaireAnswers[i].get(j) ? 1 : 0;
+            }
+        }
+        loadPoints(dataPoints);
+    }
+
+    private double[][] convert1DTo2D(double[][] points) {
+        double[][] copy = new double[points.length][2];
+        for (int i = 0; i < points.length; i++) {
+            copy[i][0] = points[i][0];
+            copy[i][1] = 0;
+        }
+        return copy;
+    }
+
+    private double[][] TSne(double[][] dataPoints) {
+        int initialDims = dataPoints[0].length;
+        double perplexity = 20.0;
+        int maxIterations = 500;
+        boolean parallel = true;
+        BarnesHutTSne tsne;
+        if(parallel) {
+            tsne = new ParallelBHTsne();
+        } else {
+            tsne = new BHTSne();
+        }
+        TSneConfiguration config = TSneUtils.buildConfig(dataPoints, 2, initialDims, perplexity, maxIterations);
+        double [][] points = tsne.tsne(config);
+
+        return points;
     }
 
     public void loadClusters(int[] clusters) {

@@ -40,7 +40,7 @@ public class Model {
 
     public void plotDatapoints() {
         if (dataset instanceof BinaryQuestionnaire) {
-
+            view.loadPointsWithClustering(((BinaryQuestionnaire) dataset).answers, tangleClusterer.getHardClustering(), tangleClusterer.getSoftClustering());
         }
         else if (dataset instanceof FeatureBasedDataset) {
             view.loadPointsWithClustering(((FeatureBasedDataset) dataset).dataPoints, tangleClusterer.getHardClustering(), tangleClusterer.getSoftClustering());

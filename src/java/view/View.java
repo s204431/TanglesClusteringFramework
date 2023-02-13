@@ -7,6 +7,7 @@ import com.jujutsu.tsne.barneshut.ParallelBHTsne;
 import com.jujutsu.utils.MatrixOps;
 import com.jujutsu.utils.MatrixUtils;
 import com.jujutsu.utils.TSneUtils;
+import util.BitSet;
 
 import javax.swing.*;
 import java.awt.*;
@@ -60,40 +61,28 @@ public class View extends JFrame {
         });
     }
 
-    public double[][] TSne(double[][] dataPoints) {
-        int initial_dims = 55;
-        double perplexity = 20.0;
-        BarnesHutTSne tsne;
-        boolean parallel = false;
-        if(parallel) {
-            tsne = new ParallelBHTsne();
-        } else {
-            tsne = new BHTSne();
-        }
-        TSneConfiguration config = TSneUtils.buildConfig(dataPoints, 2, initial_dims, perplexity, 1000);
-        double [][] Y = tsne.tsne(config);
-
-        return Y;
-    }
-
     public void loadPointsWithClustering(double[][] points, int[] clusters, double[][] softClustering) {
-        plottingView.loadPointsWithClustering(points, clusters, softClustering);
+        plottingView.loadPoints(points);
+        plottingView.loadClusters(clusters, softClustering);
     }
 
     public void loadPointsWithClustering(double[][] points, int[] clusters) {
-        plottingView.loadPointsWithClustering(points, clusters);
+        plottingView.loadPoints(points);
+        plottingView.loadClusters(clusters);
+    }
+
+    public void loadPointsWithClustering(BitSet[] questionnaireAnswers, int[] clusters, double[][] softClustering) {
+        plottingView.loadPoints(questionnaireAnswers);
+        plottingView.loadClusters(clusters, softClustering);
+    }
+
+    public void loadPointsWithClustering(BitSet[] questionnaireAnswers, int[] clusters) {
+        plottingView.loadPoints(questionnaireAnswers);
+        plottingView.loadClusters(clusters);
     }
 
     public void loadPoints(double[][] points) {
         plottingView.loadPoints(points);
-    }
-
-    public void loadClusters(int[] clusters) {
-        plottingView.loadClusters(clusters);
-    }
-
-    public void loadClusters(int[] clusters, double[][] softClustering) {
-        plottingView.loadClusters(clusters, softClustering);
     }
 
     protected int getWindowHeight() {
