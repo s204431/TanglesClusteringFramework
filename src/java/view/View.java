@@ -115,6 +115,10 @@ public class View extends JFrame {
         sidePanel.update(points.length);
     }
 
+    public void loadClusters(int[] clusters, double[][] softClustering) {
+        plottingView.loadClusters(clusters, softClustering);
+    }
+
     public void updateAValue(int a) {
         sidePanel.updateAValue(a);
     }

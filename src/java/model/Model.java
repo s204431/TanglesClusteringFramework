@@ -32,7 +32,8 @@ public class Model {
     public void regenerateClusters(int a) {
         this.a = a;
         tangleClusterer.generateClusters(dataset, a, psi);
-        plotDataPoints();
+        double[][] softClustering = tangleClusterer.getSoftClustering();
+        view.loadClusters(tangleClusterer.getHardClustering(), softClustering);
     }
 
     public double[][] getSoftClustering() {

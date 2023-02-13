@@ -12,9 +12,10 @@ import java.util.Date;
 
 public class Main {
     public static void main(String[] args) {
-        ClusteringTester.testTangleClusterer();
+        //ClusteringTester.testTangleClusterer();
         View view = new View();
         Model model = new Model(view);
+        view.setModel(model);
         int a = 1000;
         long time1 = new Date().getTime();
         //Tuple<double[][], int[]> generated = DatasetGenerator.generateFeatureBasedDataPoints(10000, 4, 2);
