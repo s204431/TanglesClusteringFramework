@@ -138,4 +138,8 @@ public class View extends JFrame {
     public void setModel(Model model) {
         this.model = model;
     }
+
+    protected double getNMIScore() {
+        return model.getNMIScore();
+    }
 }

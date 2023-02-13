@@ -35,6 +35,7 @@ public class SidePanel extends JPanel {
                     aValue.setText(numberOfDataPoints == 0 ? "No data points" : "" + value);
                 }
                 view.changeAValue(value);
+                repaint();
             }
         });
         add(aSlider);
@@ -77,8 +78,10 @@ public class SidePanel extends JPanel {
         Graphics2D g2d = (Graphics2D) g;
 
         g2d.setColor(Color.BLACK);
-        g2d.setFont(new Font("TimesRoman", Font.BOLD, 50));
-        g2d.drawString("a", 50, 50);
+        g2d.setFont(new Font("TimesRoman", Font.BOLD, 20));
+        g2d.drawString("NMI score:", 50, 30);
+        g2d.drawString(""+((int)(view.getNMIScore()*100000)/100000.0), 50, 50);
+        g2d.drawString("a", 50, 100);
     }
 
     protected void update() {
