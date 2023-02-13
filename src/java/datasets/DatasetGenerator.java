@@ -124,4 +124,35 @@ public class DatasetGenerator {
         return new Tuple<>(result, groundTruth);
     }
 
+    public static Tuple<double[][], int[]> generateFeatureBasedDataPoints(int numOfPoints, int numOfClusters, int numOfFeatures) {
+        double[][] result = new double[numOfPoints][numOfFeatures];
+        int[] groundTruth = new int[numOfPoints];
+
+        Random r = new Random();
+
+        double maxDist = numOfPoints * 0.6;
+        double maxStd = numOfPoints * 0.1;
+
+        //Generate means of clusters
+        double[][] centroids = new double[numOfClusters][numOfFeatures];
+        double[][] centroidStds = new double[numOfClusters][numOfFeatures];
+        for (int i = 0; i < numOfClusters; i++) {
+            for (int j = 0; j < numOfFeatures; j++) {
+                centroids[i][j] = r.nextDouble(-maxDist, maxDist);
+                centroidStds[i][j] = r.nextDouble(maxStd);
+            }
+        }
+
+        //Generate points around means
+        for (int i = 0; i < numOfPoints; i++) {
+            int centroid = i % numOfClusters;
+            for (int j = 0; j < numOfFeatures; j++) {
+                result[i][j] = r.nextGaussian(centroids[centroid][j], centroidStds[centroid][j]);
+            }
+            groundTruth[i] = centroid;
+        }
+
+        return new Tuple<>(result, groundTruth);
+    }
+
 }
