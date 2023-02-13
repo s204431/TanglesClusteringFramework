@@ -1,4 +1,6 @@
-package main;
+package view;
+
+import view.View;
 
 import javax.swing.*;
 import java.awt.*;
@@ -6,9 +8,7 @@ import java.awt.event.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
-import java.text.FieldPosition;
 import java.text.NumberFormat;
-import java.text.ParsePosition;
 import java.util.Random;
 
 public class PlottingView extends JPanel implements MouseListener, MouseMotionListener, MouseWheelListener {

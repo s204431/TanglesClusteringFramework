@@ -4,7 +4,7 @@ import datasets.BinaryQuestionnaire;
 import datasets.Dataset;
 import datasets.FeatureBasedDataset;
 import util.BitSet;
-import main.View;
+import view.View;
 import smile.validation.metric.NormalizedMutualInformation;
 
 public class Model {

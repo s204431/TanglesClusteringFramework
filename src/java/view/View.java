@@ -1,10 +1,9 @@
-package main;
+package view;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.util.Random;
 
 public class View extends JFrame {
     private int windowWidth, windowHeight;
