@@ -13,7 +13,6 @@ public class TopPanel extends JPanel {
         setLayout(null);
     }
 
-    //Draws everything on screen.
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);

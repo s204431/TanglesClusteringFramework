@@ -7,6 +7,7 @@ import com.jujutsu.tsne.barneshut.ParallelBHTsne;
 import com.jujutsu.utils.MatrixOps;
 import com.jujutsu.utils.MatrixUtils;
 import com.jujutsu.utils.TSneUtils;
+import model.Model;
 import util.BitSet;
 
 import javax.swing.*;
@@ -15,10 +16,17 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 
 public class View extends JFrame {
+    private Model model;
+
     private int windowWidth, windowHeight;
 
     private JPanel mainComponent;
     private PlottingView plottingView;
+    private SidePanel sidePanel;
+    private TopPanel topPanel;
+
+    private int topPanelHeight;
+    private int sidePanelWidth;
 
     public View() {
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -34,20 +42,14 @@ public class View extends JFrame {
 
         //Create components
         mainComponent = new JPanel();
-        mainComponent.setPreferredSize(new Dimension(windowWidth, windowHeight));
-        mainComponent.setBounds(0, 0, windowWidth, windowHeight);
         mainComponent.setLayout(null);
 
         plottingView = new PlottingView(this);
-        plottingView.setBounds(0, 100, windowWidth - 250, windowHeight);
+        sidePanel = new SidePanel(this);
+        topPanel = new TopPanel(this);
 
-        SidePanel sidePanel = new SidePanel(this);
-        sidePanel.setBounds(windowWidth - 250, 100, windowWidth, windowHeight);
+        setBounds();
 
-        TopPanel topPanel = new TopPanel(this);
-        topPanel.setBounds(0, 0, windowWidth, 100);
-
-        //Add components
         mainComponent.add(plottingView);
         mainComponent.add(sidePanel);
         mainComponent.add(topPanel);
@@ -64,33 +66,61 @@ public class View extends JFrame {
                 Component c = (Component)evt.getSource();
                 windowWidth = getWidth();
                 windowHeight = getHeight();
+                setBounds();
                 repaint();
             }
         });
     }
 
+    private void setBounds() {
+        topPanelHeight = windowHeight / 15;
+        sidePanelWidth = windowWidth / 8;
+
+        topPanelHeight = topPanelHeight < 50 ? 50 : topPanelHeight;
+        sidePanelWidth = sidePanelWidth < 200 ? 200 : sidePanelWidth;
+
+        mainComponent.setPreferredSize(new Dimension(windowWidth, windowHeight));
+        mainComponent.setBounds(0, 0, windowWidth, windowHeight);
+        plottingView.setBounds(0, topPanelHeight, windowWidth - sidePanelWidth, windowHeight);
+        sidePanel.setBounds(windowWidth - sidePanelWidth, topPanelHeight, windowWidth, windowHeight);
+        topPanel.setBounds(0, 0, windowWidth, topPanelHeight);
+    }
+
     public void loadPointsWithClustering(double[][] points, int[] clusters, double[][] softClustering) {
         plottingView.loadPoints(points);
         plottingView.loadClusters(clusters, softClustering);
+        sidePanel.update(points.length);
     }
 
     public void loadPointsWithClustering(double[][] points, int[] clusters) {
         plottingView.loadPoints(points);
         plottingView.loadClusters(clusters);
+        sidePanel.update(points.length);
     }
 
     public void loadPointsWithClustering(BitSet[] questionnaireAnswers, int[] clusters, double[][] softClustering) {
         plottingView.loadPoints(questionnaireAnswers);
         plottingView.loadClusters(clusters, softClustering);
+        sidePanel.update(questionnaireAnswers.length);
     }
 
     public void loadPointsWithClustering(BitSet[] questionnaireAnswers, int[] clusters) {
         plottingView.loadPoints(questionnaireAnswers);
         plottingView.loadClusters(clusters);
+        sidePanel.update(questionnaireAnswers.length);
     }
 
     public void loadPoints(double[][] points) {
         plottingView.loadPoints(points);
+        sidePanel.update(points.length);
+    }
+
+    public void updateAValue(int a) {
+        sidePanel.updateAValue(a);
+    }
+
+    protected void changeAValue(int a) {
+        model.regenerateClusters(a);
     }
 
     protected int getWindowHeight() {
@@ -99,5 +129,9 @@ public class View extends JFrame {
 
     protected int getWindowWidth() {
         return windowWidth;
+    }
+
+    public void setModel(Model model) {
+        this.model = model;
     }
 }

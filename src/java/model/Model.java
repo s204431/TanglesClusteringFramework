@@ -11,6 +11,8 @@ public class Model {
     private TangleClusterer tangleClusterer = new TangleClusterer();
     private Dataset dataset;
     private View view;
+    private int a;
+    private int psi;
 
     public Model() {
 
@@ -22,12 +24,15 @@ public class Model {
 
     public void generateClusters(Dataset dataset, int a, int psi) {
         this.dataset = dataset;
+        this.a = a;
+        this.psi = psi;
         tangleClusterer.generateClusters(dataset, a, psi);
     }
 
-    public void generateClusters(BitSet[] questionnaireAnswers, int a, int psi) {
-        dataset = new BinaryQuestionnaire(questionnaireAnswers);
+    public void regenerateClusters(int a) {
+        this.a = a;
         tangleClusterer.generateClusters(dataset, a, psi);
+        plotDatapoints();
     }
 
     public double[][] getSoftClustering() {
@@ -45,6 +50,7 @@ public class Model {
         else if (dataset instanceof FeatureBasedDataset) {
             view.loadPointsWithClustering(((FeatureBasedDataset) dataset).dataPoints, tangleClusterer.getHardClustering(), tangleClusterer.getSoftClustering());
         }
+        view.updateAValue(a);
     }
 
     public double getNMIScore() {

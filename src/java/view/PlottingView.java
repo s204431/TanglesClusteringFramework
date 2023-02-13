@@ -31,7 +31,7 @@ public class PlottingView extends JPanel implements MouseListener, MouseMotionLi
     private double[][] points;
     private int[] clusters;
     private double[][] softClustering;
-    private Color[] colors = new Color[] { Color.RED, Color.BLUE, Color.YELLOW, Color.GREEN, Color.ORANGE, Color.PINK, Color.GRAY };  //Default colors
+    private Color[] colors;
 
     private int[] mouseOrigVector;
     private boolean dragging = false;
@@ -113,7 +113,7 @@ public class PlottingView extends JPanel implements MouseListener, MouseMotionLi
         int lineSize1 = windowMax/150;
         int lineSize2 = windowMax/75;
         int fontSize = windowMax / 70;
-        g.setFont(new Font("TimesRoman", Font.BOLD, Math.max(fontSize, 12)));
+        g2d.setFont(new Font("TimesRoman", Font.BOLD, Math.max(fontSize, 12)));
         g2d.setStroke(stroke2);
         if (lineGap == 0) {
             lineGap = windowMax / 30;
@@ -237,6 +237,7 @@ public class PlottingView extends JPanel implements MouseListener, MouseMotionLi
                 dataPoints[i][j] = questionnaireAnswers[i].get(j) ? 1 : 0;
             }
         }
+        dataPoints = TSne(dataPoints);
         loadPoints(dataPoints);
     }
 
@@ -267,6 +268,7 @@ public class PlottingView extends JPanel implements MouseListener, MouseMotionLi
     }
 
     public void loadClusters(int[] clusters) {
+        colors = new Color[] { Color.RED, Color.BLUE, Color.YELLOW, Color.GREEN, Color.ORANGE, Color.PINK, Color.GRAY };
         this.clusters = clusters;
         int amountOfColors = 0;
         for (int i = 0; i < clusters.length; i++) {
@@ -396,7 +398,7 @@ public class PlottingView extends JPanel implements MouseListener, MouseMotionLi
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
         int lineGapReset = windowMax / 30;
-        double nZoom = lineGap / (double)70;
+        double nZoom = lineGap / (double)50;
         double tempFactor = factor;
         double tempLineGap = lineGap;
         double origWidthDist = ((double)(e.getX() - xOrig) / (double)lineGap);
