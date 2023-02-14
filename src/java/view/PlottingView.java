@@ -15,6 +15,8 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Random;
 
 public class PlottingView extends JPanel implements MouseListener, MouseMotionListener, MouseWheelListener {
@@ -353,6 +355,20 @@ public class PlottingView extends JPanel implements MouseListener, MouseMotionLi
     private String convertNumberToScientificNotation(double n) {
         NumberFormat numberFormat = new DecimalFormat("0.00E0");
         return numberFormat.format(n);
+    }
+
+    //Returns an array of "amount" random distinct numbers between 0 (inclusive) and "maxNumber" (exclusive).
+    private int[] getRandomDistinctNumbers(int amount, int maxNumber) {
+        ArrayList<Integer> list = new ArrayList<>(maxNumber);
+        for (int i = 0; i < maxNumber; i++) {
+            list.add(i);
+        }
+        Collections.shuffle(list);
+        int[] result = new int[amount];
+        for (int i = 0; i < amount; i++) {
+            result[i] = list.get(i);
+        }
+        return result;
     }
 
     @Override
