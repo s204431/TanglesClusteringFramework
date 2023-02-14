@@ -106,6 +106,7 @@ public class ValueAdjuster extends JComponent {
         slider.setFocusable(enabled);
         slider.setEnabled(enabled);
         textField.setFocusable(enabled);
+        textField.setEnabled(enabled);
         this.enabled = enabled;
         textField.setText(enabled ? "" + getValue() : "-");
     }
