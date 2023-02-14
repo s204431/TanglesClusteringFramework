@@ -1,21 +1,13 @@
 package view;
 
+import util.ValueAdjuster;
+
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 
 public class SidePanel extends JPanel {
     private View view;
-
-    private JSlider aSlider;
-    private JTextField aValue;
-
-    protected int numberOfDataPoints;
-
-    private boolean valueEntered = false;
+    private ValueAdjuster aValueAdjuster;
 
     public SidePanel(View view) {
         this.view = view;
@@ -23,53 +15,16 @@ public class SidePanel extends JPanel {
         setPreferredSize(new Dimension(view.getWindowWidth(), view.getWindowHeight()));
         setLayout(null);
 
-        aSlider = new JSlider(JSlider.HORIZONTAL, 0, 80, 50);
-        aSlider.setBounds(50, 200, 100, 50);
-        aSlider.setMinorTickSpacing(100);
-        aSlider.setMajorTickSpacing(100);
-        aSlider.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                int value = (int)(aSlider.getValue() * numberOfDataPoints / 100.0);
-                if (!valueEntered) {
-                    aValue.setText(numberOfDataPoints == 0 ? "No data points" : "" + value);
-                }
-                valueEntered = false;
+        aValueAdjuster = new ValueAdjuster();
+        aValueAdjuster.setBounds(50, 200, 100, 130);
+        aValueAdjuster.performOnChange(() -> {
+            int value = aValueAdjuster.getValue();
+            if (value >= 0) {
                 view.changeAValue(value);
                 repaint();
             }
         });
-        add(aSlider);
-
-        aValue = new JTextField("No data points");
-        aValue.setBounds(50, 250, 100, 30);
-        aValue.setHorizontalAlignment(JTextField.CENTER);
-        add(aValue);
-
-        aValue.addKeyListener(new KeyListener() {
-            @Override
-            public void keyTyped(KeyEvent e) {
-
-            }
-
-            @Override
-            public void keyPressed(KeyEvent e) {
-                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                    try {
-                        int a = Integer.parseInt(aValue.getText());
-                        valueEntered = true;
-                        aSlider.setValue((int)(a * 100.0 / numberOfDataPoints));
-                        aValue.setFocusable(false);
-                        aValue.setFocusable(true);
-                    } catch (Exception exception) { }
-                }
-            }
-
-            @Override
-            public void keyReleased(KeyEvent e) {
-
-            }
-        });
+        add(aValueAdjuster);
     }
 
     @Override
@@ -92,13 +47,12 @@ public class SidePanel extends JPanel {
     }
 
     protected void update(int n) {
-        this.numberOfDataPoints = n;
+        aValueAdjuster.setMaximumValue(n);
         update();
     }
 
     protected void updateAValue(int a) {
-        aSlider.setValue((int)(a * 100.0 / numberOfDataPoints));
-        aValue.setText(""+a);
+        aValueAdjuster.setValue(a);
     }
 
 }
