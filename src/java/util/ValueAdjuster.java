@@ -16,6 +16,7 @@ public class ValueAdjuster extends JComponent {
     private boolean valueEntered = false;
     private int maximumValue;
     private ChangeListener changeListener;
+    private boolean enabled = true;
 
     public ValueAdjuster() {
         this(1, 80);
@@ -32,7 +33,7 @@ public class ValueAdjuster extends JComponent {
                 new ChangeEvent(this);
                 int value = (int)(slider.getValue() * maximumValue / 100.0);
                 if (!valueEntered) {
-                    textField.setText(maximumValue == 0 ? "-" : "" + value);
+                    textField.setText("" + value);
                     if (changeListener != null) {
                         changeListener.stateChanged(new ChangeEvent(thisObject));
                     }
@@ -75,7 +76,6 @@ public class ValueAdjuster extends JComponent {
 
             }
         });
-        setFocusable(maximumValue > 0);
     }
 
     public void setValue(int value) {
@@ -94,7 +94,6 @@ public class ValueAdjuster extends JComponent {
 
     public void setMaximumValue(int maxValue) {
         maximumValue = maxValue;
-        setFocusable(maximumValue > 0);
         repaint();
     }
 
@@ -103,10 +102,12 @@ public class ValueAdjuster extends JComponent {
     }
 
     @Override
-    public void setFocusable(boolean focusable) {
-        slider.setFocusable(focusable);
-        slider.setEnabled(focusable);
-        textField.setFocusable(focusable);
+    public void setEnabled(boolean enabled) {
+        slider.setFocusable(enabled);
+        slider.setEnabled(enabled);
+        textField.setFocusable(enabled);
+        this.enabled = enabled;
+        textField.setText(enabled ? "" + getValue() : "-");
     }
 
     @Override

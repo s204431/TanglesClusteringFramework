@@ -19,6 +19,7 @@ public class SidePanel extends JPanel {
 
         aValueAdjuster = new ValueAdjuster();
         aValueAdjuster.setBounds(50, 200, 100, 130);
+        aValueAdjuster.setEnabled(false);
         aValueAdjuster.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
@@ -53,6 +54,7 @@ public class SidePanel extends JPanel {
 
     protected void update(int n) {
         aValueAdjuster.setMaximumValue(n);
+        aValueAdjuster.setEnabled(true);
         update();
     }
 
