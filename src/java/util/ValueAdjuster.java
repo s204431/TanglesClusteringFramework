@@ -15,24 +15,26 @@ public class ValueAdjuster extends JComponent {
     private JTextField textField;
     private boolean valueEntered = false;
     private int maximumValue;
-    private Runnable onChangeRunnable;
+    private ChangeListener changeListener;
 
     public ValueAdjuster() {
         this(1, 80);
     }
 
     public ValueAdjuster(int minSliderValue, int maxSliderValue) {
+        ValueAdjuster thisObject = this;
         slider = new JSlider(JSlider.HORIZONTAL, minSliderValue, maxSliderValue, (maxSliderValue-minSliderValue)/2);
         slider.setMinorTickSpacing(100);
         slider.setMajorTickSpacing(100);
         slider.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
+                new ChangeEvent(this);
                 int value = (int)(slider.getValue() * maximumValue / 100.0);
                 if (!valueEntered) {
                     textField.setText(maximumValue == 0 ? "-" : "" + value);
-                    if (onChangeRunnable != null) {
-                        onChangeRunnable.run();
+                    if (changeListener != null) {
+                        changeListener.stateChanged(new ChangeEvent(thisObject));
                     }
                 }
                 valueEntered = false;
@@ -58,8 +60,8 @@ public class ValueAdjuster extends JComponent {
                         int value = Integer.parseInt(textField.getText());
                         valueEntered = true;
                         slider.setValue((int)(value * 100.0 / maximumValue));
-                        if (onChangeRunnable != null) {
-                            onChangeRunnable.run();
+                        if (changeListener != null) {
+                            changeListener.stateChanged(new ChangeEvent(thisObject));
                         }
                         textField.setFocusable(false);
                         textField.setFocusable(true);
@@ -96,8 +98,8 @@ public class ValueAdjuster extends JComponent {
         repaint();
     }
 
-    public void performOnChange(Runnable runnable) {
-        this.onChangeRunnable = runnable;
+    public void addChangeListener(ChangeListener changeListener) {
+        this.changeListener = changeListener;
     }
 
     @Override

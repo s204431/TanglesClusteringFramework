@@ -3,6 +3,8 @@ package view;
 import util.ValueAdjuster;
 
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import java.awt.*;
 
 public class SidePanel extends JPanel {
@@ -17,11 +19,14 @@ public class SidePanel extends JPanel {
 
         aValueAdjuster = new ValueAdjuster();
         aValueAdjuster.setBounds(50, 200, 100, 130);
-        aValueAdjuster.performOnChange(() -> {
-            int value = aValueAdjuster.getValue();
-            if (value >= 0) {
-                view.changeAValue(value);
-                repaint();
+        aValueAdjuster.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                int value = aValueAdjuster.getValue();
+                if (value >= 0) {
+                    view.changeAValue(value);
+                    repaint();
+                }
             }
         });
         add(aValueAdjuster);
