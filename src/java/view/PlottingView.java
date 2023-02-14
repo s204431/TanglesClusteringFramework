@@ -57,7 +57,6 @@ public class PlottingView extends JPanel implements MouseListener, MouseMotionLi
 
     private int[] indicesToDraw; //Indices of points to draw when there are too many points.
     protected int originalNumberOfPoints; //Number of points before reducing the number of points.
-    private boolean pointsShuffled = false;
 
     public PlottingView(View view) {
         this.view = view;
