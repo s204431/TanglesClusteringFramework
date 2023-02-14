@@ -31,9 +31,10 @@ public class SidePanel extends JPanel {
             @Override
             public void stateChanged(ChangeEvent e) {
                 int value = (int)(aSlider.getValue() * numberOfDataPoints / 100.0);
-                if (!valueEntered) {
+                if (valueEntered) {
                     aValue.setText(numberOfDataPoints == 0 ? "No data points" : "" + value);
                 }
+                valueEntered = true;
                 view.changeAValue(value);
                 repaint();
             }
