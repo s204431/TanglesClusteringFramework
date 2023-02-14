@@ -6,7 +6,6 @@ import com.jujutsu.tsne.barneshut.BarnesHutTSne;
 import com.jujutsu.tsne.barneshut.ParallelBHTsne;
 import com.jujutsu.utils.TSneUtils;
 import util.BitSet;
-import view.View;
 
 import javax.swing.*;
 import java.awt.*;
@@ -191,7 +190,7 @@ public class PlottingView extends JPanel implements MouseListener, MouseMotionLi
             int bound = MAX_POINTS_TO_DRAW_WHEN_MOVING < points.length && dragging ? MAX_POINTS_TO_DRAW_WHEN_MOVING : points.length;
             for (int i = 0; i < bound; i++) {
                 int[] coor = convertPointToCoordinateOnScreen(points[i]);
-                if (clusters != null) {
+                if (clusters != null && clusters[i] < colors.length && colors[clusters[i]] != null) {
                     Color c = colors[clusters[i]];
                     if (softClustering != null) {
                         c = changeTranslucencyOfColor(c, softClustering[i][clusters[i]]);
@@ -318,7 +317,6 @@ public class PlottingView extends JPanel implements MouseListener, MouseMotionLi
 
     //Reduces the number of points if there are too many points to draw.
     private double[][] convertPoints(double[][] dataPoints) {
-        pointsShuffled = true;
         indicesToDraw = getRandomDistinctNumbers(Math.min(MAX_POINTS_TO_DRAW, dataPoints.length), dataPoints.length);
         double[][] newPoints = new double[indicesToDraw.length][dataPoints[0].length];
         for (int i = 0; i < newPoints.length; i++) {

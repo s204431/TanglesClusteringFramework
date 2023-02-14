@@ -1,12 +1,5 @@
 package view;
 
-import com.jujutsu.tsne.TSneConfiguration;
-import com.jujutsu.tsne.barneshut.BHTSne;
-import com.jujutsu.tsne.barneshut.BarnesHutTSne;
-import com.jujutsu.tsne.barneshut.ParallelBHTsne;
-import com.jujutsu.utils.MatrixOps;
-import com.jujutsu.utils.MatrixUtils;
-import com.jujutsu.utils.TSneUtils;
 import model.Model;
 import util.BitSet;
 

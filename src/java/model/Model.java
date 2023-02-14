@@ -3,7 +3,6 @@ package model;
 import datasets.BinaryQuestionnaire;
 import datasets.Dataset;
 import datasets.FeatureBasedDataset;
-import util.BitSet;
 import view.View;
 import smile.validation.metric.NormalizedMutualInformation;
 import java.util.Date;
