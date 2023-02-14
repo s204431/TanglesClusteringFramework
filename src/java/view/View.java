@@ -21,7 +21,7 @@ public class View extends JFrame {
     private int windowWidth, windowHeight;
 
     private JPanel mainComponent;
-    private PlottingView plottingView;
+    protected PlottingView plottingView;
     private SidePanel sidePanel;
     private TopPanel topPanel;
 

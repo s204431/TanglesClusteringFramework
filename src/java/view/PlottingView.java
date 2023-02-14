@@ -20,7 +20,9 @@ import java.util.Collections;
 import java.util.Random;
 
 public class PlottingView extends JPanel implements MouseListener, MouseMotionListener, MouseWheelListener {
-    public static final int POINT_SIZE = 8;
+    private static final int POINT_SIZE = 8;
+    private static final int MAX_POINTS_TO_DRAW = 10000;
+    private static final int MAX_POINTS_TO_DRAW_WHEN_MOVING = 2000;
 
     private View view;
 
@@ -52,6 +54,10 @@ public class PlottingView extends JPanel implements MouseListener, MouseMotionLi
     private final BasicStroke stroke2 = new BasicStroke(2);
     private final BasicStroke stroke3 = new BasicStroke(3);
     private final BasicStroke stroke4 = new BasicStroke(4);
+
+    private int[] indicesToDraw; //Indices of points to draw when there are too many points.
+    protected int originalNumberOfPoints; //Number of points before reducing the number of points.
+    private boolean pointsShuffled = false;
 
     public PlottingView(View view) {
         this.view = view;
@@ -183,7 +189,8 @@ public class PlottingView extends JPanel implements MouseListener, MouseMotionLi
 
         //Plot points
         if (points != null) {
-            for (int i = 0; i < points.length; i++) {
+            int bound = MAX_POINTS_TO_DRAW_WHEN_MOVING < points.length && dragging ? MAX_POINTS_TO_DRAW_WHEN_MOVING : points.length;
+            for (int i = 0; i < bound; i++) {
                 int[] coor = convertPointToCoordinateOnScreen(points[i]);
                 if (clusters != null) {
                     Color c = colors[clusters[i]];
@@ -220,6 +227,14 @@ public class PlottingView extends JPanel implements MouseListener, MouseMotionLi
     }
 
     protected void loadPoints(double[][] points) {
+        loadPoints(points, true);
+    }
+
+    protected void loadPoints(double[][] points, boolean shufflePoints) {
+        if (shufflePoints) {
+            originalNumberOfPoints = points.length;
+            points = convertPoints(points);
+        }
         if (points[0].length > 2) {
             points = TSne(points);
         }
@@ -233,14 +248,16 @@ public class PlottingView extends JPanel implements MouseListener, MouseMotionLi
     }
 
     protected void loadPoints(BitSet[] questionnaireAnswers) {
+        originalNumberOfPoints = questionnaireAnswers.length;
         double[][] dataPoints = new double[questionnaireAnswers.length][questionnaireAnswers[0].size()];
         for (int i = 0; i < questionnaireAnswers.length; i++) {
             for (int j = 0; j < questionnaireAnswers[i].size(); j++) {
                 dataPoints[i][j] = questionnaireAnswers[i].get(j) ? 1 : 0;
             }
         }
+        dataPoints = convertPoints(dataPoints);
         dataPoints = TSne(dataPoints);
-        loadPoints(dataPoints);
+        loadPoints(dataPoints, false);
     }
 
     private double[][] convert1DTo2D(double[][] points) {
@@ -270,6 +287,7 @@ public class PlottingView extends JPanel implements MouseListener, MouseMotionLi
     }
 
     public void loadClusters(int[] clusters) {
+        clusters = convertClusters(clusters);
         colors = new Color[] { Color.RED, Color.BLUE, Color.YELLOW, Color.GREEN, Color.ORANGE, Color.PINK, Color.GRAY };
         this.clusters = clusters;
         int amountOfColors = 0;
@@ -294,8 +312,37 @@ public class PlottingView extends JPanel implements MouseListener, MouseMotionLi
     }
 
     public void loadClusters(int[] clusters, double[][] softClustering) {
+        softClustering = convertSoftClustering(softClustering);
         this.softClustering = softClustering;
         loadClusters(clusters);
+    }
+
+    //Reduces the number of points if there are too many points to draw.
+    private double[][] convertPoints(double[][] dataPoints) {
+        pointsShuffled = true;
+        indicesToDraw = getRandomDistinctNumbers(Math.min(MAX_POINTS_TO_DRAW, dataPoints.length), dataPoints.length);
+        double[][] newPoints = new double[indicesToDraw.length][dataPoints[0].length];
+        for (int i = 0; i < newPoints.length; i++) {
+            newPoints[i] = dataPoints[indicesToDraw[i]];
+        }
+        return newPoints;
+    }
+
+    //Matches the clusters to the points if the number of points have been reduced.
+    private int[] convertClusters(int[] clusters) {
+        int[] newClusters = new int[indicesToDraw.length];
+        for (int i = 0; i < indicesToDraw.length; i++) {
+            newClusters[i] = clusters[indicesToDraw[i]];
+        }
+        return newClusters;
+    }
+
+    private double[][] convertSoftClustering(double[][] softClustering) {
+        double[][] newSoftClustering = new double[indicesToDraw.length][];
+        for (int i = 0; i < indicesToDraw.length; i++) {
+            newSoftClustering[i] = softClustering[indicesToDraw[i]];
+        }
+        return newSoftClustering;
     }
 
     private double[] findBounds(double[][] points) {
@@ -371,6 +418,13 @@ public class PlottingView extends JPanel implements MouseListener, MouseMotionLi
         return result;
     }
 
+    protected int getNumberOfPoints() {
+        if (points == null) {
+            return 0;
+        }
+        return points.length;
+    }
+
     @Override
     public void mouseDragged(MouseEvent e) {
 
@@ -398,6 +452,7 @@ public class PlottingView extends JPanel implements MouseListener, MouseMotionLi
     @Override
     public void mouseReleased(MouseEvent e) {
         dragging = false;
+        repaint();
     }
 
     @Override

@@ -12,6 +12,8 @@ public class TangleClusterer {
     private TangleSearchTree tangleSearchTree;
     //private static FeatureBasedDataset data;
 
+    protected boolean doneClustering = false;
+
     protected void generateClusters(Dataset dataset, int a, int psi) {
         //data = (FeatureBasedDataset) dataset;
         long time1 = new Date().getTime();
@@ -61,6 +63,7 @@ public class TangleClusterer {
         long time8 = new Date().getTime();
         System.out.println("Total tangle search tree time: " + (time8-time3) + " ms");
         System.out.println();*/
+        doneClustering = true;
     }
 
     protected double[][] getSoftClustering() {

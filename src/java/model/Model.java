@@ -61,8 +61,7 @@ public class Model {
     }
 
     public double getNMIScore() {
-        if (dataset.getGroundTruth() == null) {
-            System.out.println("Cannot calculate NMI score because ground truth is null.");
+        if (!tangleClusterer.doneClustering || dataset.getGroundTruth() == null) {
             return -1;
         }
         return NormalizedMutualInformation.joint(getHardClustering(), dataset.getGroundTruth());
