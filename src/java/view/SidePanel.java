@@ -17,16 +17,13 @@ public class SidePanel extends JPanel {
         setPreferredSize(new Dimension(view.getWindowWidth(), view.getWindowHeight()));
         setLayout(null);
 
-        aValueAdjuster = new ValueAdjuster();
+        aValueAdjuster = new ValueAdjuster(1, 80);
         aValueAdjuster.setEnabled(false);
         aValueAdjuster.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
-                int value = aValueAdjuster.getValue();
-                if (value >= 0) {
-                    view.changeAValue(value);
-                    repaint();
-                }
+                valueChanged();
+                update();
             }
         });
         add(aValueAdjuster);
@@ -50,6 +47,12 @@ public class SidePanel extends JPanel {
         g2d.drawString("Clustering time:", 30, 180);
         g2d.drawString(view.getClusteringTime() + " ms", 30, 200);
         g2d.drawString("a", 30, 300);
+    }
+
+    protected void valueChanged() {
+        if (aValueAdjuster.hasValue()) {
+            view.showClustering(aValueAdjuster.getValue());
+        }
     }
 
     protected void update() {

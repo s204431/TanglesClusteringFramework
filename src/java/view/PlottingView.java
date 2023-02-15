@@ -170,7 +170,7 @@ public class PlottingView extends JPanel implements MouseListener, MouseMotionLi
                     }
                     g2d.setColor(c);
                 } else {
-                    g2d.setColor(Color.BLACK);
+                    g2d.setColor(Color.GRAY);
                 }
                 g2d.fillOval(coor[0], coor[1], POINT_SIZE, POINT_SIZE);
                 //g2d.setColor(Color.BLACK);

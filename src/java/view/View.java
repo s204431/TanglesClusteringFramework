@@ -108,16 +108,18 @@ public class View extends JFrame {
         sidePanel.update(points.length);
     }
 
+    public void loadPoints(BitSet[] points) {
+        plottingView.loadPoints(points);
+        sidePanel.update(points.length);
+    }
+
     public void loadClusters(int[] clusters, double[][] softClustering) {
         plottingView.loadClusters(clusters, softClustering);
     }
 
-    public void updateAValue(int a) {
-        sidePanel.updateAValue(a);
-    }
-
-    protected void changeAValue(int a) {
+    public void showClustering(int a) {
         model.regenerateClusters(a);
+        loadClusters(model.getHardClustering(), model.getSoftClustering());
     }
 
     protected int getWindowHeight() {

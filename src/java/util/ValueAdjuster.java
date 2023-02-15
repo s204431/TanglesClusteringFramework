@@ -14,9 +14,10 @@ public class ValueAdjuster extends JComponent {
     private int maximumValue;
     private ChangeListener changeListener;
     private boolean enabled = true;
+    private boolean hasValue = false;
 
     public ValueAdjuster() {
-        this(1, 80);
+        this(0, 100);
     }
 
     public ValueAdjuster(int minSliderValue, int maxSliderValue) {
@@ -41,7 +42,7 @@ public class ValueAdjuster extends JComponent {
         });
         add(slider);
 
-        textField = new JTextField("-");
+        textField = new JTextField("");
         textField.setHorizontalAlignment(JTextField.CENTER);
         add(textField);
 
@@ -57,7 +58,10 @@ public class ValueAdjuster extends JComponent {
                     try {
                         int value = Integer.parseInt(textField.getText());
                         valueEntered = true;
+                        hasValue = true;
                         slider.setValue((int)(value * 100.0 / maximumValue));
+                        slider.setFocusable(true);
+                        slider.setEnabled(true);
                         if (changeListener != null) {
                             changeListener.stateChanged(new ChangeEvent(thisObject));
                         }
@@ -79,9 +83,27 @@ public class ValueAdjuster extends JComponent {
         slider.setValue((int)(value * 100.0 / maximumValue));
         textField.setText(""+value);
         valueEntered = true;
+        hasValue = true;
+        slider.setFocusable(true);
+        slider.setEnabled(true);
+    }
+
+    public void removeValue() {
+        hasValue = false;
+        slider.setFocusable(false);
+        slider.setEnabled(false);
+        slider.setValue((slider.getMaximum()-slider.getMinimum())/2);
+        textField.setText("");
+    }
+
+    public boolean hasValue() {
+        return hasValue;
     }
 
     public int getValue() {
+        if (!hasValue) {
+            return Integer.MIN_VALUE;
+        }
         try {
             return Integer.parseInt(textField.getText());
         } catch (NumberFormatException e) {
@@ -100,12 +122,12 @@ public class ValueAdjuster extends JComponent {
 
     @Override
     public void setEnabled(boolean enabled) {
-        slider.setFocusable(enabled);
-        slider.setEnabled(enabled);
+        slider.setFocusable(hasValue ? enabled : false);
+        slider.setEnabled(hasValue ? enabled : false);
         textField.setFocusable(enabled);
         textField.setEnabled(enabled);
         this.enabled = enabled;
-        textField.setText(enabled ? "" + getValue() : "-");
+        textField.setText(enabled && hasValue ? "" + getValue() : "");
     }
 
     @Override

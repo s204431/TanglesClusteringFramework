@@ -4,7 +4,6 @@ import datasets.BinaryQuestionnaire;
 import datasets.DatasetGenerator;
 import datasets.FeatureBasedDataset;
 import model.Model;
-import test.ClusteringTester;
 import util.Util.Tuple;
 import view.View;
 
@@ -16,14 +15,15 @@ public class Main {
         View view = new View();
         Model model = new Model(view);
         view.setModel(model);
-        int a = 1000;
+        int a = 10000;
         long time1 = new Date().getTime();
-        //Tuple<double[][], int[]> generated = DatasetGenerator.generateFeatureBasedDataPoints(10000, 4, 2);
+        //Tuple<double[][], int[]> generated = DatasetGenerator.generateFeatureBasedDataPoints(100000, 4, 3);
         //FeatureBasedDataset dataset = new FeatureBasedDataset(generated, a);
-        BinaryQuestionnaire dataset = new BinaryQuestionnaire(DatasetGenerator.generateBiasedBinaryQuestionnaireAnswers(10000, 40, 4));
+        BinaryQuestionnaire dataset = new BinaryQuestionnaire(DatasetGenerator.generateBiasedBinaryQuestionnaireAnswers(1000000, 40, 4));
         long time2 = new Date().getTime();
         System.out.println("File loading time: " + (time2-time1) + " ms");
-        model.generateClusters(dataset, a, -1);
+        //model.generateClusters(dataset, a, -1);
+        model.setDataset(dataset);
         long time3 = new Date().getTime();
         System.out.println("Tangle total time: " + (time3-time2) + " ms");
         double nmiScore = model.getNMIScore();

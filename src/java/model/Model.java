@@ -11,8 +11,6 @@ public class Model {
     private TangleClusterer tangleClusterer = new TangleClusterer();
     private Dataset dataset;
     private View view;
-    private int a;
-    private int psi;
     private long clusteringTime = 0;
 
     public Model() {
@@ -23,22 +21,21 @@ public class Model {
         this.view = view;
     }
 
+    public void setDataset(Dataset dataset) {
+        this.dataset = dataset;
+    }
+
     public void generateClusters(Dataset dataset, int a, int psi) {
         long time = new Date().getTime();
         this.dataset = dataset;
-        this.a = a;
-        this.psi = psi;
         tangleClusterer.generateClusters(dataset, a, psi);
         clusteringTime = new Date().getTime() - time;
     }
 
     public void regenerateClusters(int a) {
         long time = new Date().getTime();
-        this.a = a;
-        tangleClusterer.generateClusters(dataset, a, psi);
-        double[][] softClustering = tangleClusterer.getSoftClustering();
+        tangleClusterer.generateClusters(dataset, a, -1);
         clusteringTime = new Date().getTime() - time;
-        view.loadClusters(tangleClusterer.getHardClustering(), softClustering);
     }
 
     public double[][] getSoftClustering() {
@@ -51,12 +48,11 @@ public class Model {
 
     public void plotDataPoints() {
         if (dataset instanceof BinaryQuestionnaire) {
-            view.loadPointsWithClustering(((BinaryQuestionnaire) dataset).answers, tangleClusterer.getHardClustering(), tangleClusterer.getSoftClustering());
+            view.loadPoints(((BinaryQuestionnaire) dataset).answers);
         }
         else if (dataset instanceof FeatureBasedDataset) {
-            view.loadPointsWithClustering(((FeatureBasedDataset) dataset).dataPoints, tangleClusterer.getHardClustering(), tangleClusterer.getSoftClustering());
+            view.loadPoints(((FeatureBasedDataset) dataset).dataPoints);
         }
-        view.updateAValue(a);
     }
 
     public double getNMIScore() {
