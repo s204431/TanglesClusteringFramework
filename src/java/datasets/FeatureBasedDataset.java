@@ -339,16 +339,24 @@ public class FeatureBasedDataset implements Dataset {
         Random r = new Random();
         double[][] centroids = new double[clusters][features];
         double[][] tempCentroids = new double[clusters][features];
+        double[][] tempTempCentroids = new double[clusters][features];
         for (int i = 0; i < clusters; i++) {
             for (int j = 0; j < features; j++) {
                 double value = r.nextDouble(minMaxValues[j][0], minMaxValues[j][1]);
                 centroids[i][j] = value;
                 tempCentroids[i][j] = value;
+                tempTempCentroids[i][j] = value;
             }
         }
 
-        boolean brk = true;
-        while (brk) {
+        int count = 0;
+        boolean run = true;
+        while (run) {
+            count++;
+
+            if (count > 200) {
+                break;
+            }
 
             //Find the nearest centroid for every participant
             for (int i = 0; i < dataPoints.length; i++) {
@@ -377,21 +385,34 @@ public class FeatureBasedDataset implements Dataset {
                 }
             }
 
-            //Update centroid + break loop if centroids haven't changed; else tempCentroids
-            brk = false;
+            //Update centroid + break loop if centroids haven't changed or if centroids keep moving back and forth; else update temporary centroids
+            run = false;
+            boolean brk = true;
             for (int i = 0; i < clusters; i++) {
                 for (int j = 0; j < features; j++) {
+                    //Update centroid means
                     if (participantsInClusters[i] != 0) {
-                        centroids[i][j] = sums[i][j] / participantsInClusters[i];   //Update centroid means
+                        centroids[i][j] = sums[i][j] / participantsInClusters[i];
                     }
+                    //Check if centroids are moving back and forth
+                    if (centroids[i][j] != tempTempCentroids[i][j]) {
+                        brk = false;
+                    }
+                    tempTempCentroids[i][j] = tempCentroids[i][j];
+
+                    //Check if centroids haven't changed
                     if (centroids[i][j] != tempCentroids[i][j]) {
                         tempCentroids[i][j] = centroids[i][j];
-                        brk = true;
+                        run = true;
                     }
                 }
             }
-        }
 
+            if (brk) {
+                break;
+            }
+        }
+/*
         //Prints resulting centroids
         /*System.out.println("Resulting centroid means:");
         for (int i = 0; i < clusters; i++) {
