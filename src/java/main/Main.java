@@ -48,7 +48,7 @@ public class Main {
         int numOfFeatures = 3;
         FeatureBasedDataset dataset = new FeatureBasedDataset(DatasetGenerator.generateGaussianMixturePoints(numOfPoints, numOfClusters));
         int[] kMeansClustering = dataset.kMeans(numOfClusters);
-        dataset.printKMeansResults(kMeansClustering, numOfClusters);
+        dataset.printKMeansResults(kMeansClustering);
 
         view.loadPointsWithClustering(dataset.dataPoints, kMeansClustering);
  */

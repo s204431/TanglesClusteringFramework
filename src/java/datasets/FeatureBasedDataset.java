@@ -381,7 +381,9 @@ public class FeatureBasedDataset implements Dataset {
             brk = false;
             for (int i = 0; i < clusters; i++) {
                 for (int j = 0; j < features; j++) {
-                    centroids[i][j] = sums[i][j] / participantsInClusters[i];   //Update centroid means
+                    if (participantsInClusters[i] != 0) {
+                        centroids[i][j] = sums[i][j] / participantsInClusters[i];   //Update centroid means
+                    }
                     if (centroids[i][j] != tempCentroids[i][j]) {
                         tempCentroids[i][j] = centroids[i][j];
                         brk = true;
@@ -404,7 +406,7 @@ public class FeatureBasedDataset implements Dataset {
         return resultingClustering;
     }
 
-    public void printKMeansResults(int[] resultingClustering, int numOfClusters) {
+    public void printKMeansResults(int[] resultingClustering) {
 
         //Print ground truth vs k-means clusters
         System.out.println("Ground truth: ");
@@ -415,19 +417,6 @@ public class FeatureBasedDataset implements Dataset {
         for (int i = 0; i < resultingClustering.length; i++) {
             System.out.print(resultingClustering[i] + " ");
         }
-
-        //Print accuracy
-        int[] GTCounts = new int[numOfClusters];
-        int[] KMCounts = new int[numOfClusters];
-        for (int i = 0; i < groundTruth.length; i++) {
-            GTCounts[groundTruth[i]]++;
-            KMCounts[resultingClustering[i]]++;
-        }
-        int wrongAnswers = 0;
-        for (int i = 0; i < numOfClusters; i++) {
-            wrongAnswers += Math.abs(GTCounts[i] - KMCounts[i]);
-        }
-        System.out.println("\nAccuracy: " + (1 - wrongAnswers/(double)dataPoints.length));
 
     }
 }
