@@ -18,23 +18,25 @@ public class FeatureBasedDataset implements Dataset {
 
     private static int precision = 1; //Determines the number of cuts generated.
 
-    public FeatureBasedDataset(int a) {
-        this.a = a;
+    public FeatureBasedDataset() {
+
     }
 
-    public FeatureBasedDataset(double[][] dataPoints, int a) {
+    public FeatureBasedDataset(double[][] dataPoints) {
         this.dataPoints = dataPoints;
-        this.a = a;
     }
 
-    public FeatureBasedDataset(Tuple<double[][], int[]> dataPointsWithGroundTruth, int a) {
+    public FeatureBasedDataset(Tuple<double[][], int[]> dataPointsWithGroundTruth) {
         dataPoints = dataPointsWithGroundTruth.x;
         groundTruth = dataPointsWithGroundTruth.y;
-        this.a = a;
     }
 
     public int[] getGroundTruth() {
         return groundTruth;
+    }
+
+    public void setA(int a) {
+        this.a = a;
     }
 
     public BitSet[] getInitialCutsOld() {

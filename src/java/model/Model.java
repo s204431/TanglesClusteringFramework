@@ -11,7 +11,7 @@ public class Model {
     private TangleClusterer tangleClusterer = new TangleClusterer();
     private Dataset dataset;
     private View view;
-    private long clusteringTime = 0;
+    private long clusteringTime = -1;
 
     public Model() {
 

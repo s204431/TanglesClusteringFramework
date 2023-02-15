@@ -29,6 +29,10 @@ public class BinaryQuestionnaire implements Dataset {
         return groundTruth;
     }
 
+    public void setA(int a) {
+        //Does not need a. Do nothing.
+    }
+
     private int getNumberOfParticipants() {
         return answers.length;
     }

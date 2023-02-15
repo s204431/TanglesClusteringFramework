@@ -17,6 +17,7 @@ public class TangleClusterer {
     protected void generateClusters(Dataset dataset, int a, int psi) {
         //data = (FeatureBasedDataset) dataset;
         long time1 = new Date().getTime();
+        dataset.setA(a);
         BitSet[] initialCuts = dataset.getInitialCuts();
         long time2 = new Date().getTime();
         //System.out.println("Initial cuts time: " + (time2-time1) + " ms");

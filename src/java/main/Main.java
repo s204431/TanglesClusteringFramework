@@ -17,9 +17,9 @@ public class Main {
         view.setModel(model);
         int a = 10000;
         long time1 = new Date().getTime();
-        //Tuple<double[][], int[]> generated = DatasetGenerator.generateFeatureBasedDataPoints(100000, 4, 3);
-        //FeatureBasedDataset dataset = new FeatureBasedDataset(generated, a);
-        BinaryQuestionnaire dataset = new BinaryQuestionnaire(DatasetGenerator.generateBiasedBinaryQuestionnaireAnswers(1000000, 40, 4));
+        Tuple<double[][], int[]> generated = DatasetGenerator.generateFeatureBasedDataPoints(100000, 4, 2);
+        FeatureBasedDataset dataset = new FeatureBasedDataset(generated);
+        //BinaryQuestionnaire dataset = new BinaryQuestionnaire(DatasetGenerator.generateBiasedBinaryQuestionnaireAnswers(1000000, 40, 4));
         long time2 = new Date().getTime();
         System.out.println("File loading time: " + (time2-time1) + " ms");
         //model.generateClusters(dataset, a, -1);

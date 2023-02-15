@@ -44,7 +44,7 @@ public class ClusteringTester {
                 long time1 = new Date().getTime();
                 int a = (int)((i/j)*(1.0/2.0));
                 Tuple<double[][], int[]> generated = DatasetGenerator.generateGaussianMixturePoints(i, j);
-                Dataset dataset = new FeatureBasedDataset(generated.x, a);
+                Dataset dataset = new FeatureBasedDataset(generated.x);
                 int[] groundTruth = generated.y;
                 model.generateClusters(dataset, a, -1);
                 model.getSoftClustering();

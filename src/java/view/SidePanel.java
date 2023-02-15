@@ -42,10 +42,14 @@ public class SidePanel extends JPanel {
         if (view.plottingView.originalNumberOfPoints != view.plottingView.getNumberOfPoints()) {
             g2d.drawString("Showing "+view.plottingView.getNumberOfPoints(), 30, 70);
         }
-        g2d.drawString("NMI score:", 30, 130);
-        g2d.drawString(""+((int)(view.getNMIScore()*100000)/100000.0), 30, 150);
-        g2d.drawString("Clustering time:", 30, 180);
-        g2d.drawString(view.getClusteringTime() + " ms", 30, 200);
+        if (view.getNMIScore() >= 0) {
+            g2d.drawString("NMI score:", 30, 130);
+            g2d.drawString(""+((int)(view.getNMIScore()*100000)/100000.0), 30, 150);
+        }
+        if (view.getClusteringTime() >= 0) {
+            g2d.drawString("Clustering time:", 30, 180);
+            g2d.drawString(view.getClusteringTime() + " ms", 30, 200);
+        }
         g2d.drawString("a", 30, 300);
     }
 

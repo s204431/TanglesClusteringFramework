@@ -8,5 +8,6 @@ public interface Dataset {
     public double[] getCutCosts();
 
     public int[] getGroundTruth();
+    public void setA(int a);
 
 }
