@@ -315,7 +315,7 @@ public class FeatureBasedDataset implements Dataset {
         System.out.println(dataPoints.length + " " + dataPoints[0].length);
     }
 
-    //Performs K-means clustering on a binary dataset
+    //Performs K-means clustering on a feature based dataset
     public int[] kMeans(int clusters) {
         int[] resultingClustering = new int[dataPoints.length];
         int features = dataPoints[0].length;
@@ -393,7 +393,7 @@ public class FeatureBasedDataset implements Dataset {
         }
 
         //Prints resulting centroids
-        System.out.println("Resulting centroid means:");
+        /*System.out.println("Resulting centroid means:");
         for (int i = 0; i < clusters; i++) {
             System.out.print("Centroid " + (i+1) + ": ");
             for (int j = 0; j < features; j++) {
@@ -401,7 +401,7 @@ public class FeatureBasedDataset implements Dataset {
             }
             System.out.println();
         }
-        System.out.println();
+        System.out.println();*/
 
         return resultingClustering;
     }

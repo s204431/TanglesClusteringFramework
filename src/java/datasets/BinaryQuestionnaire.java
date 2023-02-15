@@ -145,8 +145,8 @@ public class BinaryQuestionnaire implements Dataset {
     }
 
     //Performs K-means clustering on a binary dataset
-    public int[] kMeans() {
-        int K = 2;  //Amount of clusters
+    public int[] kMeans(int clusters) {
+        int K = clusters;  //Amount of clusters
         int[] resultingClustering = new int[getNumberOfParticipants()];   //The resulting cluster each participant is assigned to
 
         //Place centroids randomly

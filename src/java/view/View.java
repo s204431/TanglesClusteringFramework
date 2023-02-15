@@ -61,7 +61,7 @@ public class View extends JFrame {
         pane.addTab("Tangle", new JPanel(null));
         ((JComponent)pane.getSelectedComponent()).add(plottingView);
 
-        addSidePanel(new TangleSidePanel(this));
+        addSidePanel(new KMeansSidePanel(this), "K-Means");
 
         topPanel = new TopPanel(this);
 
@@ -91,7 +91,7 @@ public class View extends JFrame {
     }
 
     //Adds a new side panel/tab.
-    protected void addSidePanel(SidePanel sidePanel) {
+    protected void addSidePanel(SidePanel sidePanel, String name) {
         sidePanel.addMouseListener(new MouseListener() {
             public void mouseClicked(MouseEvent e) {}
             public void mousePressed(MouseEvent e) {
@@ -105,7 +105,7 @@ public class View extends JFrame {
         sidePanels.add(sidePanel);
         sidePanel.setBounds();
         sidePanel.setVisible(false);
-        pane.addTab("Tangle", new JPanel(null));
+        pane.addTab(name, new JPanel(null));
     }
 
     //Changes the side panel/tab.
@@ -174,8 +174,14 @@ public class View extends JFrame {
         plottingView.loadClusters(clusters, softClustering);
     }
 
-    public void showClustering(int a) {
-        model.regenerateClusters(a);
+    protected void showClustering(int a, int psi) {
+        model.generateClusters(a, -1);
+        loadClusters(model.getHardClustering(), model.getSoftClustering());
+        selectedSidePanel.setValues(model.getNMIScore(), model.getClusteringTime());
+    }
+
+    protected void showClusteringKMeans(int k) {
+        model.generateClustersKMeans(k);
         loadClusters(model.getHardClustering(), model.getSoftClustering());
         selectedSidePanel.setValues(model.getNMIScore(), model.getClusteringTime());
     }

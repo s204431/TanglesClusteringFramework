@@ -46,7 +46,8 @@ public class ClusteringTester {
                 Tuple<double[][], int[]> generated = DatasetGenerator.generateGaussianMixturePoints(i, j);
                 Dataset dataset = new FeatureBasedDataset(generated.x);
                 int[] groundTruth = generated.y;
-                model.generateClusters(dataset, a, -1);
+                model.setDataset(dataset);
+                model.generateClusters(a, -1);
                 model.getSoftClustering();
                 int[] hardClustering = model.getHardClustering();
                 long time2 = new Date().getTime();
@@ -83,7 +84,8 @@ public class ClusteringTester {
                     Tuple<BitSet[], int[]> generated = DatasetGenerator.generateBiasedBinaryQuestionnaireAnswers(i, j, k);
                     Dataset dataset = new BinaryQuestionnaire(generated.x);
                     int[] groundTruth = generated.y;
-                    model.generateClusters(dataset, a, -1);
+                    model.setDataset(dataset);
+                    model.generateClusters(a, -1);
                     model.getSoftClustering();
                     int[] hardClustering = model.getHardClustering();
                     long time2 = new Date().getTime();

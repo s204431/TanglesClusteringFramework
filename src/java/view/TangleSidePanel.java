@@ -40,7 +40,7 @@ public class TangleSidePanel extends SidePanel {
 
     protected void valueChanged() {
         if (aValueAdjuster.hasValue()) {
-            view.showClustering(aValueAdjuster.getValue());
+            view.showClustering(aValueAdjuster.getValue(), -1);
         }
     }
 

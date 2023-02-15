@@ -12,6 +12,9 @@ public class Model {
     private Dataset dataset;
     private View view;
     private long clusteringTime = -1;
+    private double[][] softClustering;
+    private int[] hardClustering;
+    private double NMIScore = -1;
 
     public Model() {
 
@@ -25,25 +28,36 @@ public class Model {
         this.dataset = dataset;
     }
 
-    public void generateClusters(Dataset dataset, int a, int psi) {
+    public void generateClusters(int a, int psi) {
         long time = new Date().getTime();
-        this.dataset = dataset;
         tangleClusterer.generateClusters(dataset, a, psi);
+        softClustering = tangleClusterer.getSoftClustering();
+        hardClustering = tangleClusterer.getHardClustering();
+        updateNMIScore();
         clusteringTime = new Date().getTime() - time;
     }
 
-    public void regenerateClusters(int a) {
+    public void generateClustersKMeans(int k) {
         long time = new Date().getTime();
-        tangleClusterer.generateClusters(dataset, a, -1);
+        softClustering = null;
+        hardClustering = dataset.kMeans(k);
+        updateNMIScore();
         clusteringTime = new Date().getTime() - time;
+    }
+
+    private void updateNMIScore() {
+        NMIScore = -1;
+        if (getHardClustering() != null && dataset.getGroundTruth() != null) {
+            NMIScore = NormalizedMutualInformation.joint(getHardClustering(), dataset.getGroundTruth());
+        }
     }
 
     public double[][] getSoftClustering() {
-        return tangleClusterer.getSoftClustering();
+        return softClustering;
     }
 
     public int[] getHardClustering() {
-        return tangleClusterer.getHardClustering();
+        return hardClustering;
     }
 
     public void plotDataPoints() {
@@ -56,10 +70,7 @@ public class Model {
     }
 
     public double getNMIScore() {
-        if (!tangleClusterer.doneClustering || dataset.getGroundTruth() == null) {
-            return -1;
-        }
-        return NormalizedMutualInformation.joint(getHardClustering(), dataset.getGroundTruth());
+        return NMIScore;
     }
 
     public long getClusteringTime() {
