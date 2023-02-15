@@ -4,6 +4,7 @@ import datasets.BinaryQuestionnaire;
 import datasets.DatasetGenerator;
 import datasets.FeatureBasedDataset;
 import model.Model;
+import test.ClusteringTester;
 import util.Util.Tuple;
 import view.View;
 
@@ -29,11 +30,7 @@ public class Main {
         double nmiScore = model.getNMIScore();
         System.out.println("NMI score: " + nmiScore);
         model.plotDataPoints();
-        System.out.println("\nkMeans:");
         long time4 = new Date().getTime();
-        System.out.println();
-
-        System.out.println("K-means time: " + (time4-time3) + " ms");
         System.out.println("Total time: " + (time4-time1) + " ms");
 
 

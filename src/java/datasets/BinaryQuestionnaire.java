@@ -224,13 +224,13 @@ public class BinaryQuestionnaire implements Dataset {
         }
 
         //Prints resulting centroids
-        for (int k = 0; k < K; k++) {
+        /*for (int k = 0; k < K; k++) {
             System.out.println("Centroid " + (k + 1) + ":");
             for (int i = 0; i < getNumberOfQuestions(); i++) {
                 System.out.print(centroids[k].get(i) + ", ");
             }
             System.out.println();
-        }
+        }*/
 
         return resultingClustering;
     }

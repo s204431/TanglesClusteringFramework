@@ -92,15 +92,6 @@ public class View extends JFrame {
 
     //Adds a new side panel/tab.
     protected void addSidePanel(SidePanel sidePanel, String name) {
-        sidePanel.addMouseListener(new MouseListener() {
-            public void mouseClicked(MouseEvent e) {}
-            public void mousePressed(MouseEvent e) {
-                changeSidePanel(0);
-            }
-            public void mouseReleased(MouseEvent e) {}
-            public void mouseEntered(MouseEvent e) {}
-            public void mouseExited(MouseEvent e) {}
-        });
         mainComponent.add(sidePanel);
         sidePanels.add(sidePanel);
         sidePanel.setBounds();
