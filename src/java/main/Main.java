@@ -36,5 +36,21 @@ public class Main {
         System.out.println("K-means time: " + (time4-time3) + " ms");
         System.out.println("Total time: " + (time4-time1) + " ms");
 
+
+/*
+        //Test of feature based k-means
+        View view = new View();
+        Model model = new Model(view);
+        view.setModel(model);
+
+        int numOfPoints = 1500;
+        int numOfClusters = 4;
+        int numOfFeatures = 3;
+        FeatureBasedDataset dataset = new FeatureBasedDataset(DatasetGenerator.generateGaussianMixturePoints(numOfPoints, numOfClusters));
+        int[] kMeansClustering = dataset.kMeans(numOfClusters);
+        dataset.printKMeansResults(kMeansClustering, numOfClusters);
+
+        view.loadPointsWithClustering(dataset.dataPoints, kMeansClustering);
+ */
     }
 }

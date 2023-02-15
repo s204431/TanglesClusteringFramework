@@ -151,11 +151,11 @@ public class BinaryQuestionnaire implements Dataset {
 
         //Place centroids randomly
         Random r = new Random();
-        util.BitSet[] centroids = new BitSet[K]; //K randomly generated participants used as centroids
+        BitSet[] centroids = new BitSet[K]; //K randomly generated participants used as centroids
         BitSet[] tempCentroids = new util.BitSet[K];
         for (int k = 0; k < K; k++) {
-            centroids[k] = new util.BitSet(getNumberOfQuestions());
-            tempCentroids[k] = new util.BitSet(getNumberOfQuestions());
+            centroids[k] = new BitSet(getNumberOfQuestions());
+            tempCentroids[k] = new BitSet(getNumberOfQuestions());
             for (int i = 0; i < getNumberOfQuestions(); i++) {
                 if (r.nextBoolean()) {
                     centroids[k].add(i);

@@ -10,6 +10,8 @@ import java.io.File;
 import java.io.FilenameFilter;
 
 public class TopPanel extends JPanel {
+    public static final int BUTTON_WIDTH = 100;
+    public static final int BUTTON_HEIGHT = 30;
 
     private View view;
 
@@ -95,7 +97,7 @@ public class TopPanel extends JPanel {
         newButton = new JButton("New");
         newButton.addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent e) {
-                newPopup.show(e.getComponent(), e.getX(), e.getY());
+                newPopup.show(e.getComponent(), 0, newButton.getY() + BUTTON_HEIGHT);
             }
         });
         toolBar.add(newButton);
@@ -122,14 +124,11 @@ public class TopPanel extends JPanel {
     }
 
     protected void setBounds() {
-        int buttonWidth = 100;
-        int buttonHeight = 30;
-
         setBounds(0, 0, view.windowWidth, view.topPanelHeight);
         toolBar.setBounds(0, 0, view.windowWidth, view.topPanelHeight);
-        newButton.setBounds(buttonHeight, view.topPanelHeight / 2 - buttonHeight / 2, buttonWidth, buttonHeight);
-        exportButton.setBounds(buttonHeight + buttonWidth, view.topPanelHeight / 2 - buttonHeight / 2, buttonWidth, buttonHeight);
-        algorithmButton.setBounds(buttonHeight + buttonWidth * 2, view.topPanelHeight / 2 - buttonHeight / 2, buttonWidth, buttonHeight);
+        newButton.setBounds(BUTTON_HEIGHT, view.topPanelHeight / 2 - BUTTON_HEIGHT / 2, BUTTON_WIDTH, BUTTON_HEIGHT);
+        exportButton.setBounds(BUTTON_HEIGHT + BUTTON_WIDTH, view.topPanelHeight / 2 - BUTTON_HEIGHT / 2, BUTTON_WIDTH, BUTTON_HEIGHT);
+        algorithmButton.setBounds(BUTTON_HEIGHT + BUTTON_WIDTH * 2, view.topPanelHeight / 2 - BUTTON_HEIGHT / 2, BUTTON_WIDTH, BUTTON_HEIGHT);
     }
 
 }

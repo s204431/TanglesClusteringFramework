@@ -4,10 +4,7 @@ import util.BitSet;
 import util.Util.Tuple;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Scanner;
+import java.util.*;
 
 public class FeatureBasedDataset implements Dataset {
 
@@ -316,5 +313,121 @@ public class FeatureBasedDataset implements Dataset {
             System.out.println();
         }
         System.out.println(dataPoints.length + " " + dataPoints[0].length);
+    }
+
+    //Performs K-means clustering on a binary dataset
+    public int[] kMeans(int clusters) {
+        int[] resultingClustering = new int[dataPoints.length];
+        int features = dataPoints[0].length;
+
+        //Find min and max value for every feature of the dataset
+        double[][] minMaxValues = new double[features][2];
+        for (int i = 0; i < features; i++) {
+            minMaxValues[i][0] = Double.MAX_VALUE;  //Min
+            minMaxValues[i][1] = Double.MIN_VALUE;  //Max
+            for (int j = 0; j < dataPoints.length; j++) {
+                if (dataPoints[j][i] < minMaxValues[i][0]) {
+                    minMaxValues[i][0] = dataPoints[j][i];
+                }
+                if (dataPoints[j][i] > minMaxValues[i][1]) {
+                    minMaxValues[i][1] = dataPoints[j][i];
+                }
+            }
+        }
+
+        //Place centroids randomly
+        Random r = new Random();
+        double[][] centroids = new double[clusters][features];
+        double[][] tempCentroids = new double[clusters][features];
+        for (int i = 0; i < clusters; i++) {
+            for (int j = 0; j < features; j++) {
+                double value = r.nextDouble(minMaxValues[j][0], minMaxValues[j][1]);
+                centroids[i][j] = value;
+                tempCentroids[i][j] = value;
+            }
+        }
+
+        boolean brk = true;
+        while (brk) {
+
+            //Find the nearest centroid for every participant
+            for (int i = 0; i < dataPoints.length; i++) {
+                double min = Double.MAX_VALUE;
+                for (int j = 0; j < clusters; j++) {
+                    double[] centroid = centroids[j];
+                    double manhattanDistance = 0;
+                    for (int k = 0; k < features; k++) {
+                        manhattanDistance += Math.abs(centroid[k] - dataPoints[i][k]);
+                    }
+                    if (manhattanDistance < min) {
+                        min = manhattanDistance;
+                        resultingClustering[i] = j;
+                    }
+                }
+            }
+
+            //Calculate sums used to update centroid means
+            double[][] sums = new double[clusters][features];
+            int[] participantsInClusters = new int[clusters];
+            for (int i = 0; i < dataPoints.length; i++) {
+                int cluster = resultingClustering[i];
+                for (int j = 0; j < features; j++) {
+                    sums[cluster][j] += dataPoints[i][j];
+                    participantsInClusters[cluster]++;
+                }
+            }
+
+            //Update centroid + break loop if centroids haven't changed; else tempCentroids
+            brk = true;
+            for (int i = 0; i < clusters; i++) {
+                for (int j = 0; j < features; j++) {
+                    centroids[i][j] = sums[i][j] / participantsInClusters[i];   //Update centroid means
+                    if (centroids[i][j] != tempCentroids[i][j]) {
+                        tempCentroids[i][j] = centroids[i][j];
+                        brk = false;
+                    }
+                }
+            }
+        }
+
+        //Prints resulting centroids
+        System.out.println("Resulting centroid means:");
+        for (int i = 0; i < clusters; i++) {
+            System.out.print("Centroid " + (i+1) + ": ");
+            for (int j = 0; j < features; j++) {
+                System.out.print(centroids[i][j] + " ");
+            }
+            System.out.println();
+        }
+        System.out.println();
+
+        return resultingClustering;
+    }
+
+    public void printKMeansResults(int[] resultingClustering, int numOfClusters) {
+
+        //Print ground truth vs k-means clusters
+        System.out.println("Ground truth: ");
+        for (int i = 0; i < groundTruth.length; i++) {
+            System.out.print(groundTruth[i] + " ");
+        }
+        System.out.println("\nK-means: ");
+        for (int i = 0; i < resultingClustering.length; i++) {
+            System.out.print(resultingClustering[i] + " ");
+        }
+
+        //Print accuracy
+        int[] GTCounts = new int[numOfClusters];
+        int[] KMCounts = new int[numOfClusters];
+        for (int i = 0; i < groundTruth.length; i++) {
+            GTCounts[groundTruth[i]]++;
+            KMCounts[resultingClustering[i]]++;
+        }
+        int wrongAnswers = 0;
+        for (int i = 0; i < numOfClusters; i++) {
+            wrongAnswers += Math.abs(GTCounts[i] - KMCounts[i]);
+        }
+        System.out.println("\nAccuracy: " + (1 - wrongAnswers/(double)dataPoints.length));
+
     }
 }
