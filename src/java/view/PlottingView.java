@@ -56,6 +56,7 @@ public class PlottingView extends JPanel implements MouseListener, MouseMotionLi
     protected int originalNumberOfPoints; //Number of points before reducing the number of points.
 
     public PlottingView(View view) {
+        super();
         this.view = view;
 
         setPreferredSize(new Dimension(view.getWindowWidth(), view.getWindowHeight()));
@@ -77,7 +78,9 @@ public class PlottingView extends JPanel implements MouseListener, MouseMotionLi
     //Draws plottingView on screen.
     @Override
     public void paintComponent(Graphics g) {
-        super.paintComponent(g);
+        try {
+            super.paintComponent(g);
+        } catch(Exception e) {e.printStackTrace();}
 
         Graphics2D g2d = (Graphics2D) g;
 
@@ -258,6 +261,10 @@ public class PlottingView extends JPanel implements MouseListener, MouseMotionLi
     }
 
     public void loadClusters(int[] clusters) {
+        if (clusters == null) {
+            this.clusters = null;
+            return;
+        }
         clusters = convertClusters(clusters);
         colors = new Color[] { Color.RED, Color.BLUE, Color.YELLOW, Color.GREEN, Color.ORANGE, Color.PINK, Color.GRAY };
         this.clusters = clusters;
@@ -283,7 +290,9 @@ public class PlottingView extends JPanel implements MouseListener, MouseMotionLi
     }
 
     public void loadClusters(int[] clusters, double[][] softClustering) {
-        softClustering = convertSoftClustering(softClustering);
+        if (softClustering != null) {
+            softClustering = convertSoftClustering(softClustering);
+        }
         this.softClustering = softClustering;
         loadClusters(clusters);
     }

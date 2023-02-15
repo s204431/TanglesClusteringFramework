@@ -1,32 +1,20 @@
 package view;
 
-import util.ValueAdjuster;
-
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import java.awt.*;
 
 public class SidePanel extends JPanel {
-    private View view;
-    private ValueAdjuster aValueAdjuster;
+    protected View view;
+    protected double[][] softClustering;
+    protected int[] hardClustering;
+    private double NMIScore = -1;
+    private long clusteringTime = -1;
 
     public SidePanel(View view) {
         this.view = view;
 
         setPreferredSize(new Dimension(view.getWindowWidth(), view.getWindowHeight()));
         setLayout(null);
-
-        aValueAdjuster = new ValueAdjuster(1, 80);
-        aValueAdjuster.setEnabled(false);
-        aValueAdjuster.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                valueChanged();
-                update();
-            }
-        });
-        add(aValueAdjuster);
     }
 
     @Override
@@ -42,40 +30,34 @@ public class SidePanel extends JPanel {
         if (view.plottingView.originalNumberOfPoints != view.plottingView.getNumberOfPoints()) {
             g2d.drawString("Showing "+view.plottingView.getNumberOfPoints(), 30, 70);
         }
-        if (view.getNMIScore() >= 0) {
+        if (NMIScore >= 0) {
             g2d.drawString("NMI score:", 30, 130);
-            g2d.drawString(""+((int)(view.getNMIScore()*100000)/100000.0), 30, 150);
+            g2d.drawString(""+((int)(NMIScore*100000)/100000.0), 30, 150);
         }
-        if (view.getClusteringTime() >= 0) {
+        if (clusteringTime >= 0) {
             g2d.drawString("Clustering time:", 30, 180);
-            g2d.drawString(view.getClusteringTime() + " ms", 30, 200);
+            g2d.drawString(clusteringTime + " ms", 30, 200);
         }
-        g2d.drawString("a", 30, 300);
     }
 
+    //Called when a value in the panel has changed.
     protected void valueChanged() {
-        if (aValueAdjuster.hasValue()) {
-            view.showClustering(aValueAdjuster.getValue());
-        }
+
     }
 
-    protected void update() {
-        repaint();
-    }
-
+    //Updates the total number of data points.
     protected void update(int n) {
-        aValueAdjuster.setMaximumValue(n);
-        aValueAdjuster.setEnabled(true);
-        update();
-    }
 
-    protected void updateAValue(int a) {
-        aValueAdjuster.setValue(a);
     }
 
     protected void setBounds() {
         setBounds(view.windowWidth - view.sidePanelWidth, view.topPanelHeight, view.windowWidth, view.windowHeight);
-        aValueAdjuster.setBounds(30, 300, 100, 130);
+    }
+
+    //Sets different values to be stored by the panel.
+    protected void setValues(double NMIScore, long clusteringTime) {
+        this.NMIScore = NMIScore;
+        this.clusteringTime = clusteringTime;
     }
 
 }

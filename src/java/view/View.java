@@ -4,9 +4,15 @@ import model.Model;
 import util.BitSet;
 
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.util.ArrayList;
+import java.util.List;
 
 public class View extends JFrame {
     private Model model;
@@ -15,7 +21,9 @@ public class View extends JFrame {
 
     protected JPanel mainComponent;
     protected PlottingView plottingView;
-    private SidePanel sidePanel;
+    private JTabbedPane pane;
+    private List<SidePanel> sidePanels = new ArrayList<>();
+    private SidePanel selectedSidePanel;
     private TopPanel topPanel;
 
     protected int topPanelHeight;
@@ -38,16 +46,33 @@ public class View extends JFrame {
         mainComponent.setLayout(null);
 
         plottingView = new PlottingView(this);
-        sidePanel = new SidePanel(this);
+        pane = new JTabbedPane();
+        pane.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                ((JComponent)((JTabbedPane) e.getSource()).getSelectedComponent()).add(plottingView);
+                changeSidePanel(((JTabbedPane) e.getSource()).getSelectedIndex());
+            }
+        });
+        //Add initial side tab.
+        SidePanel sidePanel = new TangleSidePanel(this);
+        sidePanels.add(sidePanel);
+        selectedSidePanel = sidePanel;
+        pane.addTab("Tangle", new JPanel(null));
+        ((JComponent)pane.getSelectedComponent()).add(plottingView);
+
+        addSidePanel(new TangleSidePanel(this));
+
         topPanel = new TopPanel(this);
 
         setBounds();
 
-        mainComponent.add(plottingView);
         mainComponent.add(sidePanel);
+        mainComponent.add(pane);
         mainComponent.add(topPanel);
 
         add(mainComponent);
+
         pack();
         setLocationByPlatform(true);
         setLocationRelativeTo(null);
@@ -65,6 +90,35 @@ public class View extends JFrame {
         });
     }
 
+    //Adds a new side panel/tab.
+    protected void addSidePanel(SidePanel sidePanel) {
+        sidePanel.addMouseListener(new MouseListener() {
+            public void mouseClicked(MouseEvent e) {}
+            public void mousePressed(MouseEvent e) {
+                changeSidePanel(0);
+            }
+            public void mouseReleased(MouseEvent e) {}
+            public void mouseEntered(MouseEvent e) {}
+            public void mouseExited(MouseEvent e) {}
+        });
+        mainComponent.add(sidePanel);
+        sidePanels.add(sidePanel);
+        sidePanel.setBounds();
+        sidePanel.setVisible(false);
+        pane.addTab("Tangle", new JPanel(null));
+    }
+
+    //Changes the side panel/tab.
+    protected void changeSidePanel(int index) {
+        selectedSidePanel.setVisible(false);
+        selectedSidePanel = sidePanels.get(index);
+        selectedSidePanel.setVisible(true);
+        selectedSidePanel.setBounds();
+        selectedSidePanel.update(plottingView.originalNumberOfPoints);
+        loadClusters(selectedSidePanel.hardClustering, selectedSidePanel.softClustering);
+        plottingView.repaint();
+    }
+
     private void setBounds() {
         topPanelHeight = windowHeight / 20;
         sidePanelWidth = windowWidth / 8;
@@ -74,52 +128,56 @@ public class View extends JFrame {
 
         mainComponent.setPreferredSize(new Dimension(windowWidth, windowHeight));
         mainComponent.setBounds(0, 0, windowWidth, windowHeight);
-        plottingView.setBounds(0, topPanelHeight, windowWidth - sidePanelWidth, windowHeight);
-        sidePanel.setBounds();
+        plottingView.setBounds(0, 0, windowWidth - sidePanelWidth, windowHeight);
+        pane.setBounds(0, topPanelHeight, windowWidth - sidePanelWidth, windowHeight);
+        selectedSidePanel.setBounds();
         topPanel.setBounds();
     }
 
     public void loadPointsWithClustering(double[][] points, int[] clusters, double[][] softClustering) {
         plottingView.loadPoints(points);
         plottingView.loadClusters(clusters, softClustering);
-        sidePanel.update(points.length);
+        selectedSidePanel.update(points.length);
     }
 
     public void loadPointsWithClustering(double[][] points, int[] clusters) {
         plottingView.loadPoints(points);
         plottingView.loadClusters(clusters);
-        sidePanel.update(points.length);
+        selectedSidePanel.update(points.length);
     }
 
     public void loadPointsWithClustering(BitSet[] questionnaireAnswers, int[] clusters, double[][] softClustering) {
         plottingView.loadPoints(questionnaireAnswers);
         plottingView.loadClusters(clusters, softClustering);
-        sidePanel.update(questionnaireAnswers.length);
+        selectedSidePanel.update(questionnaireAnswers.length);
     }
 
     public void loadPointsWithClustering(BitSet[] questionnaireAnswers, int[] clusters) {
         plottingView.loadPoints(questionnaireAnswers);
         plottingView.loadClusters(clusters);
-        sidePanel.update(questionnaireAnswers.length);
+        selectedSidePanel.update(questionnaireAnswers.length);
     }
 
     public void loadPoints(double[][] points) {
         plottingView.loadPoints(points);
-        sidePanel.update(points.length);
+        selectedSidePanel.update(points.length);
     }
 
     public void loadPoints(BitSet[] points) {
         plottingView.loadPoints(points);
-        sidePanel.update(points.length);
+        selectedSidePanel.update(points.length);
     }
 
     public void loadClusters(int[] clusters, double[][] softClustering) {
+        selectedSidePanel.hardClustering = clusters;
+        selectedSidePanel.softClustering = softClustering;
         plottingView.loadClusters(clusters, softClustering);
     }
 
     public void showClustering(int a) {
         model.regenerateClusters(a);
         loadClusters(model.getHardClustering(), model.getSoftClustering());
+        selectedSidePanel.setValues(model.getNMIScore(), model.getClusteringTime());
     }
 
     protected int getWindowHeight() {
