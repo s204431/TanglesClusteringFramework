@@ -378,13 +378,13 @@ public class FeatureBasedDataset implements Dataset {
             }
 
             //Update centroid + break loop if centroids haven't changed; else tempCentroids
-            brk = true;
+            brk = false;
             for (int i = 0; i < clusters; i++) {
                 for (int j = 0; j < features; j++) {
                     centroids[i][j] = sums[i][j] / participantsInClusters[i];   //Update centroid means
                     if (centroids[i][j] != tempCentroids[i][j]) {
                         tempCentroids[i][j] = centroids[i][j];
-                        brk = false;
+                        brk = true;
                     }
                 }
             }
