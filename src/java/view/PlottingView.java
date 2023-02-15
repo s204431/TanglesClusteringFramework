@@ -27,8 +27,6 @@ public class PlottingView extends JPanel implements MouseListener, MouseMotionLi
 
     private int windowMax;
 
-    public JFrame frame;
-
     private boolean close = false;
 
     private double[][] points;
@@ -65,31 +63,6 @@ public class PlottingView extends JPanel implements MouseListener, MouseMotionLi
 
         xOrig = (int)(view.getWindowWidth() * 0.5);
         yOrig = (int)(view.getWindowHeight() * 0.5);
-
-        /*
-        //Create frame
-        frame = new JFrame("PlottingView");
-        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        frame.setPreferredSize(new Dimension(windowWidth, windowHeight));
-        frame.setLayout(null);
-
-        frame.add(this);
-        frame.pack();
-        frame.setLocationByPlatform(true);
-        frame.setLocationRelativeTo(null);
-        frame.setVisible(true);
-
-        frame.addComponentListener(new ComponentAdapter()
-        {
-            public void componentResized(ComponentEvent evt) {
-                Component c = (Component)evt.getSource();
-                windowWidth = frame.getWidth();
-                windowHeight = frame.getHeight();
-                repaint();
-            }
-        });
-
-         */
 
         coordinates.setBounds(5, 5, 150, 30);
         coordinates.setFont(new Font("TimesRoman", Font.PLAIN, 15));

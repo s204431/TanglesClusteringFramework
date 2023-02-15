@@ -66,11 +66,11 @@ public class View extends JFrame {
     }
 
     private void setBounds() {
-        topPanelHeight = windowHeight / 15;
+        topPanelHeight = windowHeight / 20;
         sidePanelWidth = windowWidth / 8;
 
-        topPanelHeight = topPanelHeight < 50 ? 50 : topPanelHeight;
-        sidePanelWidth = sidePanelWidth < 200 ? 200 : sidePanelWidth;
+        topPanelHeight = Math.max(topPanelHeight, 30);
+        sidePanelWidth = Math.max(sidePanelWidth, 200);
 
         mainComponent.setPreferredSize(new Dimension(windowWidth, windowHeight));
         mainComponent.setBounds(0, 0, windowWidth, windowHeight);
