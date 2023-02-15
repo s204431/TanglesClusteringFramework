@@ -11,15 +11,15 @@ import java.awt.event.ComponentEvent;
 public class View extends JFrame {
     private Model model;
 
-    private int windowWidth, windowHeight;
+    protected int windowWidth, windowHeight;
 
     private JPanel mainComponent;
     protected PlottingView plottingView;
     private SidePanel sidePanel;
     private TopPanel topPanel;
 
-    private int topPanelHeight;
-    private int sidePanelWidth;
+    protected int topPanelHeight;
+    protected int sidePanelWidth;
 
     public View() {
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -75,8 +75,8 @@ public class View extends JFrame {
         mainComponent.setPreferredSize(new Dimension(windowWidth, windowHeight));
         mainComponent.setBounds(0, 0, windowWidth, windowHeight);
         plottingView.setBounds(0, topPanelHeight, windowWidth - sidePanelWidth, windowHeight);
-        sidePanel.setBounds(windowWidth - sidePanelWidth, topPanelHeight, windowWidth, windowHeight);
-        topPanel.setBounds(0, 0, windowWidth, topPanelHeight);
+        sidePanel.setBounds();
+        topPanel.setBounds();
     }
 
     public void loadPointsWithClustering(double[][] points, int[] clusters, double[][] softClustering) {

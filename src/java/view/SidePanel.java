@@ -18,7 +18,6 @@ public class SidePanel extends JPanel {
         setLayout(null);
 
         aValueAdjuster = new ValueAdjuster();
-        aValueAdjuster.setBounds(30, 300, 100, 130);
         aValueAdjuster.setEnabled(false);
         aValueAdjuster.addChangeListener(new ChangeListener() {
             @Override
@@ -65,6 +64,11 @@ public class SidePanel extends JPanel {
 
     protected void updateAValue(int a) {
         aValueAdjuster.setValue(a);
+    }
+
+    protected void setBounds() {
+        setBounds(view.windowWidth - view.sidePanelWidth, view.topPanelHeight, view.windowWidth, view.windowHeight);
+        aValueAdjuster.setBounds(30, 300, 100, 130);
     }
 
 }
