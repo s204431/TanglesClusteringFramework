@@ -22,6 +22,7 @@ public class TopPanel extends JPanel {
 
 
         toolBar = new JToolBar();
+        toolBar.setLayout(null);
 
         //Create the popup menu.
         popup = new JPopupMenu();
@@ -56,7 +57,7 @@ public class TopPanel extends JPanel {
     protected void setBounds() {
         setBounds(0, 0, view.windowWidth, view.topPanelHeight);
         toolBar.setBounds(0, 0, view.windowWidth, view.topPanelHeight);
-        button.setBounds(0, 0, 100, 30);
+        button.setBounds(30, view.topPanelHeight / 2 - 25, 100, 50);
     }
 
 }
