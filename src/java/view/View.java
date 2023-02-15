@@ -13,7 +13,7 @@ public class View extends JFrame {
 
     protected int windowWidth, windowHeight;
 
-    private JPanel mainComponent;
+    protected JPanel mainComponent;
     protected PlottingView plottingView;
     private SidePanel sidePanel;
     private TopPanel topPanel;
@@ -24,8 +24,8 @@ public class View extends JFrame {
     public View() {
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 
-        windowWidth = screenSize.width - screenSize.width / 10;
-        windowHeight = screenSize.height - screenSize.height / 10;
+        windowWidth = screenSize.width - screenSize.width / 3;
+        windowHeight = screenSize.height - screenSize.height / 3;
 
         //Create frame
         setTitle("View");
