@@ -1,6 +1,7 @@
 package view;
 
 import javax.swing.*;
+import javax.swing.text.NumberFormatter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
@@ -8,6 +9,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FilenameFilter;
+import java.text.NumberFormat;
 
 public class TopPanel extends JPanel {
     public static final int BUTTON_WIDTH = 100;
@@ -31,9 +33,9 @@ public class TopPanel extends JPanel {
         toolBar = new JToolBar();
         toolBar.setLayout(null);
 
-        createNewButton();
-        createExportButton();
-        createAlgorithmButton();
+        addNewButton();
+        addExportButton();
+        addAlgorithmButton();
 
         add(toolBar);
     }
@@ -43,9 +45,17 @@ public class TopPanel extends JPanel {
         super.paintComponent(g);
     }
 
-    private void createNewButton() {
-        //Create the popup menu
+    private void addNewButton() {
         newPopup = new JPopupMenu();
+
+        //Create new dataset
+        newPopup.add(new JMenuItem(new AbstractAction("Create new dataset") {
+            public void actionPerformed(ActionEvent e) {
+                JOptionPane.showMessageDialog(view, "Create new dataset here...");
+            }
+        }));
+
+        //Load dataset
         newPopup.add(new JMenuItem(new AbstractAction("Load new dataset") {
             public void actionPerformed(ActionEvent e) {
                 File folder = new File("datasets");
@@ -60,40 +70,66 @@ public class TopPanel extends JPanel {
                     loadableDatasets[i] = matchingFiles[i].getName().substring(0, matchingFiles[i].getName().length() - 4);
                 }
 
-                //Open loading frame
-                JFrame loadPopupFrame = new JFrame();
-                loadPopupFrame.setPreferredSize(new Dimension(300, 400));
-                loadPopupFrame.setTitle("Load");
-
-                JPanel loadPopupPanel = new JPanel();
-
                 JList loadList = new JList(loadableDatasets);
-                loadList.addMouseListener(new MouseAdapter() {
-                      @Override
-                      public void mouseClicked(MouseEvent e) {
-                          if (e.getClickCount() == 2) {
-                              //Load selected dataset and close loading frame
-                              System.out.println("Clicked " + loadList.getSelectedValue());
-                              loadPopupFrame.dispatchEvent(new WindowEvent(loadPopupFrame, WindowEvent.WINDOW_CLOSING));
-                          }
-                      }
-                });
-                loadPopupPanel.add(loadList);
+                JScrollPane scrollPane = new JScrollPane(loadList);
+                JPanel loadPopupPanel = new JPanel();
+                loadPopupPanel.add(scrollPane);
 
-                loadPopupFrame.add(loadPopupPanel);
-                loadPopupFrame.pack();
-                loadPopupFrame.setLocationByPlatform(true);
-                loadPopupFrame.setLocationRelativeTo(null);
-                loadPopupFrame.setVisible(true);
+                int loadResult = JOptionPane.showConfirmDialog(view, loadPopupPanel,
+                        "Load dataset", JOptionPane.OK_CANCEL_OPTION,
+                        JOptionPane.PLAIN_MESSAGE);
+                Object selectedFile = loadList.getSelectedValue();
+
+                if (loadResult == JOptionPane.OK_OPTION && selectedFile != null) {
+                    String fileName = selectedFile.toString();
+
+                    NumberFormat format = NumberFormat.getInstance();
+                    format.setGroupingUsed(false);
+                    NumberFormatter formatter = new NumberFormatter(format);
+                    formatter.setValueClass(Integer.class);
+                    formatter.setMinimum(0);
+                    formatter.setMaximum(Integer.MAX_VALUE);
+                    formatter.setAllowsInvalid(false);
+                    // If you want the value to be committed on each keystroke instead of focus lost
+                    formatter.setCommitsOnValidEdit(true);
+
+                    JFormattedTextField startRowTextField = new JFormattedTextField("Start row");
+                    JFormattedTextField endRowTextField = new JFormattedTextField("End row");
+                    JFormattedTextField startColTextField = new JFormattedTextField("Start column");
+                    JFormattedTextField endColTextField = new JFormattedTextField("End column");
+
+                    JPanel rowPane = new JPanel();
+                    rowPane.setLayout(new BoxLayout(rowPane, BoxLayout.LINE_AXIS));
+                    rowPane.add(startRowTextField);
+                    rowPane.add(endRowTextField);
+
+                    JPanel colPane = new JPanel();
+                    colPane.setLayout(new BoxLayout(colPane, BoxLayout.LINE_AXIS));
+                    colPane.add(startColTextField);
+                    colPane.add(endColTextField);
+
+                    JPanel parameterPopupPanel = new JPanel();
+                    parameterPopupPanel.setLayout(new BoxLayout(parameterPopupPanel, BoxLayout.PAGE_AXIS));
+                    parameterPopupPanel.add(rowPane);
+                    parameterPopupPanel.add(colPane);
+
+                    int parameterResult = JOptionPane.showConfirmDialog(view, parameterPopupPanel,
+                            ("Choose loading parameters for " + selectedFile), JOptionPane.OK_CANCEL_OPTION,
+                            JOptionPane.PLAIN_MESSAGE);
+
+                    if (parameterResult == JOptionPane.OK_OPTION) {
+                        int startRow = Integer.parseInt(startRowTextField.getValue().toString());
+                        int endRow = Integer.parseInt(endRowTextField.getValue().toString());
+                        int startCol = Integer.parseInt(startColTextField.getValue().toString());
+                        int endCol = Integer.parseInt(endColTextField.getValue().toString());
+                        loadDataset(fileName, startRow, endRow, startCol, endCol);
+                    }
+                }
+
             }
         }));
-        newPopup.add(new JMenuItem(new AbstractAction("Create new dataset") {
-            public void actionPerformed(ActionEvent e) {
-                JOptionPane.showMessageDialog(view, "Create new dataset here...");
-            }
-        }));
 
-        //Create button
+        //Create button on toolbar
         newButton = new JButton("New");
         newButton.addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent e) {
@@ -103,7 +139,7 @@ public class TopPanel extends JPanel {
         toolBar.add(newButton);
     }
 
-    private void createExportButton() {
+    private void addExportButton() {
         exportButton = new JButton("Export");
         exportButton.addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent e) {
@@ -113,7 +149,7 @@ public class TopPanel extends JPanel {
         toolBar.add(exportButton);
     }
 
-    private void createAlgorithmButton() {
+    private void addAlgorithmButton() {
         algorithmButton = new JButton("Algorithm");
         algorithmButton.addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent e) {
@@ -123,12 +159,28 @@ public class TopPanel extends JPanel {
         toolBar.add(algorithmButton);
     }
 
+    private JButton createOkayButton(JPanel panel) {
+        JButton okayButton = new JButton("Okay");
+        okayButton.setPreferredSize(new Dimension(BUTTON_WIDTH, BUTTON_HEIGHT));
+        return okayButton;
+    }
+
+    private JButton createCancelButton(JPanel panel) {
+        JButton cancelButton = new JButton("Cancel");
+        cancelButton.setPreferredSize(new Dimension(BUTTON_WIDTH, BUTTON_HEIGHT));
+        return cancelButton;
+    }
+
     protected void setBounds() {
         setBounds(0, 0, view.windowWidth, view.topPanelHeight);
         toolBar.setBounds(0, 0, view.windowWidth, view.topPanelHeight);
         newButton.setBounds(BUTTON_HEIGHT, view.topPanelHeight / 2 - BUTTON_HEIGHT / 2, BUTTON_WIDTH, BUTTON_HEIGHT);
         exportButton.setBounds(BUTTON_HEIGHT + BUTTON_WIDTH, view.topPanelHeight / 2 - BUTTON_HEIGHT / 2, BUTTON_WIDTH, BUTTON_HEIGHT);
         algorithmButton.setBounds(BUTTON_HEIGHT + BUTTON_WIDTH * 2, view.topPanelHeight / 2 - BUTTON_HEIGHT / 2, BUTTON_WIDTH, BUTTON_HEIGHT);
+    }
+
+    private void loadDataset(String file, int startRow, int endRow, int startCol, int endCol) {
+        System.out.println("Load " + file + " here...");
     }
 
 }
