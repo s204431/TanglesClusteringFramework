@@ -93,25 +93,39 @@ public class TopPanel extends JPanel {
                     // If you want the value to be committed on each keystroke instead of focus lost
                     formatter.setCommitsOnValidEdit(true);
 
-                    JFormattedTextField startRowTextField = new JFormattedTextField("Start row");
-                    JFormattedTextField endRowTextField = new JFormattedTextField("End row");
-                    JFormattedTextField startColTextField = new JFormattedTextField("Start column");
-                    JFormattedTextField endColTextField = new JFormattedTextField("End column");
+                    JFormattedTextField startRowTextField = new JFormattedTextField(formatter);
+                    JFormattedTextField endRowTextField = new JFormattedTextField(formatter);
+                    JFormattedTextField startColTextField = new JFormattedTextField(formatter);
+                    JFormattedTextField endColTextField = new JFormattedTextField(formatter);
 
-                    JPanel rowPane = new JPanel();
-                    rowPane.setLayout(new BoxLayout(rowPane, BoxLayout.LINE_AXIS));
-                    rowPane.add(startRowTextField);
-                    rowPane.add(endRowTextField);
+                    JPanel textPane1 = new JPanel();
+                    textPane1.setLayout(new BoxLayout(textPane1, BoxLayout.PAGE_AXIS));
+                    textPane1.add(new JLabel("Start row: "));
+                    textPane1.add(new JLabel("Start column: "));
 
-                    JPanel colPane = new JPanel();
-                    colPane.setLayout(new BoxLayout(colPane, BoxLayout.LINE_AXIS));
-                    colPane.add(startColTextField);
-                    colPane.add(endColTextField);
+                    JPanel textPane2 = new JPanel();
+                    textPane2.setLayout(new BoxLayout(textPane2, BoxLayout.PAGE_AXIS));
+                    textPane2.add(new JLabel("End row: "));
+                    textPane2.add(new JLabel("End column: "));
+
+                    JPanel valuePane1 = new JPanel();
+                    valuePane1.setLayout(new BoxLayout(valuePane1, BoxLayout.PAGE_AXIS));
+                    valuePane1.add(startRowTextField);
+                    valuePane1.add(startColTextField);
+
+                    JPanel valuePane2 = new JPanel();
+                    valuePane2.setLayout(new BoxLayout(valuePane2, BoxLayout.PAGE_AXIS));
+                    valuePane2.add(endRowTextField);
+                    valuePane2.add(endColTextField);
 
                     JPanel parameterPopupPanel = new JPanel();
-                    parameterPopupPanel.setLayout(new BoxLayout(parameterPopupPanel, BoxLayout.PAGE_AXIS));
-                    parameterPopupPanel.add(rowPane);
-                    parameterPopupPanel.add(colPane);
+                    parameterPopupPanel.setLayout(new BoxLayout(parameterPopupPanel, BoxLayout.LINE_AXIS));
+                    parameterPopupPanel.add(textPane1);
+                    parameterPopupPanel.add(valuePane1);
+                    parameterPopupPanel.add(Box.createRigidArea(new Dimension(20, 0)));
+                    parameterPopupPanel.add(textPane2);
+                    parameterPopupPanel.add(valuePane2);
+
 
                     int parameterResult = JOptionPane.showConfirmDialog(view, parameterPopupPanel,
                             ("Choose loading parameters for " + selectedFile), JOptionPane.OK_CANCEL_OPTION,
@@ -125,7 +139,6 @@ public class TopPanel extends JPanel {
                         loadDataset(fileName, startRow, endRow, startCol, endCol);
                     }
                 }
-
             }
         }));
 
