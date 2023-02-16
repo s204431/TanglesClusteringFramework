@@ -75,6 +75,10 @@ public class TopPanel extends JPanel {
                 JPanel loadPopupPanel = new JPanel();
                 loadPopupPanel.add(scrollPane);
 
+                if (loadableDatasets.length > 0) {
+                    loadList.setSelectedIndex(0);
+                }
+
                 int loadResult = JOptionPane.showConfirmDialog(view, loadPopupPanel,
                         "Load dataset", JOptionPane.OK_CANCEL_OPTION,
                         JOptionPane.PLAIN_MESSAGE);
@@ -87,7 +91,7 @@ public class TopPanel extends JPanel {
                     format.setGroupingUsed(false);
                     NumberFormatter formatter = new NumberFormatter(format);
                     formatter.setValueClass(Integer.class);
-                    formatter.setMinimum(0);
+                    formatter.setMinimum(-1);
                     formatter.setMaximum(Integer.MAX_VALUE);
                     formatter.setAllowsInvalid(false);
                     // If you want the value to be committed on each keystroke instead of focus lost
@@ -97,6 +101,10 @@ public class TopPanel extends JPanel {
                     JFormattedTextField endRowTextField = new JFormattedTextField(formatter);
                     JFormattedTextField startColTextField = new JFormattedTextField(formatter);
                     JFormattedTextField endColTextField = new JFormattedTextField(formatter);
+                    startRowTextField.setValue(0);
+                    endRowTextField.setValue(-1);
+                    startColTextField.setValue(0);
+                    endColTextField.setValue(-1);
 
                     JPanel textPane1 = new JPanel();
                     textPane1.setLayout(new BoxLayout(textPane1, BoxLayout.PAGE_AXIS));
@@ -125,7 +133,6 @@ public class TopPanel extends JPanel {
                     parameterPopupPanel.add(Box.createRigidArea(new Dimension(20, 0)));
                     parameterPopupPanel.add(textPane2);
                     parameterPopupPanel.add(valuePane2);
-
 
                     int parameterResult = JOptionPane.showConfirmDialog(view, parameterPopupPanel,
                             ("Choose loading parameters for " + selectedFile), JOptionPane.OK_CANCEL_OPTION,
