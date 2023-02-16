@@ -1,5 +1,7 @@
 package view;
 
+import datasets.FeatureBasedDataset;
+
 import javax.swing.*;
 import javax.swing.text.NumberFormatter;
 import java.awt.*;
@@ -10,6 +12,7 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.text.NumberFormat;
+import java.text.ParseException;
 
 public class TopPanel extends JPanel {
     public static final int BUTTON_WIDTH = 100;
@@ -87,15 +90,12 @@ public class TopPanel extends JPanel {
                 if (loadResult == JOptionPane.OK_OPTION && selectedFile != null) {
                     String fileName = selectedFile.toString();
 
-                    NumberFormat format = NumberFormat.getInstance();
+                    NumberFormat format = NumberFormat.getIntegerInstance();
                     format.setGroupingUsed(false);
-                    NumberFormatter formatter = new NumberFormatter(format);
-                    formatter.setValueClass(Integer.class);
+                    ExtendedNumberFormatter formatter = new ExtendedNumberFormatter(format);
                     formatter.setMinimum(-1);
                     formatter.setMaximum(Integer.MAX_VALUE);
                     formatter.setAllowsInvalid(false);
-                    // If you want the value to be committed on each keystroke instead of focus lost
-                    formatter.setCommitsOnValidEdit(true);
 
                     JFormattedTextField startRowTextField = new JFormattedTextField(formatter);
                     JFormattedTextField endRowTextField = new JFormattedTextField(formatter);
@@ -201,6 +201,20 @@ public class TopPanel extends JPanel {
 
     private void loadDataset(String file, int startRow, int endRow, int startCol, int endCol) {
         System.out.println("Load " + file + " here...");
+    }
+
+    private class ExtendedNumberFormatter extends NumberFormatter {
+        public ExtendedNumberFormatter(NumberFormat f) {
+            super(f);
+        }
+
+        @Override
+        public Object stringToValue(String text) throws ParseException {
+            if (text == "") {
+                return null;
+            }
+            return super.stringToValue(text);
+        }
     }
 
 }
