@@ -54,7 +54,7 @@ public class PlottingView extends JPanel implements MouseListener, MouseMotionLi
 
     private int[] indicesToDraw; //Indices of points to draw when there are too many points.
     protected int originalNumberOfPoints; //Number of points before reducing the number of points.
-    private boolean runningTSNE = false;
+    protected boolean runningTSNE = false;
 
     public PlottingView(View view) {
         super();
@@ -84,9 +84,8 @@ public class PlottingView extends JPanel implements MouseListener, MouseMotionLi
         Graphics2D g2d = (Graphics2D) g;
 
         if (!view.hasDataset()) {
-            g2d.setFont(getFont().deriveFont(12f));
-            g2d.drawString("Please load or generate a dataset.", getWidth()/2, getHeight()/2);
-
+            g2d.setFont(getFont().deriveFont(20f));
+            g2d.drawString("Please load or generate a dataset", getWidth()/4, getHeight()/3);
             return;
         }
 
@@ -192,6 +191,12 @@ public class PlottingView extends JPanel implements MouseListener, MouseMotionLi
         g2d.setColor(new Color(255, 255, 255, 200));
         g2d.fillRect(5, 5, 150, 30);
         updateCoordinateText();
+
+        if (runningTSNE) {
+            g2d.setColor(Color.BLACK);
+            g2d.setFont(getFont().deriveFont(35f));
+            g2d.drawString("Converting data points to 2D...", getWidth()/10, getHeight()/3);
+        }
     }
 
     private Color changeTranslucencyOfColor(Color color, double percentage) {

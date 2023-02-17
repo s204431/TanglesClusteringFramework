@@ -247,4 +247,8 @@ public class View extends JFrame {
     protected boolean hasDataset() {
         return model.getDataset() != null;
     }
+
+    public boolean isReady() {
+        return !plottingView.runningTSNE;
+    }
 }

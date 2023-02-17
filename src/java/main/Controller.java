@@ -18,6 +18,9 @@ public class Controller {
     }
 
     public void loadDatasetFromFile(String datasetTypeName, String fileName, int startRow, int endRow, int startColumn, int endColumn) {
+        if (!view.isReady()) {
+            return;
+        }
         Dataset dataset = null;
         if (datasetTypeName.equals(BinaryQuestionnaire.name)) {
             dataset = new BinaryQuestionnaire();
@@ -33,6 +36,9 @@ public class Controller {
     }
 
     public void createNewDataset(String datasetTypeName, int nPoints, int nDimensions, int nClusters) {
+        if (!view.isReady()) {
+            return;
+        }
         Dataset dataset = null;
         if (datasetTypeName.equals(BinaryQuestionnaire.name)) {
             dataset = new BinaryQuestionnaire(DatasetGenerator.generateBiasedBinaryQuestionnaireAnswers(nPoints, nDimensions, nClusters));
