@@ -9,8 +9,8 @@ import java.util.Date;
 
 public class Model {
     //Names of supported clustering algorithms.
-    public static final String kMeansName = "K-Means";
     public static final String tangleName = "Tangle";
+    public static final String kMeansName = "K-Means";
 
     private TangleClusterer tangleClusterer = new TangleClusterer();
     private Dataset dataset;

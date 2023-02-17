@@ -1,6 +1,8 @@
 package view;
 
+import datasets.Dataset;
 import datasets.FeatureBasedDataset;
+import model.Model;
 
 import javax.swing.*;
 import javax.swing.text.NumberFormatter;
@@ -75,8 +77,15 @@ public class TopPanel extends JPanel {
 
                 JList loadList = new JList(loadableDatasets);
                 JScrollPane scrollPane = new JScrollPane(loadList);
+                JComboBox<String> comboBox = new JComboBox<>();
+                for (String type : Dataset.supportedDatasetTypes) {
+                    comboBox.addItem(type);
+                }
                 JPanel loadPopupPanel = new JPanel();
+                loadPopupPanel.setLayout(new BoxLayout(loadPopupPanel, BoxLayout.PAGE_AXIS));
                 loadPopupPanel.add(scrollPane);
+                loadPopupPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+                loadPopupPanel.add(comboBox);
 
                 if (loadableDatasets.length > 0) {
                     loadList.setSelectedIndex(0);
@@ -86,6 +95,7 @@ public class TopPanel extends JPanel {
                         "Load dataset", JOptionPane.OK_CANCEL_OPTION,
                         JOptionPane.PLAIN_MESSAGE);
                 Object selectedFile = loadList.getSelectedValue();
+                String datasetType = (String) comboBox.getSelectedItem();
 
                 if (loadResult == JOptionPane.OK_OPTION && selectedFile != null) {
                     String fileName = selectedFile + ".csv";
@@ -106,33 +116,43 @@ public class TopPanel extends JPanel {
                     startColTextField.setValue(0);
                     endColTextField.setValue(-1);
 
-                    JPanel textPane1 = new JPanel();
-                    textPane1.setLayout(new BoxLayout(textPane1, BoxLayout.PAGE_AXIS));
-                    textPane1.add(new JLabel("Start row: "));
-                    textPane1.add(new JLabel("Start column: "));
+                    JPanel box1 = new JPanel();
+                    box1.setLayout(new BoxLayout(box1, BoxLayout.LINE_AXIS));
+                    JPanel box2 = new JPanel();
+                    box2.setLayout(new BoxLayout(box2, BoxLayout.LINE_AXIS));
 
-                    JPanel textPane2 = new JPanel();
-                    textPane2.setLayout(new BoxLayout(textPane2, BoxLayout.PAGE_AXIS));
-                    textPane2.add(new JLabel("End row: "));
-                    textPane2.add(new JLabel("End column: "));
+                    JPanel startRowPane = new JPanel();
+                    startRowPane.setLayout(new BoxLayout(startRowPane, BoxLayout.PAGE_AXIS));
+                    startRowPane.add(new JLabel("Start row:"));
+                    startRowPane.add(startRowTextField);
 
-                    JPanel valuePane1 = new JPanel();
-                    valuePane1.setLayout(new BoxLayout(valuePane1, BoxLayout.PAGE_AXIS));
-                    valuePane1.add(startRowTextField);
-                    valuePane1.add(startColTextField);
+                    JPanel endRowPane = new JPanel();
+                    endRowPane.setLayout(new BoxLayout(endRowPane, BoxLayout.PAGE_AXIS));
+                    endRowPane.add(new JLabel("End row:"));
+                    endRowPane.add(endRowTextField);
 
-                    JPanel valuePane2 = new JPanel();
-                    valuePane2.setLayout(new BoxLayout(valuePane2, BoxLayout.PAGE_AXIS));
-                    valuePane2.add(endRowTextField);
-                    valuePane2.add(endColTextField);
+                    JPanel startColumnPane = new JPanel();
+                    startColumnPane.setLayout(new BoxLayout(startColumnPane, BoxLayout.PAGE_AXIS));
+                    startColumnPane.add(new JLabel("Start column:"));
+                    startColumnPane.add(startColTextField);
+
+                    JPanel endColumnPane = new JPanel();
+                    endColumnPane.setLayout(new BoxLayout(endColumnPane, BoxLayout.PAGE_AXIS));
+                    endColumnPane.add(new JLabel("End column:"));
+                    endColumnPane.add(endColTextField);
+
+                    box1.add(startRowPane);
+                    box1.add(Box.createRigidArea(new Dimension(5, 0)));
+                    box1.add(endRowPane);
+                    box2.add(startColumnPane);
+                    box2.add(Box.createRigidArea(new Dimension(5, 0)));
+                    box2.add(endColumnPane);
 
                     JPanel parameterPopupPanel = new JPanel();
-                    parameterPopupPanel.setLayout(new BoxLayout(parameterPopupPanel, BoxLayout.LINE_AXIS));
-                    parameterPopupPanel.add(textPane1);
-                    parameterPopupPanel.add(valuePane1);
-                    parameterPopupPanel.add(Box.createRigidArea(new Dimension(20, 0)));
-                    parameterPopupPanel.add(textPane2);
-                    parameterPopupPanel.add(valuePane2);
+                    parameterPopupPanel.setLayout(new BoxLayout(parameterPopupPanel, BoxLayout.PAGE_AXIS));
+                    parameterPopupPanel.add(box1);
+                    parameterPopupPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+                    parameterPopupPanel.add(box2);
 
                     int parameterResult = JOptionPane.showConfirmDialog(view, parameterPopupPanel,
                             ("Choose loading parameters for " + selectedFile), JOptionPane.OK_CANCEL_OPTION,
@@ -143,7 +163,7 @@ public class TopPanel extends JPanel {
                         int endRow = Integer.parseInt(endRowTextField.getValue().toString());
                         int startCol = Integer.parseInt(startColTextField.getValue().toString());
                         int endCol = Integer.parseInt(endColTextField.getValue().toString());
-                        view.loadDatasetFromFile(FeatureBasedDataset.name, fileName, startRow, endRow, startCol, endCol);
+                        view.loadDatasetFromFile(datasetType, fileName, startRow, endRow, startCol, endCol);
                     }
                 }
             }

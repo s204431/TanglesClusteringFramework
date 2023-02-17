@@ -3,6 +3,7 @@ package datasets;
 import util.BitSet;
 
 public interface Dataset {
+    public static final String[] supportedDatasetTypes = new String[] {FeatureBasedDataset.name, BinaryQuestionnaire.name};
     public BitSet[] getInitialCuts();
 
     public double[] getCutCosts();
