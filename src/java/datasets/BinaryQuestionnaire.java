@@ -1,5 +1,6 @@
 package datasets;
 
+import model.Model;
 import util.BitSet;
 import util.Util.Tuple;
 
@@ -7,6 +8,8 @@ import java.io.File;
 import java.util.*;
 
 public class BinaryQuestionnaire implements Dataset {
+
+    public static final String name = "Binary Questionnaire";
     public BitSet[] answers;
 
     private BitSet[] initialCuts;
@@ -233,6 +236,23 @@ public class BinaryQuestionnaire implements Dataset {
         }*/
 
         return resultingClustering;
+    }
+
+    public String[] getSupportedAlgorithms() {
+        return new String[] {Model.tangleName, Model.kMeansName};
+    }
+
+    public boolean supportsAlgorithm(String algorithmName) {
+        for (String string : getSupportedAlgorithms()) {
+            if (string.equals(algorithmName)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public String getName() {
+        return name;
     }
 
 }

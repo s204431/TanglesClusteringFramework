@@ -1,5 +1,6 @@
 package datasets;
 
+import model.Model;
 import util.BitSet;
 import util.Util.Tuple;
 
@@ -8,6 +9,7 @@ import java.util.*;
 
 public class FeatureBasedDataset implements Dataset {
 
+    public static final String name = "Feature Based";
     public double[][] dataPoints;
     private BitSet[] initialCuts;
     private int[] groundTruth;
@@ -439,5 +441,22 @@ public class FeatureBasedDataset implements Dataset {
             System.out.print(resultingClustering[i] + " ");
         }
 
+    }
+
+    public String[] getSupportedAlgorithms() {
+        return new String[] {Model.tangleName, Model.kMeansName};
+    }
+
+    public boolean supportsAlgorithm(String algorithmName) {
+        for (String string : getSupportedAlgorithms()) {
+            if (string.equals(algorithmName)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public String getName() {
+        return name;
     }
 }

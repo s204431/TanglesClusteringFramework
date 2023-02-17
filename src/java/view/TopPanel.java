@@ -88,7 +88,7 @@ public class TopPanel extends JPanel {
                 Object selectedFile = loadList.getSelectedValue();
 
                 if (loadResult == JOptionPane.OK_OPTION && selectedFile != null) {
-                    String fileName = selectedFile.toString();
+                    String fileName = selectedFile + ".csv";
 
                     NumberFormat format = NumberFormat.getIntegerInstance();
                     format.setGroupingUsed(false);
@@ -143,7 +143,7 @@ public class TopPanel extends JPanel {
                         int endRow = Integer.parseInt(endRowTextField.getValue().toString());
                         int startCol = Integer.parseInt(startColTextField.getValue().toString());
                         int endCol = Integer.parseInt(endColTextField.getValue().toString());
-                        loadDataset(fileName, startRow, endRow, startCol, endCol);
+                        view.loadDatasetFromFile(FeatureBasedDataset.name, fileName, startRow, endRow, startCol, endCol);
                     }
                 }
             }

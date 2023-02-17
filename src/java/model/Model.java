@@ -8,9 +8,12 @@ import smile.validation.metric.NormalizedMutualInformation;
 import java.util.Date;
 
 public class Model {
+    //Names of supported clustering algorithms.
+    public static final String kMeansName = "K-Means";
+    public static final String tangleName = "Tangle";
+
     private TangleClusterer tangleClusterer = new TangleClusterer();
     private Dataset dataset;
-    private View view;
     private long clusteringTime = -1;
     private double[][] softClustering;
     private int[] hardClustering;
@@ -20,12 +23,12 @@ public class Model {
 
     }
 
-    public Model(View view) {
-        this.view = view;
-    }
-
     public void setDataset(Dataset dataset) {
         this.dataset = dataset;
+    }
+
+    public Dataset getDataset() {
+        return dataset;
     }
 
     public void generateClusters(int a, int psi) {
@@ -58,15 +61,6 @@ public class Model {
 
     public int[] getHardClustering() {
         return hardClustering;
-    }
-
-    public void plotDataPoints() {
-        if (dataset instanceof BinaryQuestionnaire) {
-            view.loadPoints(((BinaryQuestionnaire) dataset).answers);
-        }
-        else if (dataset instanceof FeatureBasedDataset) {
-            view.loadPoints(((FeatureBasedDataset) dataset).dataPoints);
-        }
     }
 
     public double getNMIScore() {

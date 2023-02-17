@@ -78,11 +78,16 @@ public class PlottingView extends JPanel implements MouseListener, MouseMotionLi
     //Draws plottingView on screen.
     @Override
     public void paintComponent(Graphics g) {
-        try {
-            super.paintComponent(g);
-        } catch(Exception e) {e.printStackTrace();}
+        super.paintComponent(g);
 
         Graphics2D g2d = (Graphics2D) g;
+
+        if (!view.hasDataset()) {
+            g2d.setFont(getFont().deriveFont(12f));
+            g2d.drawString("Please load or generate a dataset.", getWidth()/2, getHeight()/2);
+
+            return;
+        }
 
         //Draw axes
         g2d.setStroke(stroke4);
@@ -411,7 +416,9 @@ public class PlottingView extends JPanel implements MouseListener, MouseMotionLi
 
     @Override
     public void mouseMoved(MouseEvent e) {
-        updateCoordinateText();
+        if (view.hasDataset()) {
+            updateCoordinateText();
+        }
     }
 
     @Override

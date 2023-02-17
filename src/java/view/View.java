@@ -1,22 +1,28 @@
 package view;
 
+import datasets.BinaryQuestionnaire;
+import datasets.Dataset;
+import datasets.FeatureBasedDataset;
+import main.Controller;
 import model.Model;
 import util.BitSet;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.xml.crypto.Data;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class View extends JFrame {
     private Model model;
-
+    private Controller controller;
     protected int windowWidth, windowHeight;
 
     protected JPanel mainComponent;
@@ -29,7 +35,8 @@ public class View extends JFrame {
     protected int topPanelHeight;
     protected int sidePanelWidth;
 
-    public View() {
+    public View(Model model) {
+        this.model = model;
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 
         windowWidth = screenSize.width - screenSize.width / 3;
@@ -50,24 +57,24 @@ public class View extends JFrame {
         pane.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
-                ((JComponent)((JTabbedPane) e.getSource()).getSelectedComponent()).add(plottingView);
-                changeSidePanel(((JTabbedPane) e.getSource()).getSelectedIndex());
+                if (((JTabbedPane) e.getSource()).getSelectedComponent() != null) {
+                    ((JComponent)((JTabbedPane) e.getSource()).getSelectedComponent()).add(plottingView);
+                    changeSidePanel(((JTabbedPane) e.getSource()).getSelectedIndex());
+                }
             }
         });
-        //Add initial side tab.
-        SidePanel sidePanel = new TangleSidePanel(this);
-        sidePanels.add(sidePanel);
-        selectedSidePanel = sidePanel;
-        pane.addTab("Tangle", new JPanel(null));
-        ((JComponent)pane.getSelectedComponent()).add(plottingView);
-
-        addSidePanel(new KMeansSidePanel(this), "K-Means");
 
         topPanel = new TopPanel(this);
 
+        SidePanel sidePanel = new SidePanel(this);
+        sidePanels.add(sidePanel);
+        selectedSidePanel = sidePanel;
+        pane.addTab("", new JPanel(null));
+        ((JComponent)pane.getSelectedComponent()).add(plottingView);
+        mainComponent.add(sidePanel);
+
         setBounds();
 
-        mainComponent.add(sidePanel);
         mainComponent.add(pane);
         mainComponent.add(topPanel);
 
@@ -125,6 +132,20 @@ public class View extends JFrame {
         topPanel.setBounds();
     }
 
+    //Loads the data points from the dataset currently loaded by the model.
+    public void loadDataPoints() {
+        Dataset dataset = model.getDataset();
+        if (dataset == null) {
+            return;
+        }
+        if (dataset instanceof BinaryQuestionnaire) {
+            loadPoints(((BinaryQuestionnaire) dataset).answers);
+        }
+        else if (dataset instanceof FeatureBasedDataset) {
+            loadPoints(((FeatureBasedDataset) dataset).dataPoints);
+        }
+    }
+
     public void loadPointsWithClustering(double[][] points, int[] clusters, double[][] softClustering) {
         plottingView.loadPoints(points);
         plottingView.loadClusters(clusters, softClustering);
@@ -177,6 +198,33 @@ public class View extends JFrame {
         selectedSidePanel.setValues(model.getNMIScore(), model.getClusteringTime());
     }
 
+    public void resetView() {
+        pane.removeAll();
+        for (SidePanel sidePanel : sidePanels) {
+            mainComponent.remove(sidePanel);
+        }
+        sidePanels = new ArrayList<>();
+
+        //Add initial side tab.
+        SidePanel sidePanel = new TangleSidePanel(this);
+        sidePanels.add(sidePanel);
+        selectedSidePanel = sidePanel;
+        pane.addTab(Model.tangleName, new JPanel(null));
+        ((JComponent)pane.getSelectedComponent()).add(plottingView);
+        mainComponent.add(sidePanel);
+
+        //Add additional side tabs.
+        Dataset dataset = model.getDataset();
+        if (dataset.supportsAlgorithm(Model.kMeansName)) {
+            addSidePanel(new KMeansSidePanel(this), Model.kMeansName);
+        }
+        repaint();
+    }
+
+    protected void loadDatasetFromFile(String datasetTypeName, String fileName, int startRow, int endRow, int startColumn, int endColumn) {
+        controller.loadDatasetFromFile(datasetTypeName, fileName, startRow, endRow, startColumn, endColumn);
+    }
+
     protected int getWindowHeight() {
         return windowHeight;
     }
@@ -185,8 +233,8 @@ public class View extends JFrame {
         return windowWidth;
     }
 
-    public void setModel(Model model) {
-        this.model = model;
+    public void setController(Controller controller) {
+        this.controller = controller;
     }
 
     protected double getNMIScore() {
@@ -195,5 +243,9 @@ public class View extends JFrame {
 
     protected long getClusteringTime() {
         return model.getClusteringTime();
+    }
+
+    protected boolean hasDataset() {
+        return model.getDataset() != null;
     }
 }
