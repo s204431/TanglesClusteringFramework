@@ -29,7 +29,7 @@ public class View extends JFrame {
     protected PlottingView plottingView;
     private JTabbedPane pane;
     private List<SidePanel> sidePanels = new ArrayList<>();
-    private SidePanel selectedSidePanel;
+    protected SidePanel selectedSidePanel;
     private TopPanel topPanel;
 
     protected int topPanelHeight;
@@ -114,7 +114,6 @@ public class View extends JFrame {
         selectedSidePanel.setBounds();
         selectedSidePanel.update(plottingView.originalNumberOfPoints);
         loadClusters(selectedSidePanel.hardClustering, selectedSidePanel.softClustering);
-        plottingView.repaint();
     }
 
     private void setBounds() {
@@ -218,7 +217,7 @@ public class View extends JFrame {
         if (dataset.supportsAlgorithm(Model.kMeansName)) {
             addSidePanel(new KMeansSidePanel(this), Model.kMeansName);
         }
-        repaint();
+        plottingView.repaint();
     }
 
     protected void loadDatasetFromFile(String datasetTypeName, String fileName, int startRow, int endRow, int startColumn, int endColumn) {

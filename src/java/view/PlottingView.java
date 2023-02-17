@@ -54,6 +54,7 @@ public class PlottingView extends JPanel implements MouseListener, MouseMotionLi
 
     private int[] indicesToDraw; //Indices of points to draw when there are too many points.
     protected int originalNumberOfPoints; //Number of points before reducing the number of points.
+    private boolean runningTSNE = false;
 
     public PlottingView(View view) {
         super();
@@ -206,27 +207,29 @@ public class PlottingView extends JPanel implements MouseListener, MouseMotionLi
     }
 
     protected void loadPoints(double[][] points) {
-        loadPoints(points, true);
-    }
-
-    protected void loadPoints(double[][] points, boolean shufflePoints) {
-        if (shufflePoints) {
-            originalNumberOfPoints = points.length;
-            points = convertPoints(points);
+        if (runningTSNE) {
+            return;
         }
+        originalNumberOfPoints = points.length;
+        points = convertPoints(points);
         if (points[0].length > 2) {
-            points = TSne(points);
+            TSne(points);
         }
         else if (points[0].length == 1) {
-            points = convert1DTo2D(points);
+            this.points = convert1DTo2D(points);
+        }
+        else {
+            this.points = points;
         }
         double[] bounds = findBounds(points);
         configureAxes(bounds);
-        this.points = points;
         repaint();
     }
 
     protected void loadPoints(BitSet[] questionnaireAnswers) {
+        if (runningTSNE) {
+            return;
+        }
         originalNumberOfPoints = questionnaireAnswers.length;
         double[][] dataPoints = new double[questionnaireAnswers.length][questionnaireAnswers[0].size()];
         for (int i = 0; i < questionnaireAnswers.length; i++) {
@@ -235,8 +238,8 @@ public class PlottingView extends JPanel implements MouseListener, MouseMotionLi
             }
         }
         dataPoints = convertPoints(dataPoints);
-        dataPoints = TSne(dataPoints);
-        loadPoints(dataPoints, false);
+        TSne(dataPoints);
+        repaint();
     }
 
     private double[][] convert1DTo2D(double[][] points) {
@@ -248,7 +251,9 @@ public class PlottingView extends JPanel implements MouseListener, MouseMotionLi
         return copy;
     }
 
-    private double[][] TSne(double[][] dataPoints) {
+    private void TSne(double[][] dataPoints) {
+        runningTSNE = true;
+        points = null;
         int initialDims = dataPoints[0].length;
         double perplexity = 20.0;
         int maxIterations = 500;
@@ -260,9 +265,20 @@ public class PlottingView extends JPanel implements MouseListener, MouseMotionLi
             tsne = new BHTSne();
         }
         TSneConfiguration config = TSneUtils.buildConfig(dataPoints, 2, initialDims, perplexity, maxIterations);
-        double [][] points = tsne.tsne(config);
-
-        return points;
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                points = tsne.tsne(config);
+                if (points[0].length == 1) {
+                    points = convert1DTo2D(points);
+                }
+                double[] bounds = findBounds(points);
+                configureAxes(bounds);
+                view.selectedSidePanel.update(points.length);
+                repaint();
+                runningTSNE = false;
+            }
+        }).start();
     }
 
     public void loadClusters(int[] clusters) {
