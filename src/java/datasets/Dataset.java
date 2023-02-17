@@ -2,6 +2,8 @@ package datasets;
 
 import util.BitSet;
 
+import java.io.File;
+
 public interface Dataset {
     public static final String[] supportedDatasetTypes = new String[] {FeatureBasedDataset.name, BinaryQuestionnaire.name};
     public BitSet[] getInitialCuts();
@@ -14,5 +16,6 @@ public interface Dataset {
     public String getName();
     public String[] getSupportedAlgorithms();
     public boolean supportsAlgorithm(String algorithmName);
+    public void saveToFile(File file);
 
 }

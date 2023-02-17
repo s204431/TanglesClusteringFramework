@@ -4,7 +4,10 @@ import model.Model;
 import util.BitSet;
 import util.Util.Tuple;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.*;
 
 public class FeatureBasedDataset implements Dataset {
@@ -454,6 +457,24 @@ public class FeatureBasedDataset implements Dataset {
             }
         }
         return false;
+    }
+
+    public void saveToFile(File file) {
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+            for (int i = 0; i < dataPoints.length; i++) {
+                for (int j = 0; j < dataPoints[i].length; j++) {
+                    writer.write(""+dataPoints[i][j]);
+                    if (j != dataPoints[i].length-1) {
+                        writer.write(",");
+                    }
+                }
+                if (i != dataPoints.length-1) {
+                    writer.write("\n");
+                }
+            }
+            writer.close();
+        } catch (IOException e) {}
     }
 
     public String getName() {

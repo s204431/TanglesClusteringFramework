@@ -248,6 +248,10 @@ public class View extends JFrame {
         return model.getDataset() != null;
     }
 
+    protected Dataset getDataset() {
+        return model.getDataset();
+    }
+
     public boolean isReady() {
         return !plottingView.runningTSNE;
     }

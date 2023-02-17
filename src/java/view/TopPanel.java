@@ -5,14 +5,16 @@ import datasets.FeatureBasedDataset;
 import model.Model;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.NumberFormatter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FilenameFilter;
+import java.io.IOException;
 import java.text.NumberFormat;
 import java.text.ParseException;
 
@@ -180,10 +182,42 @@ public class TopPanel extends JPanel {
     }
 
     private void addExportButton() {
+        final JPopupMenu exportPopup = new JPopupMenu();
+        exportPopup.add(new JMenuItem(new AbstractAction("Save dataset as CSV") {
+            public void actionPerformed(ActionEvent e) {
+                final File[] file = new File[1];
+                JPanel savePopupPanel = new JPanel();
+                savePopupPanel.setLayout(new BoxLayout(savePopupPanel, BoxLayout.LINE_AXIS));
+                JLabel label = new JLabel("No file selected");
+                JButton button = new JButton("Select File");
+                button.addActionListener((l) -> {
+                    final JFileChooser fc = new JFileChooser();
+                    FileNameExtensionFilter filter = new FileNameExtensionFilter(".csv", "csv");
+                    fc.setFileFilter(filter);
+                    int returnVal = fc.showDialog(view, "Choose");
+                    if (returnVal == JFileChooser.APPROVE_OPTION) {
+                        file[0] = fc.getSelectedFile();
+                        if (!file[0].getName().endsWith(".csv")) {
+                            file[0] = new File(file[0].getPath()+".csv");
+                        }
+                        label.setText(file[0].getName());
+                    }
+                });
+                savePopupPanel.add(label);
+                savePopupPanel.add(Box.createRigidArea(new Dimension(10, 0)));
+                savePopupPanel.add(button);
+                int saveResult = JOptionPane.showConfirmDialog(view, savePopupPanel,
+                        "Save dataset as CSV", JOptionPane.OK_CANCEL_OPTION,
+                        JOptionPane.PLAIN_MESSAGE);
+                if (saveResult == JOptionPane.OK_OPTION && file[0] != null) {
+                    view.getDataset().saveToFile(file[0]);
+                }
+            }
+        }));
         exportButton = new JButton("Export");
         exportButton.addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent e) {
-
+                exportPopup.show(e.getComponent(), 0, exportButton.getY() + BUTTON_HEIGHT);
             }
         });
         toolBar.add(exportButton);

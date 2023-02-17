@@ -4,7 +4,10 @@ import model.Model;
 import util.BitSet;
 import util.Util.Tuple;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.*;
 
 public class BinaryQuestionnaire implements Dataset {
@@ -249,6 +252,24 @@ public class BinaryQuestionnaire implements Dataset {
             }
         }
         return false;
+    }
+
+    public void saveToFile(File file) {
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+            for (int i = 0; i < answers.length; i++) {
+                for (int j = 0; j < answers[i].size(); j++) {
+                    writer.write(""+(answers[i].get(j) ? 1 : 2));
+                    if (j != answers[i].size()-1) {
+                        writer.write(",");
+                    }
+                }
+                if (i != answers.length-1) {
+                    writer.write("\n");
+                }
+            }
+            writer.close();
+        } catch (IOException e) {}
     }
 
     public String getName() {
