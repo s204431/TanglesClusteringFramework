@@ -60,4 +60,9 @@ public class SidePanel extends JPanel {
         this.clusteringTime = clusteringTime;
     }
 
+    protected void setClustering(int[] hardClustering, double[][] softClustering) {
+        this.hardClustering = hardClustering;
+        this.softClustering = softClustering;
+    }
+
 }

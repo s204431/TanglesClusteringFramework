@@ -10,12 +10,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
 
-public class FeatureBasedDataset implements Dataset {
+public class FeatureBasedDataset extends Dataset {
 
     public static final String name = "Feature Based";
     public double[][] dataPoints;
-    private BitSet[] initialCuts;
-    private int[] groundTruth;
     private int a;
 
     private static int precision = 1; //Determines the number of cuts generated.
@@ -271,7 +269,8 @@ public class FeatureBasedDataset implements Dataset {
     public void loadDataFromFile(String fileName, int startRow, int endRow, int startColumn, int endColumn) {
         try {
             List<List<Double>> result = new ArrayList<>();
-            Scanner fileScanner = new Scanner(new File("datasets/" + fileName));
+            File file = new File("datasets/" + fileName);
+            Scanner fileScanner = new Scanner(file);
             for (int i = 0; i < startRow; i++) {
                 fileScanner.nextLine();
             }
@@ -305,6 +304,7 @@ public class FeatureBasedDataset implements Dataset {
                     dataPoints[i][j] = result.get(i).get(j);
                 }
             }
+            loadGroundTruth(file, startRow, endRow == -1 ? dataPoints.length-1 : endRow);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -450,15 +450,6 @@ public class FeatureBasedDataset implements Dataset {
         return new String[] {Model.tangleName, Model.kMeansName};
     }
 
-    public boolean supportsAlgorithm(String algorithmName) {
-        for (String string : getSupportedAlgorithms()) {
-            if (string.equals(algorithmName)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     public void saveToFile(File file) {
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(file));
@@ -474,6 +465,7 @@ public class FeatureBasedDataset implements Dataset {
                 }
             }
             writer.close();
+            saveGroundTruth(file);
         } catch (IOException e) {}
     }
 

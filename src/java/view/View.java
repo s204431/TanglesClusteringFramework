@@ -180,8 +180,7 @@ public class View extends JFrame {
     }
 
     public void loadClusters(int[] clusters, double[][] softClustering) {
-        selectedSidePanel.hardClustering = clusters;
-        selectedSidePanel.softClustering = softClustering;
+        selectedSidePanel.setClustering(clusters, softClustering);
         plottingView.loadClusters(clusters, softClustering);
     }
 

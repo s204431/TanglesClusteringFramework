@@ -10,13 +10,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
 
-public class BinaryQuestionnaire implements Dataset {
+public class BinaryQuestionnaire extends Dataset {
 
     public static final String name = "Binary Questionnaire";
     public BitSet[] answers;
-
-    private BitSet[] initialCuts;
-    private int[] groundTruth;
 
     public BinaryQuestionnaire() {
 
@@ -50,7 +47,8 @@ public class BinaryQuestionnaire implements Dataset {
     public void loadAnswersFromFile(String fileName, int startRow, int endRow, int startColumn, int endColumn) {
         try {
             List<List<Boolean>> result = new ArrayList<>();
-            Scanner fileScanner = new Scanner(new File("datasets/" + fileName));
+            File file = new File("datasets/" + fileName);
+            Scanner fileScanner = new Scanner(file);
             for (int i = 0; i < startRow; i++) {
                 fileScanner.nextLine();
             }
@@ -86,6 +84,7 @@ public class BinaryQuestionnaire implements Dataset {
                     }
                 }
             }
+            loadGroundTruth(file, startRow, endRow == -1 ? answers.length-1 : endRow);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -245,15 +244,6 @@ public class BinaryQuestionnaire implements Dataset {
         return new String[] {Model.tangleName, Model.kMeansName};
     }
 
-    public boolean supportsAlgorithm(String algorithmName) {
-        for (String string : getSupportedAlgorithms()) {
-            if (string.equals(algorithmName)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     public void saveToFile(File file) {
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(file));
@@ -269,6 +259,7 @@ public class BinaryQuestionnaire implements Dataset {
                 }
             }
             writer.close();
+            saveGroundTruth(file);
         } catch (IOException e) {}
     }
 
