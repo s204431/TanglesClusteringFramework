@@ -5,7 +5,6 @@ import datasets.Dataset;
 import datasets.DatasetGenerator;
 import datasets.FeatureBasedDataset;
 import model.Model;
-import smile.stat.Hypothesis;
 import view.View;
 
 public class Controller {

@@ -15,6 +15,7 @@ public class ValueAdjuster extends JComponent {
     private ChangeListener changeListener;
     private boolean enabled = true;
     private boolean hasValue = false;
+    private int lastValue = Integer.MIN_VALUE;
 
     public ValueAdjuster() {
         this(0, 100);
@@ -32,10 +33,11 @@ public class ValueAdjuster extends JComponent {
                 int value = (int)(slider.getValue() * maximumValue / 100.0);
                 if (!valueEntered) {
                     textField.setText("" + value);
-                    if (changeListener != null) {
+                    if (changeListener != null && value != lastValue) {
                         changeListener.stateChanged(new ChangeEvent(thisObject));
                     }
                 }
+                lastValue = value;
                 valueEntered = false;
                 repaint();
             }
