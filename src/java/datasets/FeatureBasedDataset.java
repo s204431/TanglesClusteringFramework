@@ -1,9 +1,11 @@
 package datasets;
 
 import model.Model;
+import smile.clustering.HierarchicalClustering;
 import smile.clustering.KMeans;
 import smile.clustering.PartitionClustering;
 import smile.clustering.SpectralClustering;
+import smile.clustering.linkage.CompleteLinkage;
 import util.BitSet;
 import util.Util.Tuple;
 
@@ -333,6 +335,12 @@ public class FeatureBasedDataset extends Dataset {
     public int[] spectralClustering(int k, double sigma) {
         SpectralClustering clusters = SpectralClustering.fit(dataPoints, k, sigma);
         return clusters.y;
+    }
+
+    //Performs hierarchical clustering on a feature based dataset
+    public int[] hierarchicalClustering(int k) {
+        HierarchicalClustering clusters = HierarchicalClustering.fit(CompleteLinkage.of(dataPoints));
+        return clusters.partition(k);
     }
 
     /*
