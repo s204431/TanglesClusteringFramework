@@ -19,7 +19,7 @@ public class Main {
         view.setController(controller);
         int a = 10000;
         long time1 = new Date().getTime();
-        Tuple<double[][], int[]> generated = DatasetGenerator.generateFeatureBasedDataPoints(100000, 4, 2);
+        Tuple<double[][], int[]> generated = DatasetGenerator.generateFeatureBasedDataPoints(10, 4, 2);
         FeatureBasedDataset dataset = new FeatureBasedDataset(generated);
         //BinaryQuestionnaire dataset = new BinaryQuestionnaire(DatasetGenerator.generateBiasedBinaryQuestionnaireAnswers(1000000, 40, 4));
         model.setDataset(dataset);
@@ -34,6 +34,7 @@ public class Main {
         view.loadDataPoints();
         long time4 = new Date().getTime();
         System.out.println("Total time: " + (time4-time1) + " ms");
+
 
 
 /*

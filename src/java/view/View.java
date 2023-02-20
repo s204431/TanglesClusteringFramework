@@ -196,6 +196,12 @@ public class View extends JFrame {
         selectedSidePanel.setValues(model.getNMIScore(), model.getClusteringTime());
     }
 
+    protected void showClusteringSpectral(int k, double sigma) {
+        model.generateClustersSpectral(k, sigma);
+        loadClusters(model.getHardClustering(), model.getSoftClustering());
+        selectedSidePanel.setValues(model.getNMIScore(), model.getClusteringTime());
+    }
+
     public void resetView() {
         pane.removeAll();
         for (SidePanel sidePanel : sidePanels) {
@@ -215,6 +221,9 @@ public class View extends JFrame {
         Dataset dataset = model.getDataset();
         if (dataset.supportsAlgorithm(Model.kMeansName)) {
             addSidePanel(new KMeansSidePanel(this), Model.kMeansName);
+        }
+        if (dataset.supportsAlgorithm(Model.spectralClusteringName)) {
+            addSidePanel(new SpectralSidePanel(this), Model.spectralClusteringName);
         }
         plottingView.repaint();
     }

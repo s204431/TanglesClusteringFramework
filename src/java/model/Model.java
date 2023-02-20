@@ -11,6 +11,7 @@ public class Model {
     //Names of supported clustering algorithms.
     public static final String tangleName = "Tangle";
     public static final String kMeansName = "K-Means";
+    public static final String spectralClusteringName = "Spectral";
 
     private TangleClusterer tangleClusterer = new TangleClusterer();
     private Dataset dataset;
@@ -44,6 +45,14 @@ public class Model {
         long time = new Date().getTime();
         softClustering = null;
         hardClustering = dataset.kMeans(k);
+        updateNMIScore();
+        clusteringTime = new Date().getTime() - time;
+    }
+
+    public void generateClustersSpectral(int k, double sigma) {
+        long time = new Date().getTime();
+        softClustering = null;
+        hardClustering = dataset.spectralClustering(k, sigma);
         updateNMIScore();
         clusteringTime = new Date().getTime() - time;
     }

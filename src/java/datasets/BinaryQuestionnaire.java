@@ -240,6 +240,7 @@ public class BinaryQuestionnaire extends Dataset {
         return resultingClustering;
     }
 
+
     public String[] getSupportedAlgorithms() {
         return new String[] {Model.tangleName, Model.kMeansName};
     }

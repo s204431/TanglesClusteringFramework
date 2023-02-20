@@ -1,6 +1,9 @@
 package datasets;
 
 import model.Model;
+import smile.clustering.KMeans;
+import smile.clustering.PartitionClustering;
+import smile.clustering.SpectralClustering;
 import util.BitSet;
 import util.Util.Tuple;
 
@@ -321,6 +324,19 @@ public class FeatureBasedDataset extends Dataset {
     }
 
     //Performs K-means clustering on a feature based dataset
+    public int[] kMeans(int k) {
+        KMeans clusters = PartitionClustering.run(20, () -> KMeans.fit(dataPoints, k));
+        return clusters.y;
+    }
+
+    //Performs spectral clustering on a feature based dataset
+    public int[] spectralClustering(int k, double sigma) {
+        SpectralClustering clusters = SpectralClustering.fit(dataPoints, k, sigma);
+        return clusters.y;
+    }
+
+    /*
+    //Performs K-means clustering on a feature based dataset
     public int[] kMeans(int clusters) {
         int[] resultingClustering = new int[dataPoints.length];
         int features = dataPoints[0].length;
@@ -417,9 +433,9 @@ public class FeatureBasedDataset extends Dataset {
                 break;
             }
         }
-/*
+
         //Prints resulting centroids
-        /*System.out.println("Resulting centroid means:");
+        System.out.println("Resulting centroid means:");
         for (int i = 0; i < clusters; i++) {
             System.out.print("Centroid " + (i+1) + ": ");
             for (int j = 0; j < features; j++) {
@@ -427,10 +443,11 @@ public class FeatureBasedDataset extends Dataset {
             }
             System.out.println();
         }
-        System.out.println();*/
+        System.out.println();
 
         return resultingClustering;
     }
+    */
 
     public void printKMeansResults(int[] resultingClustering) {
 
@@ -447,7 +464,7 @@ public class FeatureBasedDataset extends Dataset {
     }
 
     public String[] getSupportedAlgorithms() {
-        return new String[] {Model.tangleName, Model.kMeansName};
+        return new String[] {Model.tangleName, Model.kMeansName, Model.spectralClusteringName};
     }
 
     public void saveToFile(File file) {
