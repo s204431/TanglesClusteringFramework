@@ -105,7 +105,7 @@ public class TopPanel extends JPanel {
                     NumberFormat format = NumberFormat.getIntegerInstance();
                     format.setGroupingUsed(false);
                     ExtendedNumberFormatter formatter = new ExtendedNumberFormatter(format);
-                    formatter.setMinimum(-1);
+                    formatter.setMinimum(0);
                     formatter.setMaximum(Integer.MAX_VALUE);
                     formatter.setAllowsInvalid(false);
 
@@ -113,10 +113,6 @@ public class TopPanel extends JPanel {
                     JFormattedTextField endRowTextField = new JFormattedTextField(formatter);
                     JFormattedTextField startColTextField = new JFormattedTextField(formatter);
                     JFormattedTextField endColTextField = new JFormattedTextField(formatter);
-                    startRowTextField.setValue(0);
-                    endRowTextField.setValue(-1);
-                    startColTextField.setValue(0);
-                    endColTextField.setValue(-1);
 
                     JPanel box1 = new JPanel();
                     box1.setLayout(new BoxLayout(box1, BoxLayout.LINE_AXIS));
@@ -161,10 +157,10 @@ public class TopPanel extends JPanel {
                             JOptionPane.PLAIN_MESSAGE);
 
                     if (parameterResult == JOptionPane.OK_OPTION) {
-                        int startRow = Integer.parseInt(startRowTextField.getValue().toString());
-                        int endRow = Integer.parseInt(endRowTextField.getValue().toString());
-                        int startCol = Integer.parseInt(startColTextField.getValue().toString());
-                        int endCol = Integer.parseInt(endColTextField.getValue().toString());
+                        int startRow = Integer.parseInt(getTextFieldValue(startRowTextField, 0));
+                        int endRow = Integer.parseInt(getTextFieldValue(endRowTextField, -1));
+                        int startCol = Integer.parseInt(getTextFieldValue(startColTextField, 0));
+                        int endCol = Integer.parseInt(getTextFieldValue(endColTextField ,-1));
                         view.loadDatasetFromFile(datasetType, fileName, startRow, endRow, startCol, endCol);
                     }
                 }
@@ -253,10 +249,6 @@ public class TopPanel extends JPanel {
         algorithmButton.setBounds(BUTTON_HEIGHT + BUTTON_WIDTH * 2, view.topPanelHeight / 2 - BUTTON_HEIGHT / 2, BUTTON_WIDTH, BUTTON_HEIGHT);
     }
 
-    private void loadDataset(String file, int startRow, int endRow, int startCol, int endCol) {
-        System.out.println("Load " + file + " here...");
-    }
-
     private class ExtendedNumberFormatter extends NumberFormatter {
         public ExtendedNumberFormatter(NumberFormat f) {
             super(f);
@@ -269,6 +261,13 @@ public class TopPanel extends JPanel {
             }
             return super.stringToValue(text);
         }
+    }
+
+    private String getTextFieldValue(JFormattedTextField textfield, int defaultValue) {
+        if (textfield.getValue() == null) {
+            return ""+defaultValue;
+        }
+        return textfield.getValue().toString();
     }
 
 }
