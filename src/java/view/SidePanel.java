@@ -21,6 +21,10 @@ public class SidePanel extends JPanel {
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
 
+        if (view.getDataset() == null) {
+            return;
+        }
+
         Graphics2D g2d = (Graphics2D) g;
 
         g2d.setColor(Color.BLACK);

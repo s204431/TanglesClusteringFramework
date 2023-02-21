@@ -203,6 +203,7 @@ public class View extends JFrame {
     }
 
     public void resetView() {
+        Dataset dataset = model.getDataset();
         pane.removeAll();
         for (SidePanel sidePanel : sidePanels) {
             mainComponent.remove(sidePanel);
@@ -210,20 +211,24 @@ public class View extends JFrame {
         sidePanels = new ArrayList<>();
 
         //Add initial side tab.
-        SidePanel sidePanel = new TangleSidePanel(this);
+        SidePanel sidePanel = dataset == null ? new SidePanel(this) : new TangleSidePanel(this);
         sidePanels.add(sidePanel);
         selectedSidePanel = sidePanel;
-        pane.addTab(Model.tangleName, new JPanel(null));
+        pane.addTab(dataset == null ? "" : Model.tangleName, new JPanel(null));
         ((JComponent)pane.getSelectedComponent()).add(plottingView);
         mainComponent.add(sidePanel);
 
-        //Add additional side tabs.
-        Dataset dataset = model.getDataset();
-        if (dataset.supportsAlgorithm(Model.kMeansName)) {
-            addSidePanel(new KMeansSidePanel(this), Model.kMeansName);
+        if (dataset == null) {
+            selectedSidePanel.setVisible(false);
         }
-        if (dataset.supportsAlgorithm(Model.spectralClusteringName)) {
-            addSidePanel(new SpectralSidePanel(this), Model.spectralClusteringName);
+        else {
+            //Add additional side tabs.
+            if (dataset.supportsAlgorithm(Model.kMeansName)) {
+                addSidePanel(new KMeansSidePanel(this), Model.kMeansName);
+            }
+            if (dataset.supportsAlgorithm(Model.spectralClusteringName)) {
+                addSidePanel(new SpectralSidePanel(this), Model.spectralClusteringName);
+            }
         }
         plottingView.repaint();
     }

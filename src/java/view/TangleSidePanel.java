@@ -72,6 +72,6 @@ public class TangleSidePanel extends SidePanel {
     }
 
     protected boolean showCuts() {
-        return showCutsCheckBox.isSelected();
+        return showCutsCheckBox == null ? false : showCutsCheckBox.isSelected();
     }
 }

@@ -170,7 +170,7 @@ public class TangleSearchTree {
     }
 
     private double getWeight(double cost) {
-        return Math.exp(-((cost-minCost)/(maxCost-minCost)));
+        return (maxCost-minCost) == 0.0 ? 1.0 : Math.exp(-((cost-minCost)/(maxCost-minCost)));
     }
 
     private int getSoftClustering(Node node, int datapoint, int index, double accumulated, double[] result) {

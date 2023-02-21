@@ -196,7 +196,7 @@ public class PlottingView extends JPanel implements MouseListener, MouseMotionLi
         updateCoordinateText();
 
         //Show cuts.
-        if (view.selectedSidePanel instanceof TangleSidePanel && ((TangleSidePanel) view.selectedSidePanel).showCuts() && points != null) {
+        if (points != null && view.selectedSidePanel instanceof TangleSidePanel && ((TangleSidePanel) view.selectedSidePanel).showCuts()) {
             FeatureBasedDataset dataset = (FeatureBasedDataset) view.getDataset();
             if (dataset.axisParallelCuts != null && dataset.cutCosts != null) {
                 double lowestCost = Double.MAX_VALUE;
