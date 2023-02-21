@@ -214,7 +214,7 @@ public class PlottingView extends JPanel implements MouseListener, MouseMotionLi
                     for (int j = 0; j < dataset.axisParallelCuts[i].length; j++) {
                         g2d.setStroke(stroke2);
                         double p = (highestCost - lowestCost) == 0 ? 0.5 : (dataset.cutCosts[costIndex] - lowestCost)/(highestCost - lowestCost);
-                        g2d.setColor(p <= 0.5 ? new Color((int)(p*2.0*255), 0, 0) : new Color(255, (int)((p-0.5)*2.0*255), (int)((p-0.5)*2.0*255)));
+                        g2d.setColor(p <= 0.5 ? new Color((int)(p*2.0*255), 0, 0) : new Color(255, (int)((p-0.5)*2.0*200), (int)((p-0.5)*2.0*200)));
                         if (i == 0) {
                             double pos = convertPointToCoordinateOnScreen(new double[] {dataset.axisParallelCuts[i][j], 0})[0];
                             g2d.drawLine((int) pos, 0, (int) pos, view.getWindowHeight());

@@ -58,7 +58,6 @@ public abstract class Dataset {
     public void saveGroundTruth(File originalFile) {
         try {
             String newName = originalFile.getName().substring(0, originalFile.getName().length()-4)+".gt";
-            System.out.println(originalFile.getParent()+"\\"+newName);
             File newFile = new File(originalFile.getParent()+"\\"+newName);
             BufferedWriter writer = new BufferedWriter(new FileWriter(newFile));
             for (int i = 0; i < groundTruth.length; i++) {

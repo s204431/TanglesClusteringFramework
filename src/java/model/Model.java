@@ -37,24 +37,24 @@ public class Model {
         tangleClusterer.generateClusters(dataset, a, psi);
         softClustering = tangleClusterer.getSoftClustering();
         hardClustering = tangleClusterer.getHardClustering();
-        updateNMIScore();
         clusteringTime = new Date().getTime() - time;
+        updateNMIScore();
     }
 
     public void generateClustersKMeans(int k) {
         long time = new Date().getTime();
         softClustering = null;
         hardClustering = dataset.kMeans(k);
-        updateNMIScore();
         clusteringTime = new Date().getTime() - time;
+        updateNMIScore();
     }
 
     public void generateClustersSpectral(int k, double sigma) {
         long time = new Date().getTime();
         softClustering = null;
         hardClustering = dataset.spectralClustering(k, sigma);
-        updateNMIScore();
         clusteringTime = new Date().getTime() - time;
+        updateNMIScore();
     }
 
     private void updateNMIScore() {
