@@ -14,6 +14,8 @@ public class TangleSearchTree {
 
     private BitSet[] orientations;
     private double[] cutCosts;
+    private double minCost;
+    private double maxCost;
     private int integerBits; //Number of bits to represent the index of an orientation.
     private Hashtable<Long, Integer> hashtable = new Hashtable();
     protected double[][] softClustering;
@@ -134,6 +136,7 @@ public class TangleSearchTree {
     }
 
     protected double[][] calculateSoftClustering() {
+        calculateMinMaxCost(cutCosts);
         int clusters = getNumberOfClusters(root);
         double[][] result = new double[orientations[0].size()][clusters];
         for (int i = 0; i < orientations[0].size(); i++) {
@@ -141,6 +144,19 @@ public class TangleSearchTree {
         }
         softClustering = result;
         return result;
+    }
+
+    private void calculateMinMaxCost(double[] cutCosts) {
+        minCost = Double.MAX_VALUE;
+        maxCost = Double.MIN_VALUE;
+        for (int i = 0; i < cutCosts.length; i++) {
+            if (cutCosts[i] < minCost) {
+                minCost = cutCosts[i];
+            }
+            if (cutCosts[i] > maxCost) {
+                maxCost = cutCosts[i];
+            }
+        }
     }
 
     //Generates a default clustering with one cluster.
@@ -154,7 +170,7 @@ public class TangleSearchTree {
     }
 
     private double getWeight(double cost) {
-        return 1.0/cost;
+        return Math.exp(-((cost-minCost)/(maxCost-minCost)));
     }
 
     private int getSoftClustering(Node node, int datapoint, int index, double accumulated, double[] result) {
