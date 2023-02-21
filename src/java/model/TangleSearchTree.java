@@ -169,7 +169,7 @@ public class TangleSearchTree {
         return result;
     }
 
-    private double getWeight(double cost, int depth) {
+    private double getWeight(double cost) {
         return (maxCost-minCost) == 0.0 ? 1.0 : Math.exp(-((cost-minCost)/(maxCost-minCost)));
     }
 
@@ -183,15 +183,15 @@ public class TangleSearchTree {
             double sum2 = 0;
             for (int distinguished : node.distinguishedCuts) {
                 if (node.leftChild.condensedOrientations.get(distinguished)) {
-                    sum2 += getWeight(cutCosts[distinguished], getDepth(node));
+                    sum2 += getWeight(cutCosts[distinguished]);
                     if (!orientations[distinguished].get(datapoint)) {
-                        sum1 += getWeight(cutCosts[distinguished], getDepth(node));
+                        sum1 += getWeight(cutCosts[distinguished]);
                     }
                 }
                 if (node.leftChild.condensedOrientations.get(distinguished+node.leftChild.condensedOrientations.size()/2)) {
-                    sum2 += getWeight(cutCosts[distinguished], getDepth(node));
+                    sum2 += getWeight(cutCosts[distinguished]);
                     if (orientations[distinguished].get(datapoint)) {
-                        sum1 += getWeight(cutCosts[distinguished], getDepth(node));
+                        sum1 += getWeight(cutCosts[distinguished]);
                     }
                 }
             }
