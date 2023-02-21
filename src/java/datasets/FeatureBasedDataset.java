@@ -18,10 +18,11 @@ import java.util.*;
 public class FeatureBasedDataset extends Dataset {
 
     public static final String name = "Feature Based";
+    private static final int precision = 1; //Determines the number of cuts generated.
     public double[][] dataPoints;
     private int a;
-
-    private static int precision = 1; //Determines the number of cuts generated.
+    public double[][] axisParallelCuts; //Only used when cuts are axis parallel. Used for visualization.
+    public double[] cutCosts; //Used for visualization.
 
     public FeatureBasedDataset() {
 
@@ -79,22 +80,12 @@ public class FeatureBasedDataset extends Dataset {
             result[i] = cuts.get(i);
         }
         initialCuts = result;
-        int[] hardClustering = new int[result[0].size()];
-        double[][] softClustering = new double[result[0].size()][result.length];
-        //BEGIN TEST
-        /*int n = 1;
-        for (int j = 0; j < result[n].size(); j++) {
-            hardClustering[j] = result[n].get(j) ? 0 : 1;
-            softClustering[j][0] = result[n].get(j) ? 1 : 0;
-            softClustering[j][1] = result[n].get(j) ? 0 : 1;
-        }
-        new PlottingView().loadPointsWithClustering(dataPoints, hardClustering, softClustering);*/
-        //END TEST
         return result;
     }
 
     public BitSet[] getInitialCuts() {
         List<BitSet> cuts = new ArrayList<>();
+        List<Double>[] axisParallelCuts = new ArrayList[dataPoints[0].length]; //For visualization.
         double[][] copy = new double[dataPoints.length][dataPoints[0].length];
         int[] originalIndices = new int[dataPoints.length];
         for (int i = 0; i < dataPoints.length; i++) {
@@ -104,6 +95,7 @@ public class FeatureBasedDataset extends Dataset {
             }
         }
         for (int i = 0; i < dataPoints[0].length; i++) {
+            axisParallelCuts[i] = new ArrayList<>();
             mergeSort(copy, originalIndices, i, 0, dataPoints.length-1);
             //BitSet first = new BitSet(dataPoints.length);
             //first.add(originalIndices[0]);
@@ -111,6 +103,7 @@ public class FeatureBasedDataset extends Dataset {
             BitSet currentBitSet = new BitSet(dataPoints.length);
             cuts.add(currentBitSet);
             BitSet accumulated = new BitSet(dataPoints.length);
+            axisParallelCuts[i].add(dataPoints[0][i]);
             int cutIndex = 0;
             for (int j = 0; j < dataPoints.length-1; j++) {
                 accumulated.add(originalIndices[j]);
@@ -132,6 +125,7 @@ public class FeatureBasedDataset extends Dataset {
                             cutIndex = k;
                         }
                     }
+                    axisParallelCuts[i].add(dataPoints[originalIndices[cutIndex]][i]);
                 }
             }
         }
@@ -140,17 +134,13 @@ public class FeatureBasedDataset extends Dataset {
             result[i] = cuts.get(i);
         }
         initialCuts = result;
-        //BEGIN TEST
-        /*int[] hardClustering = new int[result[0].size()];
-        double[][] softClustering = new double[result[0].size()][result.length];
-        int n = 6;
-        for (int j = 0; j < result[n].size(); j++) {
-            hardClustering[j] = result[n].get(j) ? 0 : 1;
-            softClustering[j][0] = result[n].get(j) ? 1 : 0;
-            softClustering[j][1] = result[n].get(j) ? 0 : 1;
+        this.axisParallelCuts = new double[axisParallelCuts.length][];
+        for (int i = 0; i < axisParallelCuts.length; i++) {
+            this.axisParallelCuts[i] = new double[axisParallelCuts[i].size()];
+            for (int j = 0; j < axisParallelCuts[i].size(); j++) {
+                this.axisParallelCuts[i][j] = axisParallelCuts[i].get(j);
+            }
         }
-        new PlottingView().loadPointsWithClustering(dataPoints, hardClustering, softClustering);*/
-        //END TEST
         return result;
     }
 
@@ -260,6 +250,7 @@ public class FeatureBasedDataset extends Dataset {
             }
             //costs[i] /= initialCuts[i].count()*(initialCuts[i].size() - initialCuts[i].count());
         }
+        cutCosts = costs;
         return costs;
     }
 

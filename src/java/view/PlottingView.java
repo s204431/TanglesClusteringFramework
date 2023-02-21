@@ -5,6 +5,8 @@ import com.jujutsu.tsne.barneshut.BHTSne;
 import com.jujutsu.tsne.barneshut.BarnesHutTSne;
 import com.jujutsu.tsne.barneshut.ParallelBHTsne;
 import com.jujutsu.utils.TSneUtils;
+import datasets.Dataset;
+import datasets.FeatureBasedDataset;
 import util.BitSet;
 
 import javax.swing.*;
@@ -55,6 +57,7 @@ public class PlottingView extends JPanel implements MouseListener, MouseMotionLi
     private int[] indicesToDraw; //Indices of points to draw when there are too many points.
     protected int originalNumberOfPoints; //Number of points before reducing the number of points.
     protected boolean runningTSNE = false;
+    protected boolean showingCuts = true;
 
     public PlottingView(View view) {
         super();
@@ -191,6 +194,40 @@ public class PlottingView extends JPanel implements MouseListener, MouseMotionLi
         g2d.setColor(new Color(255, 255, 255, 200));
         g2d.fillRect(5, 5, 150, 30);
         updateCoordinateText();
+
+        //Show cuts.
+        if (view.selectedSidePanel instanceof TangleSidePanel && ((TangleSidePanel) view.selectedSidePanel).showCuts() && points != null) {
+            FeatureBasedDataset dataset = (FeatureBasedDataset) view.getDataset();
+            if (dataset.axisParallelCuts != null && dataset.cutCosts != null) {
+                double lowestCost = Double.MAX_VALUE;
+                double highestCost = Double.MIN_VALUE;
+                for (int i = 0; i < dataset.cutCosts.length; i++) {
+                    if (dataset.cutCosts[i] < lowestCost) {
+                        lowestCost = dataset.cutCosts[i];
+                    }
+                    if (dataset.cutCosts[i] > highestCost) {
+                        highestCost = dataset.cutCosts[i];
+                    }
+                }
+                int costIndex = 0;
+                for (int i = 0; i < dataset.axisParallelCuts.length; i++) {
+                    for (int j = 0; j < dataset.axisParallelCuts[i].length; j++) {
+                        g2d.setStroke(stroke2);
+                        double p = (highestCost - lowestCost) == 0 ? 0.5 : (dataset.cutCosts[costIndex] - lowestCost)/(highestCost - lowestCost);
+                        g2d.setColor(p <= 0.5 ? new Color((int)(p*2.0*255), 0, 0) : new Color(255, (int)((p-0.5)*2.0*255), (int)((p-0.5)*2.0*255)));
+                        if (i == 0) {
+                            double pos = convertPointToCoordinateOnScreen(new double[] {dataset.axisParallelCuts[i][j], 0})[0];
+                            g2d.drawLine((int) pos, 0, (int) pos, view.getWindowHeight());
+                        }
+                        else {
+                            double pos = convertPointToCoordinateOnScreen(new double[] {0, dataset.axisParallelCuts[i][j]})[1];
+                            g2d.drawLine(0, (int) pos, view.getWindowWidth(), (int) pos);
+                        }
+                        costIndex++;
+                    }
+                }
+            }
+        }
 
         if (runningTSNE) {
             g2d.setColor(Color.BLACK);

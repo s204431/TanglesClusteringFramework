@@ -1,7 +1,9 @@
 package view;
 
+import datasets.FeatureBasedDataset;
 import util.ValueAdjuster;
 
+import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
@@ -9,6 +11,7 @@ import java.awt.*;
 public class TangleSidePanel extends SidePanel {
 
     private ValueAdjuster aValueAdjuster; //Slider for the "a" parameter.
+    private JCheckBox showCutsCheckBox;
 
     public TangleSidePanel(View view) {
         super(view);
@@ -26,6 +29,16 @@ public class TangleSidePanel extends SidePanel {
             }
         });
         add(aValueAdjuster);
+        if (view.getDataset() instanceof FeatureBasedDataset && ((FeatureBasedDataset) view.getDataset()).dataPoints[0].length <= 2) {
+            showCutsCheckBox = new JCheckBox("Show Cuts");
+            showCutsCheckBox.addChangeListener(new ChangeListener() {
+                @Override
+                public void stateChanged(ChangeEvent e) {
+                    view.plottingView.repaint();
+                }
+            });
+            add(showCutsCheckBox);
+        }
     }
 
     public void paintComponent(Graphics g) {
@@ -53,5 +66,12 @@ public class TangleSidePanel extends SidePanel {
     protected void setBounds() {
         super.setBounds();
         aValueAdjuster.setBounds(30, 300, 100, 130);
+        if (showCutsCheckBox != null) {
+            showCutsCheckBox.setBounds(30, 400, 100, 50);
+        }
+    }
+
+    protected boolean showCuts() {
+        return showCutsCheckBox.isSelected();
     }
 }
