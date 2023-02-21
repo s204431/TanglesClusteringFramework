@@ -103,7 +103,7 @@ public class FeatureBasedDataset extends Dataset {
             BitSet currentBitSet = new BitSet(dataPoints.length);
             cuts.add(currentBitSet);
             BitSet accumulated = new BitSet(dataPoints.length);
-            axisParallelCuts[i].add(dataPoints[0][i]);
+            axisParallelCuts[i].add(dataPoints[originalIndices[0]][i]);
             int cutIndex = 0;
             for (int j = 0; j < dataPoints.length-1; j++) {
                 accumulated.add(originalIndices[j]);
