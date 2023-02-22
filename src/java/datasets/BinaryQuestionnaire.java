@@ -1,6 +1,11 @@
 package datasets;
 
 import model.Model;
+import smile.clustering.HierarchicalClustering;
+import smile.clustering.KMeans;
+import smile.clustering.PartitionClustering;
+import smile.clustering.SpectralClustering;
+import smile.clustering.linkage.CompleteLinkage;
 import util.BitSet;
 import util.Util.Tuple;
 
@@ -149,8 +154,9 @@ public class BinaryQuestionnaire extends Dataset {
         return initialCuts[cut].count();
     }
 
+
     //Performs K-means clustering on a binary dataset
-    public int[] kMeans(int clusters) {
+    public int[] kMeansOld(int clusters) {
         int K = clusters;  //Amount of clusters
         int[] resultingClustering = new int[getNumberOfParticipants()];   //The resulting cluster each participant is assigned to
 
@@ -200,7 +206,7 @@ public class BinaryQuestionnaire extends Dataset {
                             }
                         }
                     }
-                    if (trueCount >= count/2) {
+                    if (trueCount >= count / 2) {
                         centroids[k].add(i);
                     } else {
                         centroids[k].remove(i);
@@ -227,22 +233,51 @@ public class BinaryQuestionnaire extends Dataset {
                 break;
             }
         }
-
-        //Prints resulting centroids
-        /*for (int k = 0; k < K; k++) {
-            System.out.println("Centroid " + (k + 1) + ":");
-            for (int i = 0; i < getNumberOfQuestions(); i++) {
-                System.out.print(centroids[k].get(i) + ", ");
-            }
-            System.out.println();
-        }*/
-
         return resultingClustering;
     }
 
+    //Performs k-means clustering on a binary questionnaire
+    public int[] kMeans(int k) {
+        if (k < 2) {
+            return new int[answers.length];
+        }
+        double[][] dataPoints = convertAnswersToDataPoints();
+        KMeans clusters = PartitionClustering.run(20, () -> KMeans.fit(dataPoints, k));
+        return clusters.y;
+    }
+
+    //Performs spectral clustering on a binary questionnaire
+    public int[] spectralClustering(int k, double sigma) {
+        if (k < 2) {
+            return new int[answers.length];
+        }
+        double[][] dataPoints = convertAnswersToDataPoints();
+        SpectralClustering clusters = SpectralClustering.fit(dataPoints, k, sigma);
+        return clusters.y;
+    }
+
+    //Performs hierarchical clustering on a binary questionnaire
+    public int[] hierarchicalClustering(int k) {
+        if (k < 2) {
+            return new int[answers.length];
+        }
+        double[][] dataPoints = convertAnswersToDataPoints();
+        HierarchicalClustering clusters = HierarchicalClustering.fit(CompleteLinkage.of(dataPoints));
+        return clusters.partition(k);
+    }
+
+    private double[][] convertAnswersToDataPoints() {
+        double[][] dataPoints = new double[answers.length][answers[0].size()];
+        for (int i = 0; i < dataPoints.length; i++) {
+            for (int j = 0; j < dataPoints[0].length; j++) {
+                dataPoints[i][j] = answers[i].get(j) ? 1 : 0;
+            }
+        }
+        return dataPoints;
+    }
 
     public String[] getSupportedAlgorithms() {
-        return new String[] {Model.tangleName, Model.kMeansName};
+        return new String[] {Model.tangleName, Model.kMeansName, Model.spectralClusteringName, Model.linkageName};
     }
 
     public void saveToFile(File file) {
