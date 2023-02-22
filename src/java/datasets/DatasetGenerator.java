@@ -132,16 +132,28 @@ public class DatasetGenerator {
 
         Random r = new Random();
 
-        double maxDist = numOfPoints * 0.6;
+        double maxDist = numOfPoints * 0.1 * numOfClusters;
         double maxStd = numOfPoints * 0.1;
+        double minStd = numOfPoints * 0.01;
 
         //Generate means of clusters
         double[][] centroids = new double[numOfClusters][numOfFeatures];
         double[][] centroidStds = new double[numOfClusters][numOfFeatures];
         for (int i = 0; i < numOfClusters; i++) {
             for (int j = 0; j < numOfFeatures; j++) {
-                centroids[i][j] = r.nextDouble(-maxDist, maxDist);
-                centroidStds[i][j] = r.nextDouble(maxStd);
+                //Generate until not too close to another cluster.
+                boolean good = false;
+                while (!good) {
+                    good = true;
+                    centroids[i][j] = r.nextDouble(-maxDist, maxDist);
+                    centroidStds[i][j] = r.nextDouble(minStd, maxStd);
+                    for (int k = 0; k < i; k++) {
+                        if (Math.abs(centroids[k][j] - centroids[i][j]) < 1.75*(centroidStds[k][j] + centroidStds[i][j])) {
+                            good = false;
+                            break;
+                        }
+                    }
+                }
             }
         }
 

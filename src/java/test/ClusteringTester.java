@@ -43,7 +43,7 @@ public class ClusteringTester {
                 sizeCount++;
                 long time1 = new Date().getTime();
                 int a = (int)((i/j)*(1.0/2.0));
-                Tuple<double[][], int[]> generated = DatasetGenerator.generateGaussianMixturePoints(i, j);
+                Tuple<double[][], int[]> generated = DatasetGenerator.generateFeatureBasedDataPoints(i, j, 2);
                 Dataset dataset = new FeatureBasedDataset(generated.x);
                 int[] groundTruth = generated.y;
                 model.setDataset(dataset);

@@ -331,7 +331,7 @@ public class FeatureBasedDataset extends Dataset {
 
     //Performs K-means clustering on a feature based dataset
     public int[] kMeans(int k) {
-        KMeans clusters = PartitionClustering.run(20, () -> KMeans.fit(dataPoints, k));
+        KMeans clusters = PartitionClustering.run(1, () -> KMeans.fit(dataPoints, k));
         return clusters.y;
     }
 
