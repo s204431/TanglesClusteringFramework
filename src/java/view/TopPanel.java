@@ -75,13 +75,13 @@ public class TopPanel extends JPanel {
                 createPopupPanel.setLayout(new BoxLayout(createPopupPanel, BoxLayout.PAGE_AXIS));
                 createPopupPanel.add(new JLabel("Number of points"));
                 createPopupPanel.add(pointsTextField);
-                createPopupPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+                createPopupPanel.add(Box.createRigidArea(new Dimension(0, 10)));
                 createPopupPanel.add(new JLabel("Number of dimensions"));
                 createPopupPanel.add(dimensionTextField);
-                createPopupPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+                createPopupPanel.add(Box.createRigidArea(new Dimension(0, 10)));
                 createPopupPanel.add(new JLabel("Number of clusters"));
                 createPopupPanel.add(clusterTextField);
-                createPopupPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+                createPopupPanel.add(Box.createRigidArea(new Dimension(0, 15)));
                 createPopupPanel.add(comboBox);
 
                 int createResult = JOptionPane.showConfirmDialog(view, createPopupPanel,
