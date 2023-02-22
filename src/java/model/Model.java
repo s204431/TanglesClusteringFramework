@@ -12,6 +12,7 @@ public class Model {
     public static final String tangleName = "Tangle";
     public static final String kMeansName = "K-Means";
     public static final String spectralClusteringName = "Spectral";
+    public static final String linkageName = "Linkage";
 
     private TangleClusterer tangleClusterer = new TangleClusterer();
     private Dataset dataset;
@@ -53,6 +54,14 @@ public class Model {
         long time = new Date().getTime();
         softClustering = null;
         hardClustering = dataset.spectralClustering(k, sigma);
+        clusteringTime = new Date().getTime() - time;
+        updateNMIScore();
+    }
+
+    public void generateClustersLinkage(int k) {
+        long time = new Date().getTime();
+        softClustering = null;
+        hardClustering = dataset.hierarchicalClustering(k);
         clusteringTime = new Date().getTime() - time;
         updateNMIScore();
     }

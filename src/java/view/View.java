@@ -202,6 +202,12 @@ public class View extends JFrame {
         selectedSidePanel.setValues(model.getNMIScore(), model.getClusteringTime());
     }
 
+    protected void showClusteringLinkage(int k) {
+        model.generateClustersLinkage(k);
+        loadClusters(model.getHardClustering(), model.getSoftClustering());
+        selectedSidePanel.setValues(model.getNMIScore(), model.getClusteringTime());
+    }
+
     public void resetView() {
         Dataset dataset = model.getDataset();
         pane.removeAll();
@@ -228,6 +234,9 @@ public class View extends JFrame {
             }
             if (dataset.supportsAlgorithm(Model.spectralClusteringName)) {
                 addSidePanel(new SpectralSidePanel(this), Model.spectralClusteringName);
+            }
+            if (dataset.supportsAlgorithm(Model.spectralClusteringName)) {
+                addSidePanel(new LinkageSidePanel(this), Model.linkageName);
             }
         }
         plottingView.repaint();

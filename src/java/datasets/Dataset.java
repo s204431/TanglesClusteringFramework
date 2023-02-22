@@ -23,6 +23,7 @@ public abstract class Dataset {
     public void setA(int a) {}
     public int[] kMeans(int clusters) {return null;}
     public int[] spectralClustering(int clusters, double sigma) {return null;}
+    public int[] hierarchicalClustering(int clusters) {return null;}
     public String getName() {return "Dataset";}
     public String[] getSupportedAlgorithms() {return null;}
 
