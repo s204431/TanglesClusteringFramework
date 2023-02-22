@@ -101,14 +101,16 @@ public class FeatureBasedDataset extends Dataset {
             //first.add(originalIndices[0]);
             //cuts.add(first);
             BitSet currentBitSet = new BitSet(dataPoints.length);
+            currentBitSet.setAll();
             cuts.add(currentBitSet);
             BitSet accumulated = new BitSet(dataPoints.length);
+            accumulated.setAll();
             axisParallelCuts[i].add(dataPoints[originalIndices[0]][i]);
             int cutIndex = 0;
-            for (int j = 0; j < dataPoints.length-1; j++) {
-                accumulated.add(originalIndices[j]);
+            for (int j = 0; j < dataPoints.length; j++) {
+                accumulated.remove(originalIndices[j]);
                 if (j <= cutIndex) {
-                    currentBitSet.add(originalIndices[j]);
+                    currentBitSet.remove(originalIndices[j]);
                 }
                 if (j > 0 && j % (a/precision) == 0) {
                     if (dataPoints.length - j <= (a/precision) - 1) {
@@ -190,6 +192,7 @@ public class FeatureBasedDataset extends Dataset {
 
     private double[] pairwiseDistanceCostFunction() {
         double[] costs = new double[initialCuts.length];
+        double maxRange = getMaxRange();
         for (int i = 0; i < initialCuts.length; i++) {
             double cost = 0;
             for (int j = 0; j < dataPoints.length; j++) {
@@ -200,29 +203,19 @@ public class FeatureBasedDataset extends Dataset {
                     if (!initialCuts[i].get(k)) {
                         continue;
                     }
-                    cost += Math.exp(-getDistance(dataPoints[j], dataPoints[k]));
+                    cost += Math.exp(-(1.0/maxRange)*getDistance(dataPoints[j], dataPoints[k]));
                 }
             }
             costs[i] = cost;///(initialCuts[i].count()*(initialCuts[i].size()-initialCuts[i].count()));
             //costs[i] = cost;
         }
+        cutCosts = costs;
         return costs;
     }
 
     private double[] distanceToMeanCostFunction() {
         double[] costs = new double[initialCuts.length];
-        double minValue = Double.MAX_VALUE;
-        double maxValue = Double.MIN_VALUE;
-        for (int i = 0; i < dataPoints.length; i++) {
-            for (int j = 0; j < dataPoints[i].length; j++) {
-                if (dataPoints[i][j] < minValue) {
-                    minValue = dataPoints[i][j];
-                }
-                if (dataPoints[i][j] > maxValue) {
-                    maxValue = dataPoints[i][j];
-                }
-            }
-        }
+        double maxRange = getMaxRange();
         for (int i = 0; i < initialCuts.length; i++) {
             int cutCount = initialCuts[i].count();
             double[] mean1 = new double[dataPoints[0].length];
@@ -246,12 +239,32 @@ public class FeatureBasedDataset extends Dataset {
             for (int j = 0; j < initialCuts[i].size(); j++) {
                 double[] mean = initialCuts[i].get(j) ? mean2 : mean1;
                 int otherSideSize = initialCuts[i].get(j) ? initialCuts[i].size() - cutCount : cutCount;
-                costs[i] += Math.exp(-(1.0/(maxValue-minValue))*getDistance(dataPoints[j], mean));//*otherSideSize;
+                costs[i] += Math.exp(-(1.0/maxRange)*getDistance(dataPoints[j], mean));//*otherSideSize;
             }
             //costs[i] /= initialCuts[i].count()*(initialCuts[i].size() - initialCuts[i].count());
         }
         cutCosts = costs;
         return costs;
+    }
+
+    private double getMaxRange() {
+        double maxRange = 0;
+        for (int i = 0; i < dataPoints.length; i++) {
+            double minValue = Double.MAX_VALUE;
+            double maxValue = Double.MIN_VALUE;
+            for (int j = 0; j < dataPoints[i].length; j++) {
+                if (dataPoints[i][j] < minValue) {
+                    minValue = dataPoints[i][j];
+                }
+                if (dataPoints[i][j] > maxValue) {
+                    maxValue = dataPoints[i][j];
+                }
+            }
+            if (maxValue - minValue > maxRange) {
+                maxRange = maxValue - minValue;
+            }
+        }
+        return maxRange;
     }
 
     private double getDistance(double[] point1, double[] point2) {

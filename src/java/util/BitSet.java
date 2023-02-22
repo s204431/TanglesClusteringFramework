@@ -19,6 +19,17 @@ public class BitSet {
         set[longIndex] = set[longIndex] | (1L << index);
     }
 
+    //Sets all bits to 1.
+    public void setAll() {
+        for (int i = 0; i < set.length; i++) {
+            set[i] = -1;
+            if (i == set.length-1) {
+                int bitsInLastLong = size() % 64;
+                set[i] = set[i] >>> (64-bitsInLastLong);
+            }
+        }
+    }
+
     //Removes participant with specific index to set (constant time complexity).
     public void remove(int index) {
         int longIndex = index >> 6; //index / 64

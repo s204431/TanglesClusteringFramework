@@ -83,7 +83,11 @@ public class TangleClusterer {
         for (int i = 0; i < indices.length; i++) {
             indices[i] = i;
         }
-        quicksort(costs, indices, 0, costs.length-1);
+        double[] costsOrdered = new double[costs.length];
+        for (int i = 0; i < costs.length; i++) {
+            costsOrdered[i] = costs[i];
+        }
+        quicksort(costsOrdered, indices, 0, costsOrdered.length-1);
         /*int n = 5;
         for (int i = 0; i < n; i++) {
             int[] hardClustering = new int[initialCuts[indices[i]].size()];
@@ -96,8 +100,8 @@ public class TangleClusterer {
             new PlottingView().loadPointsWithClustering(data.dataPoints, hardClustering, softClustering);
         }*/
         TangleSearchTree tree = new TangleSearchTree(a, initialCuts, costs);
-        for (int i = 0; i < costs.length; i++) {
-            if (psi > 0 && costs[i] > psi) {
+        for (int i = 0; i < costsOrdered.length; i++) {
+            if (psi > 0 && costsOrdered[i] > psi) {
                 break;
             }
             boolean consistent = false;
