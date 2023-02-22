@@ -463,7 +463,7 @@ public class FeatureBasedDataset extends Dataset {
     }
 
     public String[] getSupportedAlgorithms() {
-        return new String[] {Model.tangleName, Model.kMeansName, Model.spectralClusteringName};
+        return new String[] {Model.tangleName, Model.kMeansName, Model.spectralClusteringName, Model.linkageName};
     }
 
     public void saveToFile(File file) {
