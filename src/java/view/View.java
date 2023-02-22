@@ -242,6 +242,10 @@ public class View extends JFrame {
         plottingView.repaint();
     }
 
+    protected void createDataset(String datasetTypeName, int nPoints, int nDimensions, int nClusters) {
+        controller.createNewDataset(datasetTypeName, nPoints, nDimensions, nClusters);
+    }
+
     protected void loadDatasetFromFile(String datasetTypeName, String fileName, int startRow, int endRow, int startColumn, int endColumn) {
         controller.loadDatasetFromFile(datasetTypeName, fileName, startRow, endRow, startColumn, endColumn);
     }

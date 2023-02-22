@@ -1,8 +1,10 @@
 package view;
 
 import datasets.Dataset;
+import datasets.DatasetGenerator;
 import datasets.FeatureBasedDataset;
 import model.Model;
+import util.Util;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -58,7 +60,41 @@ public class TopPanel extends JPanel {
         //Create new dataset
         newPopup.add(new JMenuItem(new AbstractAction("Create new dataset") {
             public void actionPerformed(ActionEvent e) {
-                JOptionPane.showMessageDialog(view, "Create new dataset here...");
+                ExtendedNumberFormatter formatter = createNumberFormatter();
+                JFormattedTextField pointsTextField = new JFormattedTextField(formatter);
+                JFormattedTextField dimensionTextField = new JFormattedTextField(formatter);
+                JFormattedTextField clusterTextField = new JFormattedTextField(formatter);
+
+                JComboBox<String> comboBox = new JComboBox<>();
+                for (String type : Dataset.supportedDatasetTypes) {
+                    comboBox.addItem(type);
+                }
+                comboBox.setAlignmentX(LEFT_ALIGNMENT);
+
+                JPanel createPopupPanel = new JPanel();
+                createPopupPanel.setLayout(new BoxLayout(createPopupPanel, BoxLayout.PAGE_AXIS));
+                createPopupPanel.add(new JLabel("Number of points"));
+                createPopupPanel.add(pointsTextField);
+                createPopupPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+                createPopupPanel.add(new JLabel("Number of dimensions"));
+                createPopupPanel.add(dimensionTextField);
+                createPopupPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+                createPopupPanel.add(new JLabel("Number of clusters"));
+                createPopupPanel.add(clusterTextField);
+                createPopupPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+                createPopupPanel.add(comboBox);
+
+                int createResult = JOptionPane.showConfirmDialog(view, createPopupPanel,
+                        "Choose parameters", JOptionPane.OK_CANCEL_OPTION,
+                        JOptionPane.PLAIN_MESSAGE);
+
+                if (createResult == JOptionPane.OK_OPTION) {
+                    int points = Integer.parseInt(getTextFieldValue(pointsTextField, 1000));
+                    int dimensions = Integer.parseInt(getTextFieldValue(dimensionTextField, 2));
+                    int clusters = Integer.parseInt(getTextFieldValue(clusterTextField, 4));
+                    String datasetType = (String) comboBox.getSelectedItem();
+                    view.createDataset(datasetType, points, dimensions, clusters);
+                }
             }
         }));
 
@@ -102,13 +138,7 @@ public class TopPanel extends JPanel {
                 if (loadResult == JOptionPane.OK_OPTION && selectedFile != null) {
                     String fileName = selectedFile + ".csv";
 
-                    NumberFormat format = NumberFormat.getIntegerInstance();
-                    format.setGroupingUsed(false);
-                    ExtendedNumberFormatter formatter = new ExtendedNumberFormatter(format);
-                    formatter.setMinimum(0);
-                    formatter.setMaximum(Integer.MAX_VALUE);
-                    formatter.setAllowsInvalid(false);
-
+                    ExtendedNumberFormatter formatter = createNumberFormatter();
                     JFormattedTextField startRowTextField = new JFormattedTextField(formatter);
                     JFormattedTextField endRowTextField = new JFormattedTextField(formatter);
                     JFormattedTextField startColTextField = new JFormattedTextField(formatter);
@@ -268,6 +298,16 @@ public class TopPanel extends JPanel {
             return ""+defaultValue;
         }
         return textfield.getValue().toString();
+    }
+
+    private ExtendedNumberFormatter createNumberFormatter() {
+        NumberFormat format = NumberFormat.getIntegerInstance();
+        format.setGroupingUsed(false);
+        ExtendedNumberFormatter formatter = new ExtendedNumberFormatter(format);
+        formatter.setMinimum(0);
+        formatter.setMaximum(Integer.MAX_VALUE);
+        formatter.setAllowsInvalid(false);
+        return formatter;
     }
 
 }
