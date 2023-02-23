@@ -393,14 +393,16 @@ public class PlottingView extends JPanel implements MouseListener, MouseMotionLi
             if (point[0] > bounds[0]) {
                 bounds[0] = point[0];
             }
-            if (point[1] > bounds[1]) {
-                bounds[1] = point[1];
-            }
-            if (point[0] < bounds[2]) {
+            if (point[0] <= bounds[2]) {
                 bounds[2] = point[0];
             }
-            if (point[1] < bounds[3]) {
-                bounds[3] = point[1];
+            if (point.length > 1) {
+                if (point[1] > bounds[1]) {
+                    bounds[1] = point[1];
+                }
+                if (point[1] <= bounds[3]) {
+                    bounds[3] = point[1];
+                }
             }
         }
         return bounds;

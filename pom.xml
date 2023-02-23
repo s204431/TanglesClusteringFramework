@@ -37,6 +37,14 @@
             <version>3.8.0-1.5.8</version>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/guru.nidi/graphviz-java -->
+        <dependency>
+            <groupId>guru.nidi</groupId>
+            <artifactId>graphviz-java</artifactId>
+            <version>0.18.1</version>
+        </dependency>
+
+
 
     </dependencies>
 

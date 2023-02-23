@@ -1,22 +1,16 @@
 package view;
 
 import datasets.Dataset;
-import datasets.DatasetGenerator;
-import datasets.FeatureBasedDataset;
-import model.Model;
-import util.Util;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.NumberFormatter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FilenameFilter;
-import java.io.IOException;
 import java.text.NumberFormat;
 import java.text.ParseException;
 
@@ -101,42 +95,45 @@ public class TopPanel extends JPanel {
         //Load dataset
         newPopup.add(new JMenuItem(new AbstractAction("Load new dataset") {
             public void actionPerformed(ActionEvent e) {
-                File folder = new File("datasets");
-                File[] matchingFiles = folder.listFiles(new FilenameFilter() {
-                    public boolean accept(File dir, String name) {
-                        return name.endsWith(".csv");
+                final File[] file = new File[1];
+                JPanel savePopupPanel = new JPanel();
+                savePopupPanel.setLayout(new BoxLayout(savePopupPanel, BoxLayout.LINE_AXIS));
+                JLabel label = new JLabel("No file selected");
+                JButton fileButton = new JButton("Select File");
+                fileButton.addActionListener((l) -> {
+                    final JFileChooser fc = new JFileChooser();
+                    FileNameExtensionFilter filter = new FileNameExtensionFilter(".csv", "csv");
+                    fc.setFileFilter(filter);
+                    int returnVal = fc.showDialog(view, "Choose");
+                    if (returnVal == JFileChooser.APPROVE_OPTION) {
+                        file[0] = fc.getSelectedFile();
+                        label.setText(file[0].getName());
                     }
                 });
 
-                String[] loadableDatasets = new String[matchingFiles.length];
-                for (int i = 0; i < matchingFiles.length; i++) {
-                    loadableDatasets[i] = matchingFiles[i].getName().substring(0, matchingFiles[i].getName().length() - 4);
-                }
+                savePopupPanel.add(label);
+                savePopupPanel.add(Box.createRigidArea(new Dimension(10, 0)));
+                savePopupPanel.add(fileButton);
 
-                JList loadList = new JList(loadableDatasets);
-                JScrollPane scrollPane = new JScrollPane(loadList);
                 JComboBox<String> comboBox = new JComboBox<>();
                 for (String type : Dataset.supportedDatasetTypes) {
                     comboBox.addItem(type);
                 }
                 JPanel loadPopupPanel = new JPanel();
                 loadPopupPanel.setLayout(new BoxLayout(loadPopupPanel, BoxLayout.PAGE_AXIS));
-                loadPopupPanel.add(scrollPane);
+                loadPopupPanel.add(savePopupPanel);
                 loadPopupPanel.add(Box.createRigidArea(new Dimension(0, 10)));
                 loadPopupPanel.add(comboBox);
-
-                if (loadableDatasets.length > 0) {
-                    loadList.setSelectedIndex(0);
-                }
 
                 int loadResult = JOptionPane.showConfirmDialog(view, loadPopupPanel,
                         "Load dataset", JOptionPane.OK_CANCEL_OPTION,
                         JOptionPane.PLAIN_MESSAGE);
-                Object selectedFile = loadList.getSelectedValue();
+
+                Object selectedFile = file[0];
                 String datasetType = (String) comboBox.getSelectedItem();
 
-                if (loadResult == JOptionPane.OK_OPTION && selectedFile != null) {
-                    String fileName = selectedFile + ".csv";
+                if (loadResult == JOptionPane.OK_OPTION && file[0] != null) {
+                    String fileName = file[0].getName();
 
                     ExtendedNumberFormatter formatter = createNumberFormatter();
                     JFormattedTextField startRowTextField = new JFormattedTextField(formatter);

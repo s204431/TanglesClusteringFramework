@@ -242,7 +242,7 @@ public class BinaryQuestionnaire extends Dataset {
             return new int[answers.length];
         }
         double[][] dataPoints = convertAnswersToDataPoints();
-        KMeans clusters = PartitionClustering.run(20, () -> KMeans.fit(dataPoints, k));
+        KMeans clusters = PartitionClustering.run(1, () -> KMeans.fit(dataPoints, k));
         return clusters.y;
     }
 
