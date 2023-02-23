@@ -232,7 +232,7 @@ public class GraphDataset extends Dataset {
     }
 
     public String asGraphviz() {
-        String result = "digraph G {\n";
+        String result = "graph G {\n";
         for (int i = 0; i < dataPoints.length; i++) {
             for (int j = 0; j < dataPoints[i].length; j++) {
                 result += " " + i + " -- " + dataPoints[i][j][0] + " [label=" + dataPoints[i][j][1] + "];\n";
