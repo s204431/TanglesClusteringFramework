@@ -206,8 +206,7 @@ public class FeatureBasedDataset extends Dataset {
                     cost += Math.exp(-(1.0/maxRange)*getDistance(dataPoints[j], dataPoints[k]));
                 }
             }
-            costs[i] = cost;///(initialCuts[i].count()*(initialCuts[i].size()-initialCuts[i].count()));
-            //costs[i] = cost;
+            costs[i] = cost/(initialCuts[i].count()*(initialCuts[i].size()-initialCuts[i].count()));
         }
         cutCosts = costs;
         return costs;
