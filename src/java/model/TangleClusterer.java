@@ -25,7 +25,7 @@ public class TangleClusterer {
         /*for (double cost : costs) {
             System.out.print(cost + " ");
         }*/
-        Tuple<BitSet[], double[]> redundancyRemoved = removeRedundantCuts(initialCuts, costs, 0.9); //Set factor to 1 to turn it off.
+        Tuple<BitSet[], double[]> redundancyRemoved = removeRedundantCuts(initialCuts, costs, 1.0); //Set factor to 1 to turn it off.
         initialCuts = redundancyRemoved.x;
         costs = redundancyRemoved.y;
         long time3 = new Date().getTime();
