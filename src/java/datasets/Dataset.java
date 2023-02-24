@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Scanner;
 
 public abstract class Dataset {
-    public static final String[] supportedDatasetTypes = new String[] {FeatureBasedDataset.name, BinaryQuestionnaire.name};
+    public static final String[] supportedDatasetTypes = new String[] {FeatureBasedDataset.name, BinaryQuestionnaire.name, GraphDataset.name};
     protected BitSet[] initialCuts;
     protected int[] groundTruth;
 

@@ -53,10 +53,10 @@ public class SidePanel extends JPanel {
         g2d.setColor(Color.BLACK);
         g2d.setFont(new Font("TimesRoman", Font.BOLD, 18));
 
-        pointsLabel.setText(""+view.plottingView.originalNumberOfPoints);
+        pointsLabel.setText(""+view.dataVisualizer.getOriginalNumberOfPoints());
 
-        if (view.plottingView.originalNumberOfPoints != view.plottingView.getNumberOfPoints()) {
-            showingLabel.setText("Showing "+view.plottingView.getNumberOfPoints());
+        if (view.dataVisualizer.getOriginalNumberOfPoints() != view.dataVisualizer.getNumberOfPoints()) {
+            showingLabel.setText("Showing "+view.dataVisualizer.getNumberOfPoints());
         } else {
             showingLabel.setText(" ");
         }

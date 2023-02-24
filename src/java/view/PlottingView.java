@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
 
-public class PlottingView extends JPanel implements MouseListener, MouseMotionListener, MouseWheelListener {
+public class PlottingView extends JPanel implements DataVisualizer, MouseListener, MouseMotionListener, MouseWheelListener {
     private static final int POINT_SIZE = 8;
     private static final int MAX_POINTS_TO_DRAW = 10000;
     private static final int MAX_POINTS_TO_DRAW_WHEN_MOVING = 2000;
@@ -57,7 +57,6 @@ public class PlottingView extends JPanel implements MouseListener, MouseMotionLi
     private int[] indicesToDraw; //Indices of points to draw when there are too many points.
     protected int originalNumberOfPoints; //Number of points before reducing the number of points.
     protected boolean runningTSNE = false;
-    protected boolean showingCuts = true;
 
     public PlottingView(View view) {
         super();
@@ -240,7 +239,7 @@ public class PlottingView extends JPanel implements MouseListener, MouseMotionLi
         return new Color(color.getRed(), color.getGreen(), color.getBlue(), (int)(percentage * 255));
     }
 
-    public int[] convertPointToCoordinateOnScreen(double[] coor) {
+    private int[] convertPointToCoordinateOnScreen(double[] coor) {
         return new int[] { (int)(xOrig + (coor[0] * (lineGap) / factor) - POINT_SIZE / 2),  (int)(yOrig - (coor[1] * (lineGap) / factor) - POINT_SIZE / 2)};
     }
 
@@ -462,11 +461,19 @@ public class PlottingView extends JPanel implements MouseListener, MouseMotionLi
         return result;
     }
 
-    protected int getNumberOfPoints() {
+    public int getNumberOfPoints() {
         if (points == null) {
             return 0;
         }
         return points.length;
+    }
+
+    public int getOriginalNumberOfPoints() {
+        return originalNumberOfPoints;
+    }
+
+    public boolean isReady() {
+        return !runningTSNE;
     }
 
     @Override

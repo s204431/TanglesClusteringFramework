@@ -1,11 +1,13 @@
 package datasets;
 
+import model.Model;
 import util.BitSet;
 
 import java.io.File;
 import java.util.*;
 
 public class GraphDataset extends Dataset {
+    public static final String name = "Graph";
     private int[][][] dataPoints;
     private int[][] edges;
 
@@ -231,12 +233,17 @@ public class GraphDataset extends Dataset {
         return Integer.MIN_VALUE;
     }
 
-    public String asGraphviz() {
+    public String getName() {return name;}
+    public String[] getSupportedAlgorithms() {
+        return new String[] {Model.tangleName};
+    }
+    public int[] getGroundTruth() {return groundTruth;}
+
+    //Converts this graph dataset to dot format.
+    public String asDot() {
         String result = "graph G {\n";
-        for (int i = 0; i < dataPoints.length; i++) {
-            for (int j = 0; j < dataPoints[i].length; j++) {
-                result += " " + i + " -- " + dataPoints[i][j][0] + " [label=" + dataPoints[i][j][1] + "];\n";
-            }
+        for (int i = 0; i < edges.length; i++) {
+            result += " " + edges[i][0] + " -- " + edges[i][1] + " [label=" + edges[i][2] + "];\n";
         }
         return result + "}";
     }

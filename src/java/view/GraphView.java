@@ -1,5 +1,6 @@
 package view;
 
+import datasets.GraphDataset;
 import guru.nidi.graphviz.attribute.Color;
 import guru.nidi.graphviz.attribute.Rank;
 import guru.nidi.graphviz.attribute.Style;
@@ -24,7 +25,7 @@ import static guru.nidi.graphviz.attribute.Rank.RankDir.LEFT_TO_RIGHT;
 import static guru.nidi.graphviz.model.Factory.*;
 import static guru.nidi.graphviz.model.Factory.node;
 
-public class GraphView extends JPanel {
+public class GraphView extends JPanel implements DataVisualizer {
     private View view;
 
     private Image image;
@@ -37,7 +38,7 @@ public class GraphView extends JPanel {
         this.view = view;
         setPreferredSize(new Dimension(view.getWindowWidth(), view.getWindowHeight()));
 
-        String exampleDot =
+        /*String exampleDot =
                 "graph {\n" +
                 "    white -- cyan -- blue\n" +
                 "    white -- yellow -- green\n" +
@@ -48,7 +49,7 @@ public class GraphView extends JPanel {
                 "    pink -- blue -- black\n" +
                 "}";
         loadGraphFromDotString(exampleDot);
-        drawClusters(
+        loadClusters(
                 new int[] { 0,0,0,0,1,1,1,1 },
                 new double[][] {
                         {0.9, 0.1},
@@ -70,7 +71,7 @@ public class GraphView extends JPanel {
         frame.pack();
         frame.setLocationByPlatform(true);
         frame.setLocationRelativeTo(null);
-        frame.setVisible(true);
+        frame.setVisible(true);*/
     }
 
     //Draws graphView on screen
@@ -105,22 +106,51 @@ public class GraphView extends JPanel {
                                     Style.FILLED,
                                     Style.lineWidth(1)
                             ));
+            image = convertGraphToImage();
+            repaint();
         } catch (Exception e) {}
     }
 
-    protected void drawClusters(int[] hardClustering) {
+    public void loadClusters(int[] hardClustering) {
+        if (hardClustering == null) {
+            return;
+        }
+        loadGraphFromDotString(((GraphDataset)view.getDataset()).asDot());
         final int[] i = {0};
         graph.nodes().forEach(node ->
                         node.add(
                                 Color.rgba(colors[hardClustering[i[0]++]].getRGB()).fill()
                         ));
+        image = convertGraphToImage();
+        repaint();
     }
 
-    protected void drawClusters(int[] hardClustering, double[][] softClustering) {
+    public void loadClusters(int[] hardClustering, double[][] softClustering) {
+        if (hardClustering == null || softClustering == null) {
+            return;
+        }
+        loadGraphFromDotString(((GraphDataset)view.getDataset()).asDot());
         final int[] i = {0};
         graph.nodes().forEach(node ->
                 node.add(
                         Color.rgba(colors[hardClustering[i[0]]].getRGB() + ((int)(softClustering[i[0]][hardClustering[i[0]++]] * 200) << 24)).fill()
                 ));
+        image = convertGraphToImage();
+        repaint();
+    }
+
+    public int getNumberOfPoints() {
+        if (graph == null) {
+            return 0;
+        }
+        return graph.nodes().size();
+    }
+
+    public int getOriginalNumberOfPoints() {
+        return getNumberOfPoints();
+    }
+
+    public boolean isReady() {
+        return true;
     }
 }

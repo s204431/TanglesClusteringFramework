@@ -126,7 +126,7 @@ public class BinaryQuestionnaire extends Dataset {
     public double[] getCutCosts() {
         double[] result = new double[getNumberOfQuestions()];
         for (int i = 0; i < getNumberOfQuestions(); i++) {
-            long cost = 0;
+            double cost = 0;
             for (int j = 0; j < getNumberOfQuestions(); j++) {
                 long intersection1 = BitSet.intersection(initialCuts[i], initialCuts[j], false, false); //Number of people who answered "true" on one side of cut.
                 long intersection2 = BitSet.intersection(initialCuts[i], initialCuts[j], true, false); //Number of people who answered "true" on other side of cut.
@@ -139,7 +139,7 @@ public class BinaryQuestionnaire extends Dataset {
             else {
                 cost /= cutSize*(getNumberOfParticipants()-cutSize);
             }
-            result[i] = (int)cost;
+            result[i] = cost;
             initialCuts[i].cutCost = result[i];
         }
         return result;

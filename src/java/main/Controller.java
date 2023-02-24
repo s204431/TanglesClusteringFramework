@@ -1,10 +1,8 @@
 package main;
 
-import datasets.BinaryQuestionnaire;
-import datasets.Dataset;
-import datasets.DatasetGenerator;
-import datasets.FeatureBasedDataset;
+import datasets.*;
 import model.Model;
+import smile.graph.Graph;
 import view.View;
 
 public class Controller {
@@ -28,6 +26,10 @@ public class Controller {
         else if (datasetTypeName.equals(FeatureBasedDataset.name)) {
             dataset = new FeatureBasedDataset();
             ((FeatureBasedDataset) dataset).loadDataFromFile(fileName, startRow, endRow, startColumn, endColumn);
+        }
+        else if (datasetTypeName.equals(GraphDataset.name)) {
+            dataset = new GraphDataset();
+            ((GraphDataset) dataset).loadGraphFromFile(fileName);
         }
         model.setDataset(dataset);
         view.resetView();

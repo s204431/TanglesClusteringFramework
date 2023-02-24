@@ -41,7 +41,7 @@ public class TangleSidePanel extends SidePanel {
             showCutsCheckBox.addChangeListener(new ChangeListener() {
                 @Override
                 public void stateChanged(ChangeEvent e) {
-                    view.plottingView.repaint();
+                    ((JPanel)view.dataVisualizer).repaint();
                 }
             });
             add(showCutsCheckBox);
@@ -60,7 +60,7 @@ public class TangleSidePanel extends SidePanel {
 
     protected void update(int n) {
         aValueAdjuster.setMaximumValue(n);
-        aValueAdjuster.setEnabled(view.plottingView.getNumberOfPoints() > 0);
+        aValueAdjuster.setEnabled(view.dataVisualizer.getNumberOfPoints() > 0);
         repaint();
     }
 

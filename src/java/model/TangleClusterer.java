@@ -25,7 +25,7 @@ public class TangleClusterer {
         /*for (double cost : costs) {
             System.out.print(cost + " ");
         }*/
-        Tuple<BitSet[], double[]> redundancyRemoved = removeRedundantCuts(initialCuts, costs, 1.0); //Set factor to 1 to turn it off.
+        Tuple<BitSet[], double[]> redundancyRemoved = removeRedundantCuts(initialCuts, costs, 0.9); //Set factor to 1 to turn it off.
         initialCuts = redundancyRemoved.x;
         costs = redundancyRemoved.y;
         long time3 = new Date().getTime();
@@ -52,9 +52,9 @@ public class TangleClusterer {
         long time6 = new Date().getTime();
         //System.out.println("Contracting time: " + (time6-time5) + " ms");
         double[][] softClustering = tree.calculateSoftClustering();
-        long time7 = new Date().getTime();
-        /*System.out.println("Clustering time: " + (time7-time6) + " ms");
-        for (int i = softClustering.length/2-10; i < softClustering.length/2+40; i++) {
+        /*long time7 = new Date().getTime();
+        System.out.println("Clustering time: " + (time7-time6) + " ms");
+        for (int i = 0; i < softClustering.length; i++) {
             for (double d : softClustering[i]) {
                 System.out.print(d + " ");
             }

@@ -64,9 +64,9 @@ public class SpectralSidePanel extends SidePanel {
 
     protected void update(int n) {
         kValueAdjuster.setMaximumValue(100);
-        kValueAdjuster.setEnabled(view.plottingView.getNumberOfPoints() > 0);
+        kValueAdjuster.setEnabled(view.dataVisualizer.getNumberOfPoints() > 0);
         sigmaValueAdjuster.setMaximumValue(n/2);
-        sigmaValueAdjuster.setEnabled(view.plottingView.getNumberOfPoints() > 0);
+        sigmaValueAdjuster.setEnabled(view.dataVisualizer.getNumberOfPoints() > 0);
         repaint();
     }
 

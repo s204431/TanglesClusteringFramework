@@ -3,6 +3,7 @@ package view;
 import datasets.BinaryQuestionnaire;
 import datasets.Dataset;
 import datasets.FeatureBasedDataset;
+import datasets.GraphDataset;
 import main.Controller;
 import model.Model;
 import util.BitSet;
@@ -26,7 +27,7 @@ public class View extends JFrame {
     protected int windowWidth, windowHeight;
 
     protected JPanel mainComponent;
-    protected PlottingView plottingView;
+    protected DataVisualizer dataVisualizer;
     private JTabbedPane pane;
     private List<SidePanel> sidePanels = new ArrayList<>();
     public SidePanel selectedSidePanel;
@@ -52,13 +53,13 @@ public class View extends JFrame {
         mainComponent = new JPanel();
         mainComponent.setLayout(null);
 
-        plottingView = new PlottingView(this);
+        dataVisualizer = new PlottingView(this);
         pane = new JTabbedPane();
         pane.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
                 if (((JTabbedPane) e.getSource()).getSelectedComponent() != null) {
-                    ((JComponent)((JTabbedPane) e.getSource()).getSelectedComponent()).add(plottingView);
+                    ((JComponent)((JTabbedPane) e.getSource()).getSelectedComponent()).add((JPanel)dataVisualizer);
                     changeSidePanel(((JTabbedPane) e.getSource()).getSelectedIndex());
                 }
             }
@@ -70,7 +71,7 @@ public class View extends JFrame {
         sidePanels.add(sidePanel);
         selectedSidePanel = sidePanel;
         pane.addTab("", new JPanel(null));
-        ((JComponent)pane.getSelectedComponent()).add(plottingView);
+        ((JComponent)pane.getSelectedComponent()).add((JPanel)dataVisualizer);
         mainComponent.add(sidePanel);
 
         setBounds();
@@ -112,7 +113,7 @@ public class View extends JFrame {
         selectedSidePanel = sidePanels.get(index);
         selectedSidePanel.setVisible(true);
         selectedSidePanel.setBounds();
-        selectedSidePanel.update(plottingView.originalNumberOfPoints);
+        selectedSidePanel.update(dataVisualizer.getOriginalNumberOfPoints());
         loadClusters(selectedSidePanel.hardClustering, selectedSidePanel.softClustering);
     }
 
@@ -125,7 +126,7 @@ public class View extends JFrame {
 
         mainComponent.setPreferredSize(new Dimension(windowWidth, windowHeight));
         mainComponent.setBounds(0, 0, windowWidth, windowHeight);
-        plottingView.setBounds(0, 0, windowWidth - sidePanelWidth, windowHeight);
+        ((JPanel)dataVisualizer).setBounds(0, 0, windowWidth - sidePanelWidth, windowHeight);
         pane.setBounds(0, topPanelHeight, windowWidth - sidePanelWidth, windowHeight);
         selectedSidePanel.setBounds();
         topPanel.setBounds();
@@ -143,45 +144,29 @@ public class View extends JFrame {
         else if (dataset instanceof FeatureBasedDataset) {
             loadPoints(((FeatureBasedDataset) dataset).dataPoints);
         }
-    }
-
-    public void loadPointsWithClustering(double[][] points, int[] clusters, double[][] softClustering) {
-        plottingView.loadPoints(points);
-        plottingView.loadClusters(clusters, softClustering);
-        selectedSidePanel.update(points.length);
-    }
-
-    public void loadPointsWithClustering(double[][] points, int[] clusters) {
-        plottingView.loadPoints(points);
-        plottingView.loadClusters(clusters);
-        selectedSidePanel.update(points.length);
-    }
-
-    public void loadPointsWithClustering(BitSet[] questionnaireAnswers, int[] clusters, double[][] softClustering) {
-        plottingView.loadPoints(questionnaireAnswers);
-        plottingView.loadClusters(clusters, softClustering);
-        selectedSidePanel.update(questionnaireAnswers.length);
-    }
-
-    public void loadPointsWithClustering(BitSet[] questionnaireAnswers, int[] clusters) {
-        plottingView.loadPoints(questionnaireAnswers);
-        plottingView.loadClusters(clusters);
-        selectedSidePanel.update(questionnaireAnswers.length);
+        else if (dataset instanceof GraphDataset) {
+            loadPoints(((GraphDataset) dataset).asDot());
+        }
     }
 
     public void loadPoints(double[][] points) {
-        plottingView.loadPoints(points);
+        ((PlottingView)dataVisualizer).loadPoints(points);
         selectedSidePanel.update(points.length);
     }
 
     public void loadPoints(BitSet[] points) {
-        plottingView.loadPoints(points);
+        ((PlottingView)dataVisualizer).loadPoints(points);
         selectedSidePanel.update(points.length);
+    }
+
+    public void loadPoints(String graphDotString) {
+        ((GraphView)dataVisualizer).loadGraphFromDotString(graphDotString);
+        selectedSidePanel.update(dataVisualizer.getNumberOfPoints());
     }
 
     public void loadClusters(int[] clusters, double[][] softClustering) {
         selectedSidePanel.setClustering(clusters, softClustering);
-        plottingView.loadClusters(clusters, softClustering);
+        dataVisualizer.loadClusters(clusters, softClustering);
     }
 
     protected void showClustering(int a, int psi) {
@@ -210,6 +195,9 @@ public class View extends JFrame {
 
     public void resetView() {
         Dataset dataset = model.getDataset();
+        dataVisualizer = dataset instanceof GraphDataset ? new GraphView(this) : new PlottingView(this);
+        ((JPanel)dataVisualizer).setBounds(0, 0, windowWidth - sidePanelWidth, windowHeight);
+
         pane.removeAll();
         for (SidePanel sidePanel : sidePanels) {
             mainComponent.remove(sidePanel);
@@ -221,7 +209,7 @@ public class View extends JFrame {
         sidePanels.add(sidePanel);
         selectedSidePanel = sidePanel;
         pane.addTab(dataset == null ? "" : Model.tangleName, new JPanel(null));
-        ((JComponent)pane.getSelectedComponent()).add(plottingView);
+        ((JComponent)pane.getSelectedComponent()).add((JPanel) dataVisualizer);
         mainComponent.add(sidePanel);
 
         if (dataset == null) {
@@ -239,7 +227,7 @@ public class View extends JFrame {
                 addSidePanel(new LinkageSidePanel(this), Model.linkageName);
             }
         }
-        plottingView.repaint();
+        ((JPanel)dataVisualizer).repaint();
     }
 
     protected void createDataset(String datasetTypeName, int nPoints, int nDimensions, int nClusters) {
@@ -279,6 +267,6 @@ public class View extends JFrame {
     }
 
     public boolean isReady() {
-        return !plottingView.runningTSNE;
+        return dataVisualizer.isReady();
     }
 }

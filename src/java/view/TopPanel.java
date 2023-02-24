@@ -1,6 +1,7 @@
 package view;
 
 import datasets.Dataset;
+import datasets.GraphDataset;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -102,7 +103,7 @@ public class TopPanel extends JPanel {
                 JButton fileButton = new JButton("Select File");
                 fileButton.addActionListener((l) -> {
                     final JFileChooser fc = new JFileChooser();
-                    FileNameExtensionFilter filter = new FileNameExtensionFilter(".csv", "csv");
+                    FileNameExtensionFilter filter = new FileNameExtensionFilter(".csv, .dot", "csv", "dot");
                     fc.setFileFilter(filter);
                     int returnVal = fc.showDialog(view, "Choose");
                     if (returnVal == JFileChooser.APPROVE_OPTION) {
@@ -134,7 +135,10 @@ public class TopPanel extends JPanel {
 
                 if (loadResult == JOptionPane.OK_OPTION && file[0] != null) {
                     String fileName = file[0].getName();
-
+                    if (datasetType.equals(GraphDataset.name)) {
+                        view.loadDatasetFromFile(datasetType, fileName, 0, 0, 0, 0);
+                        return;
+                    }
                     ExtendedNumberFormatter formatter = createNumberFormatter();
                     JFormattedTextField startRowTextField = new JFormattedTextField(formatter);
                     JFormattedTextField endRowTextField = new JFormattedTextField(formatter);
