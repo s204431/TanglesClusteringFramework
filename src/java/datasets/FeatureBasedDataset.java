@@ -277,7 +277,7 @@ public class FeatureBasedDataset extends Dataset {
     public void loadDataFromFile(String fileName, int startRow, int endRow, int startColumn, int endColumn) {
         try {
             List<List<Double>> result = new ArrayList<>();
-            File file = new File("datasets/" + fileName);
+            File file = new File(fileName);
             Scanner fileScanner = new Scanner(file);
             for (int i = 0; i < startRow; i++) {
                 fileScanner.nextLine();

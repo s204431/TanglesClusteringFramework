@@ -52,7 +52,7 @@ public class BinaryQuestionnaire extends Dataset {
     public void loadAnswersFromFile(String fileName, int startRow, int endRow, int startColumn, int endColumn) {
         try {
             List<List<Boolean>> result = new ArrayList<>();
-            File file = new File("datasets/" + fileName);
+            File file = new File(fileName);
             Scanner fileScanner = new Scanner(file);
             for (int i = 0; i < startRow; i++) {
                 fileScanner.nextLine();

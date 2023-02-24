@@ -134,7 +134,7 @@ public class TopPanel extends JPanel {
                 String datasetType = (String) comboBox.getSelectedItem();
 
                 if (loadResult == JOptionPane.OK_OPTION && file[0] != null) {
-                    String fileName = file[0].getName();
+                    String fileName = file[0].getAbsolutePath();
                     if (datasetType.equals(GraphDataset.name)) {
                         view.loadDatasetFromFile(datasetType, fileName, 0, 0, 0, 0);
                         return;
@@ -210,7 +210,7 @@ public class TopPanel extends JPanel {
 
     private void addExportButton() {
         final JPopupMenu exportPopup = new JPopupMenu();
-        exportPopup.add(new JMenuItem(new AbstractAction("Save dataset as CSV") {
+        exportPopup.add(new JMenuItem(new AbstractAction("Save dataset to file") {
             public void actionPerformed(ActionEvent e) {
                 final File[] file = new File[1];
                 JPanel savePopupPanel = new JPanel();
@@ -219,13 +219,14 @@ public class TopPanel extends JPanel {
                 JButton button = new JButton("Select File");
                 button.addActionListener((l) -> {
                     final JFileChooser fc = new JFileChooser();
-                    FileNameExtensionFilter filter = new FileNameExtensionFilter(".csv", "csv");
+                    String extension = view.getDataset() instanceof GraphDataset ? "dot" : "csv";
+                    FileNameExtensionFilter filter = new FileNameExtensionFilter("."+extension, extension);
                     fc.setFileFilter(filter);
                     int returnVal = fc.showDialog(view, "Choose");
                     if (returnVal == JFileChooser.APPROVE_OPTION) {
                         file[0] = fc.getSelectedFile();
-                        if (!file[0].getName().endsWith(".csv")) {
-                            file[0] = new File(file[0].getPath()+".csv");
+                        if (!file[0].getName().endsWith("."+extension)) {
+                            file[0] = new File(file[0].getPath()+"."+extension);
                         }
                         label.setText(file[0].getName());
                     }
@@ -234,7 +235,7 @@ public class TopPanel extends JPanel {
                 savePopupPanel.add(Box.createRigidArea(new Dimension(10, 0)));
                 savePopupPanel.add(button);
                 int saveResult = JOptionPane.showConfirmDialog(view, savePopupPanel,
-                        "Save dataset as CSV", JOptionPane.OK_CANCEL_OPTION,
+                        "Save dataset to file", JOptionPane.OK_CANCEL_OPTION,
                         JOptionPane.PLAIN_MESSAGE);
                 if (saveResult == JOptionPane.OK_OPTION && file[0] != null) {
                     view.getDataset().saveToFile(file[0]);

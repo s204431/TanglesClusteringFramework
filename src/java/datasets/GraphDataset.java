@@ -3,7 +3,10 @@ package datasets;
 import model.Model;
 import util.BitSet;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.*;
 
 public class GraphDataset extends Dataset {
@@ -17,7 +20,7 @@ public class GraphDataset extends Dataset {
             List<List<int[]>> result = new ArrayList<>();
             List<int[]> edgesResult = new ArrayList<>();
             List<String> names = new ArrayList<>();
-            File file = new File("datasets/" + fileName);
+            File file = new File(fileName);
             Scanner fileScanner = new Scanner(file);
             fileScanner.nextLine(); //Skip first line.
             while (fileScanner.hasNextLine()) {
@@ -238,6 +241,15 @@ public class GraphDataset extends Dataset {
         return new String[] {Model.tangleName};
     }
     public int[] getGroundTruth() {return groundTruth;}
+
+    public void saveToFile(File file) {
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+            writer.write(asDot());
+            writer.close();
+            saveGroundTruth(file);
+        } catch (IOException e) {}
+    }
 
     //Converts this graph dataset to dot format.
     public String asDot() {
