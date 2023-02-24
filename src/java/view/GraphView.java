@@ -52,13 +52,13 @@ public class GraphView extends JPanel {
                 new int[] { 0,0,0,0,1,1,1,1 },
                 new double[][] {
                         {0.9, 0.1},
+                        {0.5, 0.5},
                         {0.9, 0.1},
                         {0.9, 0.1},
                         {0.9, 0.1},
+                        {0.3, 0.7},
                         {0.9, 0.1},
-                        {0.1, 0.9},
-                        {0.9, 0.1},
-                        {0.1, 0.9} });
+                        {0.3, 0.7} });
         image = convertGraphToImage();
 
 

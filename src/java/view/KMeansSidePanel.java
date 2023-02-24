@@ -2,6 +2,7 @@ package view;
 
 import util.ValueAdjuster;
 
+import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
@@ -15,10 +16,15 @@ public class KMeansSidePanel extends SidePanel {
     public KMeansSidePanel(View view) {
         super(view);
 
-        setPreferredSize(new Dimension(view.getWindowWidth(), view.getWindowHeight()));
-        setLayout(null);
+        add(Box.createRigidArea(new Dimension(0, 20)));
+
+        JLabel kLabel = new JLabel("k");
+        kLabel.setFont(new Font("TimesRoman", Font.BOLD, 18));
+        kLabel.setAlignmentX(CENTER_ALIGNMENT);
+        add(kLabel);
 
         kValueAdjuster = new ValueAdjuster(1, 20);
+        kValueAdjuster.setMaximumSize(new Dimension(view.sidePanelWidth - view.sidePanelWidth / 2, view.windowHeight / 6));
         kValueAdjuster.setEnabled(false);
         kValueAdjuster.addChangeListener(new ChangeListener() {
             @Override
@@ -28,12 +34,7 @@ public class KMeansSidePanel extends SidePanel {
             }
         });
         add(kValueAdjuster);
-    }
 
-    public void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        Graphics2D g2d = (Graphics2D) g;
-        g2d.drawString("k", 30, 300);
     }
 
     protected void updateKValue(int k) {
@@ -54,6 +55,5 @@ public class KMeansSidePanel extends SidePanel {
 
     protected void setBounds() {
         super.setBounds();
-        kValueAdjuster.setBounds(30, 300, 100, 130);
     }
 }

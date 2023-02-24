@@ -29,7 +29,7 @@ public class View extends JFrame {
     protected PlottingView plottingView;
     private JTabbedPane pane;
     private List<SidePanel> sidePanels = new ArrayList<>();
-    protected SidePanel selectedSidePanel;
+    public SidePanel selectedSidePanel;
     private TopPanel topPanel;
 
     protected int topPanelHeight;

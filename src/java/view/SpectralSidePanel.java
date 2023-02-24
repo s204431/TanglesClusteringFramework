@@ -2,6 +2,7 @@ package view;
 
 import util.ValueAdjuster;
 
+import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
@@ -14,10 +15,15 @@ public class SpectralSidePanel extends SidePanel {
     public SpectralSidePanel(View view) {
         super(view);
 
-        setPreferredSize(new Dimension(view.getWindowWidth(), view.getWindowHeight()));
-        setLayout(null);
+        add(Box.createRigidArea(new Dimension(0, 20)));
+
+        JLabel kLabel = new JLabel("k");
+        kLabel.setFont(new Font("TimesRoman", Font.BOLD, 18));
+        kLabel.setAlignmentX(CENTER_ALIGNMENT);
+        add(kLabel);
 
         kValueAdjuster = new ValueAdjuster(1, 20);
+        kValueAdjuster.setMaximumSize(new Dimension(view.sidePanelWidth - view.sidePanelWidth / 2, view.windowHeight / 6));
         kValueAdjuster.setEnabled(false);
         kValueAdjuster.addChangeListener(new ChangeListener() {
             @Override
@@ -27,7 +33,14 @@ public class SpectralSidePanel extends SidePanel {
             }
         });
         add(kValueAdjuster);
+
+        JLabel sigmaLabel = new JLabel("sigma");
+        sigmaLabel.setFont(new Font("TimesRoman", Font.BOLD, 18));
+        sigmaLabel.setAlignmentX(CENTER_ALIGNMENT);
+        add(sigmaLabel);
+
         sigmaValueAdjuster = new ValueAdjuster(1, 100);
+        sigmaValueAdjuster.setMaximumSize(new Dimension(view.sidePanelWidth - view.sidePanelWidth / 2, view.windowHeight / 6));
         sigmaValueAdjuster.setEnabled(false);
         sigmaValueAdjuster.addChangeListener(new ChangeListener() {
             @Override
@@ -37,13 +50,6 @@ public class SpectralSidePanel extends SidePanel {
             }
         });
         add(sigmaValueAdjuster);
-    }
-
-    public void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        Graphics2D g2d = (Graphics2D) g;
-        g2d.drawString("k", 30, 235);
-        g2d.drawString("sigma", 30, 345);
     }
 
     protected void updateKValue(int k) {

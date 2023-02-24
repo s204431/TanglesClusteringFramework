@@ -10,11 +10,34 @@ public class SidePanel extends JPanel {
     private double NMIScore = -1;
     private long clusteringTime = -1;
 
+    private JLabel pointsText = new JLabel("Total points: ");
+    private JLabel pointsLabel = new JLabel();
+    private JLabel showingLabel = new JLabel();
+    private JLabel NMIText = new JLabel("NMI score: ");
+    private JLabel NMILabel = new JLabel();
+    private JLabel timeText = new JLabel("Clustering time: ");
+    private JLabel timeLabel = new JLabel();
+
     public SidePanel(View view) {
         this.view = view;
 
         setPreferredSize(new Dimension(view.getWindowWidth(), view.getWindowHeight()));
-        setLayout(null);
+        setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
+
+        add(Box.createRigidArea(new Dimension(0, 20)));
+
+        JLabel[] allLabels = { pointsText, pointsLabel, showingLabel, new JLabel(), NMIText, NMILabel, timeText, timeLabel };
+        Font font = new Font("TimesRoman", Font.BOLD, 18);
+
+        int c = 0;
+        for (JLabel label : allLabels) {
+            label.setFont(font);
+            label.setAlignmentX(CENTER_ALIGNMENT);
+            add(label);
+            if (c++ % 2 == 1) {
+                add(Box.createRigidArea(new Dimension(0, 20)));
+            }
+        }
     }
 
     @Override
@@ -29,18 +52,25 @@ public class SidePanel extends JPanel {
 
         g2d.setColor(Color.BLACK);
         g2d.setFont(new Font("TimesRoman", Font.BOLD, 18));
-        g2d.drawString("Total points: ", 30, 30);
-        g2d.drawString(""+view.plottingView.originalNumberOfPoints, 30, 50);
+
+        pointsLabel.setText(""+view.plottingView.originalNumberOfPoints);
+
         if (view.plottingView.originalNumberOfPoints != view.plottingView.getNumberOfPoints()) {
-            g2d.drawString("Showing "+view.plottingView.getNumberOfPoints(), 30, 70);
+            showingLabel.setText("Showing "+view.plottingView.getNumberOfPoints());
+        } else {
+            showingLabel.setText(" ");
         }
+
         if (NMIScore >= 0) {
-            g2d.drawString("NMI score:", 30, 130);
-            g2d.drawString(""+((int)(NMIScore*100000)/100000.0), 30, 150);
+            NMILabel.setText(""+((int)(NMIScore*100000)/100000.0));
+        } else {
+            NMILabel.setText("None");
         }
+
         if (clusteringTime >= 0) {
-            g2d.drawString("Clustering time:", 30, 180);
-            g2d.drawString(clusteringTime + " ms", 30, 200);
+            timeLabel.setText(clusteringTime + " ms");
+        } else {
+            timeLabel.setText("None");
         }
     }
 
@@ -55,7 +85,7 @@ public class SidePanel extends JPanel {
     }
 
     protected void setBounds() {
-        setBounds(view.windowWidth - view.sidePanelWidth, view.topPanelHeight, view.windowWidth, view.windowHeight);
+        setBounds(view.windowWidth - view.sidePanelWidth, view.topPanelHeight, view.sidePanelWidth, view.windowHeight - view.topPanelHeight);
     }
 
     //Sets different values to be stored by the panel.

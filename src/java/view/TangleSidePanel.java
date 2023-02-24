@@ -16,10 +16,15 @@ public class TangleSidePanel extends SidePanel {
     public TangleSidePanel(View view) {
         super(view);
 
-        setPreferredSize(new Dimension(view.getWindowWidth(), view.getWindowHeight()));
-        setLayout(null);
+        add(Box.createRigidArea(new Dimension(0, 20)));
+
+        JLabel aLabel = new JLabel("a");
+        aLabel.setFont(new Font("TimesRoman", Font.BOLD, 18));
+        aLabel.setAlignmentX(CENTER_ALIGNMENT);
+        add(aLabel);
 
         aValueAdjuster = new ValueAdjuster(1, 80);
+        aValueAdjuster.setMaximumSize(new Dimension(view.sidePanelWidth - view.sidePanelWidth / 2, view.windowHeight / 6));
         aValueAdjuster.setEnabled(false);
         aValueAdjuster.addChangeListener(new ChangeListener() {
             @Override
@@ -29,8 +34,10 @@ public class TangleSidePanel extends SidePanel {
             }
         });
         add(aValueAdjuster);
+
         if (view.getDataset() instanceof FeatureBasedDataset && ((FeatureBasedDataset) view.getDataset()).dataPoints[0].length <= 2) {
             showCutsCheckBox = new JCheckBox("Show Cuts");
+            showCutsCheckBox.setAlignmentX(CENTER_ALIGNMENT);
             showCutsCheckBox.addChangeListener(new ChangeListener() {
                 @Override
                 public void stateChanged(ChangeEvent e) {
@@ -39,12 +46,6 @@ public class TangleSidePanel extends SidePanel {
             });
             add(showCutsCheckBox);
         }
-    }
-
-    public void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        Graphics2D g2d = (Graphics2D) g;
-        g2d.drawString("a", 30, 300);
     }
 
     protected void updateAValue(int a) {
