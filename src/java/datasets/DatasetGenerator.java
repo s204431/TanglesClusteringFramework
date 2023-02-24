@@ -1,7 +1,10 @@
 package datasets;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
+import com.jujutsu.tsne.TSne;
 import util.BitSet;
 import util.Util.Tuple;
 
@@ -166,6 +169,67 @@ public class DatasetGenerator {
             groundTruth[i] = centroid;
         }
 
+        return new Tuple<>(result, groundTruth);
+    }
+
+    //Generates random graph dataset with a specific number of nodes and clusters.
+    public static Tuple<int[][][], int[]> generateRandomGraph(int numOfNodes, int numOfClusters) {
+        double averageEdgesToSameCluster = 5.0;
+        double averageEdgesToOtherClusters = 0.2;
+        double sameClusterProb = averageEdgesToSameCluster/(numOfNodes/numOfClusters);
+        double differentClusterProb = averageEdgesToOtherClusters/(numOfNodes - numOfNodes/numOfClusters);
+
+        int[][][] result = new int[numOfNodes][][];
+        List<Integer> groundTruthList = new ArrayList<>(numOfNodes);
+        boolean[] added = new boolean[numOfNodes];
+        Random random = new Random();
+        int[] namesMap = new int[numOfNodes];
+        for (int i = 0; i < numOfNodes; i++) {
+            namesMap[i] = -1;
+        }
+        for (int i = 0; i < numOfNodes; i++) {
+            int centroid = i/(numOfNodes/numOfClusters);
+            List<int[]> edgesList = new ArrayList<>();
+            if (!added[i] && i > 0 && (centroid != (i+1)/(numOfNodes/numOfClusters) || i+1 >= numOfNodes)) { //Insure all nodes have at least one edge.
+                namesMap[i] = groundTruthList.size();
+                groundTruthList.add(centroid);
+                added[i] = true;
+                int weight = (int)random.nextGaussian(5, 3);
+                if (weight < 1) {
+                    weight = 1;
+                }
+                edgesList.add(new int[] {namesMap[i-1], weight});
+            }
+            for (int j = i+1; j < numOfNodes; j++) {
+                boolean forceAdd = !added[i] && ((centroid != (j+1)/(numOfNodes/numOfClusters)) || j+1 >= numOfNodes); //Insure all nodes have at least one edge.
+                if (forceAdd || (centroid == j/(numOfNodes/numOfClusters) && random.nextDouble() <= sameClusterProb) || (centroid != j/(numOfNodes/numOfClusters) && random.nextDouble() <= differentClusterProb)) {
+                    if (!added[i]) {
+                        namesMap[i] = groundTruthList.size();
+                        groundTruthList.add(centroid);
+                        added[i] = true;
+                    }
+                    if (!added[j]) {
+                        namesMap[j] = groundTruthList.size();
+                        groundTruthList.add(j/(numOfNodes/numOfClusters));
+                        added[j] = true;
+                    }
+                    int weight = (int)random.nextGaussian(centroid == j/(numOfNodes/numOfClusters) ? 5 : 10, 3);
+                    if (weight < 1) {
+                        weight = 1;
+                    }
+                    edgesList.add(new int[] {namesMap[j], weight});
+                }
+            }
+            int[][] edges = new int[edgesList.size()][];
+            for (int j = 0; j < edgesList.size(); j++) {
+                edges[j] = edgesList.get(j);
+            }
+            result[namesMap[i]] = edges;
+        }
+        int[] groundTruth = new int[groundTruthList.size()];
+        for (int i = 0; i < groundTruthList.size(); i++) {
+            groundTruth[i] = groundTruthList.get(i);
+        }
         return new Tuple<>(result, groundTruth);
     }
 

@@ -1,20 +1,15 @@
 package test;
 
-import datasets.DatasetGenerator;
+import datasets.*;
 import util.BitSet;
 import util.Util.Tuple;
 
 import java.util.Date;
 
-import datasets.BinaryQuestionnaire;
-import datasets.Dataset;
-import datasets.FeatureBasedDataset;
 import model.Model;
 import smile.validation.metric.NormalizedMutualInformation;
 
 public class ClusteringTester {
-
-    //private int[][] randomFeatureBasedTestSet = new int[][] {{1000, }}; //{nDataPoints, nClusters}
     private static Model model = new Model();
 
     public static void testTangleClusterer() {
@@ -23,11 +18,14 @@ public class ClusteringTester {
         double[] result1 = testTangleClustererFeatureBased();
         System.out.println();
         double[] result2 = testTangleClustererBinaryQuestionnaire();
+        System.out.println();
+        double[] result3 = testTangleClustererGraph();
         long time2 = new Date().getTime();
         System.out.println();
         System.out.println("Feature based average NMI score: " + result1[0]/result1[1]);
         System.out.println("Questionnaire average NMI score: " + result2[0]/result2[1]);
-        System.out.println("Tests finished. Total time: " + (time2 - time1) + " ms. Average NMI score: " + (result1[0]+result2[0])/(result1[1]+result2[1]));
+        System.out.println("Graph average NMI score: " + result3[0]/result3[1]);
+        System.out.println("Tests finished. Total time: " + (time2 - time1) + " ms. Average NMI score: " + (result1[0]+result2[0]+result3[0])/(result1[1]+result2[1]+result3[1]));
     }
 
     public static double[] testTangleClustererFeatureBased() {
@@ -102,6 +100,42 @@ public class ClusteringTester {
         }
         long totalTime2 = new Date().getTime();
         System.out.println("Questionnaire tests finished in " + (totalTime2-totalTime1) + " ms. Average NMI score: " + NMISum/totalCountWithoutNaN);
+        return new double[] {NMISum, totalCountWithoutNaN};
+    }
+
+    public static double[] testTangleClustererGraph() {
+        long totalTime1 = new Date().getTime();
+        int totalCount = 0;
+        int totalCountWithoutNaN = 0;
+        double NMISum = 0;
+        for (int i = 20; i <= 500; i *= 2) {
+            totalCount++;
+            long sizeTime1 = new Date().getTime();
+            int sizeCount = 0;
+            for (int j = 2; j <= 6; j++) {
+                sizeCount++;
+                long time1 = new Date().getTime();
+                int a = (int)((i/j)*(1.0/2.0));
+                Tuple<int[][][], int[]> generated = DatasetGenerator.generateRandomGraph(i, j);
+                Dataset dataset = new GraphDataset(generated.x);
+                int[] groundTruth = generated.y;
+                model.setDataset(dataset);
+                model.generateClusters(a, -1);
+                model.getSoftClustering();
+                int[] hardClustering = model.getHardClustering();
+                long time2 = new Date().getTime();
+                double nmiScore = NormalizedMutualInformation.joint(hardClustering, groundTruth);
+                if (!Double.isNaN(nmiScore)) {
+                    totalCountWithoutNaN++;
+                    NMISum += nmiScore;
+                }
+                System.out.println("Graph test with " + i + " datapoints and " + j + " clusters took " + (time2 - time1) + " ms. NMI score: " + nmiScore);
+            }
+            long sizeTime2 = new Date().getTime();
+            System.out.println("Graph tests with " + i + " datapoints finished. Total time: " + (sizeTime2 - sizeTime1) + " ms. Average time: " + (sizeTime2-sizeTime1)/sizeCount + " ms.");
+        }
+        long totalTime2 = new Date().getTime();
+        System.out.println("Graph tests finished in " + (totalTime2-totalTime1) + " ms. Average NMI score: " + NMISum/totalCountWithoutNaN);
         return new double[] {NMISum, totalCountWithoutNaN};
     }
 

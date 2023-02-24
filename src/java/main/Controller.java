@@ -47,6 +47,9 @@ public class Controller {
         else if (datasetTypeName.equals(FeatureBasedDataset.name)) {
             dataset = new FeatureBasedDataset(DatasetGenerator.generateFeatureBasedDataPoints(nPoints, nClusters, nDimensions));
         }
+        else if (datasetTypeName.equals(GraphDataset.name)) {
+            dataset = new GraphDataset(DatasetGenerator.generateRandomGraph(nPoints, nClusters));
+        }
         model.setDataset(dataset);
         view.resetView();
         view.loadDataPoints();

@@ -2,6 +2,7 @@ package datasets;
 
 import model.Model;
 import util.BitSet;
+import util.Util.Tuple;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -13,6 +14,29 @@ public class GraphDataset extends Dataset {
     public static final String name = "Graph";
     private int[][][] dataPoints;
     private int[][] edges;
+
+    public GraphDataset() {
+
+    }
+
+    public GraphDataset(int[][][] dataPoints) {
+        this.dataPoints = dataPoints;
+        List<int[]> edgesList = new ArrayList<>();
+        for (int i = 0; i < dataPoints.length; i++) {
+            for (int j = 0; j < dataPoints[i].length; j++) {
+                edgesList.add(new int[] {i, dataPoints[i][j][0], dataPoints[i][j][1]});
+            }
+        }
+        edges = new int[edgesList.size()][];
+        for (int i = 0; i < edgesList.size(); i++) {
+            edges[i] = edgesList.get(i);
+        }
+    }
+
+    public GraphDataset(Tuple<int[][][], int[]> dataPointsWithGroundTruth) {
+        this(dataPointsWithGroundTruth.x);
+        groundTruth = dataPointsWithGroundTruth.y;
+    }
 
     //Loads a graph from graphviz format.
     public void loadGraphFromFile(String fileName) {
