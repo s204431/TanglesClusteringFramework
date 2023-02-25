@@ -8,6 +8,7 @@ import smile.clustering.SpectralClustering;
 import smile.clustering.linkage.CompleteLinkage;
 import util.BitSet;
 import util.Util.Tuple;
+import view.View;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -83,7 +84,7 @@ public class FeatureBasedDataset extends Dataset {
         return result;
     }
 
-    public BitSet[] getInitialCuts() {
+    public BitSet[] getInitialCutsRange() {
         List<BitSet> cuts = new ArrayList<>();
         List<Double>[] axisParallelCuts = new ArrayList[dataPoints[0].length]; //For visualization.
         double[][] copy = new double[dataPoints.length][dataPoints[0].length];
@@ -97,9 +98,6 @@ public class FeatureBasedDataset extends Dataset {
         for (int i = 0; i < dataPoints[0].length; i++) {
             axisParallelCuts[i] = new ArrayList<>();
             mergeSort(copy, originalIndices, i, 0, dataPoints.length-1);
-            //BitSet first = new BitSet(dataPoints.length);
-            //first.add(originalIndices[0]);
-            //cuts.add(first);
             BitSet currentBitSet = new BitSet(dataPoints.length);
             currentBitSet.setAll();
             cuts.add(currentBitSet);
@@ -187,7 +185,59 @@ public class FeatureBasedDataset extends Dataset {
 
     @Override
     public double[] getCutCosts() {
-        return distanceToMeanCostFunction();
+        double[] costs = cutCosts;
+        /*for (int i = 0; i < initialCuts.length; i++) {
+            int[] clusters = new int[dataPoints.length];
+            for (int j = 0; j < initialCuts[i].size(); j++) {
+                clusters[j] = initialCuts[i].get(j) ? 1 : 0;
+            }
+            Model model = new Model();
+            model.setDataset(this);
+            View view = new View(model);
+            view.loadDataPoints();
+            view.loadClusters(clusters, null);
+            view.selectedSidePanel.setValues(costs[i], 0);
+        }*/
+        return costs;
+    }
+
+    private double[] testCostFunction() {
+        double[] costs = new double[initialCuts.length];
+        for (int i = 0; i < initialCuts.length; i++) {
+            double[] mean1 = new double[dataPoints[0].length];
+            double[] mean2 = new double[dataPoints[0].length];
+            int n1 = 0;
+            int n2 = 0;
+            for (int k = 0; k < dataPoints.length; k++) {
+                for (int l = 0; l < dataPoints[k].length; l++) {
+                    if (initialCuts[i].get(k)) {
+                        mean1[l] += dataPoints[k][l];
+                        if (l == 0) {
+                            n1++;
+                        }
+                    }
+                    else {
+                        mean2[l] += dataPoints[k][l];
+                        if (l == 0) {
+                            n2++;
+                        }
+                    }
+                }
+            }
+            for (int k = 0; k < mean1.length; k++) {
+                mean1[k] /= n1;
+                mean2[k] /= n2;
+            }
+            for(int j = 0; j < dataPoints.length; j++) {
+                double[] ownMean = initialCuts[i].get(j) ? mean1 : mean2;
+                double[] otherMean = ownMean == mean1 ? mean2 : mean1;
+                if (getDistance(dataPoints[j], otherMean) < getDistance(dataPoints[j], ownMean)) {
+                    costs[i]++;
+                }
+            }
+        }
+        cutCosts = costs;
+        return costs;
     }
 
     private double[] pairwiseDistanceCostFunction() {
@@ -199,11 +249,11 @@ public class FeatureBasedDataset extends Dataset {
                 if (initialCuts[i].get(j)) {
                     continue;
                 }
-                for (int k = 0; k < dataPoints.length; k++) {
+                for (int k = j; k < dataPoints.length; k++) {
                     if (!initialCuts[i].get(k)) {
                         continue;
                     }
-                    cost += Math.exp(-(1.0/maxRange)*getDistance(dataPoints[j], dataPoints[k]));
+                    cost += Math.exp(-5.0*(1.0/maxRange)*getDistance(dataPoints[j], dataPoints[k]));
                 }
             }
             costs[i] = cost/(initialCuts[i].count()*(initialCuts[i].size()-initialCuts[i].count()));
@@ -346,120 +396,6 @@ public class FeatureBasedDataset extends Dataset {
         return clusters.partition(k);
     }
 
-    /*
-    //Performs K-means clustering on a feature based dataset
-    public int[] kMeans(int clusters) {
-        int[] resultingClustering = new int[dataPoints.length];
-        int features = dataPoints[0].length;
-
-        //Find min and max value for every feature of the dataset
-        double[][] minMaxValues = new double[features][2];
-        for (int i = 0; i < features; i++) {
-            minMaxValues[i][0] = Double.MAX_VALUE;  //Min
-            minMaxValues[i][1] = Double.MIN_VALUE;  //Max
-            for (int j = 0; j < dataPoints.length; j++) {
-                if (dataPoints[j][i] < minMaxValues[i][0]) {
-                    minMaxValues[i][0] = dataPoints[j][i];
-                }
-                if (dataPoints[j][i] > minMaxValues[i][1]) {
-                    minMaxValues[i][1] = dataPoints[j][i];
-                }
-            }
-        }
-
-        //Place centroids randomly
-        Random r = new Random();
-        double[][] centroids = new double[clusters][features];
-        double[][] tempCentroids = new double[clusters][features];
-        double[][] tempTempCentroids = new double[clusters][features];
-        for (int i = 0; i < clusters; i++) {
-            for (int j = 0; j < features; j++) {
-                double value = r.nextDouble(minMaxValues[j][0], minMaxValues[j][1]);
-                centroids[i][j] = value;
-                tempCentroids[i][j] = value;
-                tempTempCentroids[i][j] = value;
-            }
-        }
-
-        int count = 0;
-        boolean run = true;
-        while (run) {
-            count++;
-
-            if (count > 200) {
-                break;
-            }
-
-            //Find the nearest centroid for every participant
-            for (int i = 0; i < dataPoints.length; i++) {
-                double min = Double.MAX_VALUE;
-                for (int j = 0; j < clusters; j++) {
-                    double[] centroid = centroids[j];
-                    double manhattanDistance = 0;
-                    for (int k = 0; k < features; k++) {
-                        manhattanDistance += Math.abs(centroid[k] - dataPoints[i][k]);
-                    }
-                    if (manhattanDistance < min) {
-                        min = manhattanDistance;
-                        resultingClustering[i] = j;
-                    }
-                }
-            }
-
-            //Calculate sums used to update centroid means
-            double[][] sums = new double[clusters][features];
-            int[] participantsInClusters = new int[clusters];
-            for (int i = 0; i < dataPoints.length; i++) {
-                int cluster = resultingClustering[i];
-                for (int j = 0; j < features; j++) {
-                    sums[cluster][j] += dataPoints[i][j];
-                    participantsInClusters[cluster]++;
-                }
-            }
-
-            //Update centroid + break loop if centroids haven't changed or if centroids keep moving back and forth; else update temporary centroids
-            run = false;
-            boolean brk = true;
-            for (int i = 0; i < clusters; i++) {
-                for (int j = 0; j < features; j++) {
-                    //Update centroid means
-                    if (participantsInClusters[i] != 0) {
-                        centroids[i][j] = sums[i][j] / participantsInClusters[i];
-                    }
-                    //Check if centroids are moving back and forth
-                    if (centroids[i][j] != tempTempCentroids[i][j]) {
-                        brk = false;
-                    }
-                    tempTempCentroids[i][j] = tempCentroids[i][j];
-
-                    //Check if centroids haven't changed
-                    if (centroids[i][j] != tempCentroids[i][j]) {
-                        tempCentroids[i][j] = centroids[i][j];
-                        run = true;
-                    }
-                }
-            }
-
-            if (brk) {
-                break;
-            }
-        }
-
-        //Prints resulting centroids
-        System.out.println("Resulting centroid means:");
-        for (int i = 0; i < clusters; i++) {
-            System.out.print("Centroid " + (i+1) + ": ");
-            for (int j = 0; j < features; j++) {
-                System.out.print(centroids[i][j] + " ");
-            }
-            System.out.println();
-        }
-        System.out.println();
-
-        return resultingClustering;
-    }
-    */
-
     public void printKMeansResults(int[] resultingClustering) {
 
         //Print ground truth vs k-means clusters
@@ -499,5 +435,110 @@ public class FeatureBasedDataset extends Dataset {
 
     public String getName() {
         return name;
+    }
+
+    public BitSet[] getInitialCuts() {
+        double range = getMaxRange();
+        List<Double> costs = new ArrayList<>();
+        List<BitSet> cuts = new ArrayList<>();
+        List<Double>[] axisParallelCuts = new ArrayList[dataPoints[0].length]; //For visualization.
+        double[][] copy = new double[dataPoints.length][dataPoints[0].length];
+        int[] originalIndices = new int[dataPoints.length];
+        for (int i = 0; i < dataPoints.length; i++) {
+            originalIndices[i] = i;
+            for (int j = 0; j < dataPoints[0].length; j++) {
+                copy[i][j] = dataPoints[i][j];
+            }
+        }
+        for (int i = 0; i < dataPoints[0].length; i++) {
+            axisParallelCuts[i] = new ArrayList<>();
+            mergeSort(copy, originalIndices, i, 0, dataPoints.length-1);
+            BitSet currentBitSet = new BitSet(dataPoints.length);
+            currentBitSet.setAll();
+            cuts.add(currentBitSet);
+            BitSet accumulated = new BitSet(dataPoints.length);
+            accumulated.setAll();
+            axisParallelCuts[i].add(dataPoints[originalIndices[0]][i]);
+            int cutIndex = 0;
+            double[] mean1 = null;
+            double[] mean2 = null;
+            double cost = 0.0;
+            for (int j = 0; j < dataPoints.length; j++) {
+                accumulated.remove(originalIndices[j]);
+                if (j <= cutIndex) {
+                    if (mean1 == null || getDistance(dataPoints[originalIndices[j]], mean1) < getDistance(dataPoints[originalIndices[j]], mean2)) {
+                        currentBitSet.remove(originalIndices[j]);
+                    }
+                }
+                else if (mean1 != null && getDistance(dataPoints[originalIndices[j]], mean1) < getDistance(dataPoints[originalIndices[j]], mean2)) {
+                    currentBitSet.remove(originalIndices[j]);
+                }
+                if (mean1 != null) {
+                    cost += Math.exp(-((1.0/range)*getDistance(dataPoints[originalIndices[j]], (currentBitSet.get(originalIndices[j]) ? mean1 : mean2))));
+                }
+                if (j > 0 && j % (a/precision) == 0) {
+                    if (dataPoints.length - j <= (a/precision) - 1) {
+                        break;
+                    }
+                    currentBitSet = new BitSet(dataPoints.length);
+                    currentBitSet.unionWith(accumulated);
+                    cuts.add(currentBitSet);
+                    costs.add(cost);
+                    cost = 0.0;
+                    //Find where to put the cut.
+                    double maxRange = -1;
+                    for (int k = j+1; k < j+a/precision-1; k++) {
+                        if (copy[k+1][i] - copy[k][i] > maxRange) {
+                            maxRange = copy[k+1][i] - copy[k][i];
+                            cutIndex = k;
+                        }
+                    }
+                    axisParallelCuts[i].add(dataPoints[originalIndices[cutIndex]][i]);
+                    //Calculate means.
+                    mean1 = new double[dataPoints[0].length];
+                    mean2 = new double[dataPoints[0].length];
+                    int n1 = 0;
+                    int n2 = 0;
+                    for (int k = j+1; k < j+a/precision-1; k++) {
+                        for (int l = 0; l < dataPoints[originalIndices[k]].length; l++) {
+                            if (k <= cutIndex) {
+                                mean1[l] += dataPoints[originalIndices[k]][l];
+                                if (l == 0) {
+                                    n1++;
+                                }
+                            }
+                            else if (k > cutIndex) {
+                                mean2[l] += dataPoints[originalIndices[k]][l];
+                                if (l == 0) {
+                                    n2++;
+                                }
+                            }
+                        }
+                    }
+                    for (int k = 0; k < mean1.length; k++) {
+                        mean1[k] /= n1;
+                        mean2[k] /= n2;
+                    }
+                }
+            }
+            costs.add(cost);
+        }
+        BitSet[] result = new BitSet[cuts.size()];
+        for (int i = 0; i < cuts.size(); i++) {
+            result[i] = cuts.get(i);
+        }
+        initialCuts = result;
+        this.axisParallelCuts = new double[axisParallelCuts.length][];
+        for (int i = 0; i < axisParallelCuts.length; i++) {
+            this.axisParallelCuts[i] = new double[axisParallelCuts[i].size()];
+            for (int j = 0; j < axisParallelCuts[i].size(); j++) {
+                this.axisParallelCuts[i][j] = axisParallelCuts[i].get(j);
+            }
+        }
+        cutCosts = new double[costs.size()];
+        for (int i = 0; i < costs.size(); i++) {
+            cutCosts[i] = costs.get(i);
+        }
+        return result;
     }
 }

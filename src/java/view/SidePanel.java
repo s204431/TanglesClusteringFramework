@@ -61,11 +61,11 @@ public class SidePanel extends JPanel {
             showingLabel.setText(" ");
         }
 
-        if (NMIScore >= 0) {
+        //if (NMIScore >= 0) {
             NMILabel.setText(""+((int)(NMIScore*100000)/100000.0));
-        } else {
+        /*} else {
             NMILabel.setText("None");
-        }
+        }*/
 
         if (clusteringTime >= 0) {
             timeLabel.setText(clusteringTime + " ms");
@@ -89,7 +89,7 @@ public class SidePanel extends JPanel {
     }
 
     //Sets different values to be stored by the panel.
-    protected void setValues(double NMIScore, long clusteringTime) {
+    public void setValues(double NMIScore, long clusteringTime) {
         this.NMIScore = NMIScore;
         this.clusteringTime = clusteringTime;
     }

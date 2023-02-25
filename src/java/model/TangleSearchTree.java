@@ -150,7 +150,7 @@ public class TangleSearchTree {
         minCost = Double.MAX_VALUE;
         maxCost = Double.MIN_VALUE;
         for (int i = 0; i < cutCosts.length; i++) {
-            if (cutCosts[i] < minCost) {
+            if (cutCosts[i] > 0 && cutCosts[i] < minCost) {
                 minCost = cutCosts[i];
             }
             if (cutCosts[i] > maxCost) {
@@ -170,7 +170,7 @@ public class TangleSearchTree {
     }
 
     private double getWeight(double cost) {
-        return (maxCost-minCost) == 0.0 ? 1.0 : Math.exp(-((cost-minCost)/(maxCost-minCost)));
+        return cost == 0.0 || (maxCost-minCost) == 0.0 ? 1.0 : Math.exp(-((cost-minCost)/(maxCost-minCost)));
     }
 
     private int getSoftClustering(Node node, int datapoint, int index, double accumulated, double[] result) {
