@@ -186,7 +186,7 @@ public class FeatureBasedDataset extends Dataset {
 
     @Override
     public double[] getCutCosts() {
-        double[] costs = distanceToMeanCostFunction();
+        cutCosts = distanceToMeanCostFunction();
         /*for (int i = 0; i < initialCuts.length; i++) {
             System.out.println(costs[i]);
             int[] clusters = new int[dataPoints.length];
@@ -200,7 +200,7 @@ public class FeatureBasedDataset extends Dataset {
             view.loadClusters(clusters, null);
             view.selectedSidePanel.setValues(costs[i], 0);
         }*/
-        return costs;
+        return cutCosts;
     }
 
     private double[] testCostFunction() {
@@ -453,7 +453,7 @@ public class FeatureBasedDataset extends Dataset {
         return name;
     }
 
-    public BitSet[] getInitialCutsLocalMeansAdjust() {
+    public BitSet[] getInitialCutsLocalMeans() {
         double range = getMaxRange();
         List<Double> costs = new ArrayList<>();
         List<BitSet> cuts = new ArrayList<>();
@@ -555,6 +555,7 @@ public class FeatureBasedDataset extends Dataset {
         for (int i = 0; i < costs.size(); i++) {
             cutCosts[i] = costs.get(i);
         }
+        cutsAreAxisParallel = false;
         return result;
     }
 
