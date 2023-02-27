@@ -2,101 +2,95 @@ package view;
 
 import datasets.GraphDataset;
 import guru.nidi.graphviz.attribute.Color;
-import guru.nidi.graphviz.attribute.Rank;
 import guru.nidi.graphviz.attribute.Style;
 import guru.nidi.graphviz.engine.Format;
 import guru.nidi.graphviz.engine.Graphviz;
-import guru.nidi.graphviz.model.Graph;
-import guru.nidi.graphviz.model.LinkSource;
-import guru.nidi.graphviz.model.MutableGraph;
-import guru.nidi.graphviz.model.Node;
+import guru.nidi.graphviz.model.*;
 import guru.nidi.graphviz.parse.Parser;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.awt.image.BufferedImage;
-import java.awt.image.ImageObserver;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Random;
 
-import static guru.nidi.graphviz.attribute.Attributes.attr;
-import static guru.nidi.graphviz.attribute.Rank.RankDir.LEFT_TO_RIGHT;
 import static guru.nidi.graphviz.model.Factory.*;
-import static guru.nidi.graphviz.model.Factory.node;
 
-public class GraphView extends JPanel implements DataVisualizer {
+public class GraphView extends JPanel implements DataVisualizer, MouseListener, MouseWheelListener {
     private View view;
-
     private Image image;
-
     private MutableGraph graph;
+    private java.awt.Color[] colors;
 
-    private java.awt.Color[] colors = { java.awt.Color.RED, java.awt.Color.BLUE, java.awt.Color.YELLOW, java.awt.Color.GREEN, java.awt.Color.ORANGE, java.awt.Color.PINK, java.awt.Color.GRAY };;
+    private int numberOfPoints = 0;
+
+    private int[] mouseOrigVector;
+    private boolean dragging = false;
+    private double xOrig;
+    private double yOrig;
+    private double imageWidth;
+    private double imageHeight;
+    private double previousImageWidth;
+    private double previousImageHeight;
+
+    private boolean close = false;
 
     public GraphView(View view) {
         this.view = view;
         setPreferredSize(new Dimension(view.getWindowWidth(), view.getWindowHeight()));
 
-        /*String exampleDot =
-                "graph {\n" +
-                "    white -- cyan -- blue\n" +
-                "    white -- yellow -- green\n" +
-                "    white -- pink -- red\n" +
-                "\n" +
-                "    cyan -- green -- black\n" +
-                "    yellow -- red -- black\n" +
-                "    pink -- blue -- black\n" +
-                "}";
-        loadGraphFromDotString(exampleDot);
-        loadClusters(
-                new int[] { 0,0,0,0,1,1,1,1 },
-                new double[][] {
-                        {0.9, 0.1},
-                        {0.5, 0.5},
-                        {0.9, 0.1},
-                        {0.9, 0.1},
-                        {0.9, 0.1},
-                        {0.3, 0.7},
-                        {0.9, 0.1},
-                        {0.3, 0.7} });
-        image = convertGraphToImage();
-
-
-        //Test frame
-        JFrame frame = new JFrame();
-        frame.setTitle("GraphView test");
-        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        frame.add(this);
-        frame.pack();
-        frame.setLocationByPlatform(true);
-        frame.setLocationRelativeTo(null);
-        frame.setVisible(true);*/
+        addMouseListener(this);
+        addMouseWheelListener(this);
+        (new Thread(new BoardDragger())).start();
     }
 
     //Draws graphView on screen
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        g.fillRect(0, 0, 100, 100);
+
         if (image != null) {
-            g.drawImage(image, 0, 0, null);
+            g.drawImage(image, (int)xOrig, (int)yOrig, (int)imageWidth, (int)imageHeight, null);
         }
     }
 
     protected Image convertGraphToImage() {
-        BufferedImage image = Graphviz.fromGraph(graph).render(Format.PNG).toImage();
-        if (image.getWidth() > image.getHeight()) {
-            return Graphviz.fromGraph(graph).width(view.windowWidth - view.sidePanelWidth).render(Format.PNG).toImage();
-        } else {
-            return Graphviz.fromGraph(graph).height(view.windowHeight - view.topPanelHeight).render(Format.PNG).toImage();
+        Image image = Graphviz.fromGraph(graph).render(Format.PNG).toImage();
+        if (imageWidth == 0.0 || imageHeight == 0.0) {
+            imageWidth = image.getWidth(null);
+            imageHeight = image.getHeight(null);
+
+            int maxWidth = view.windowWidth - view.sidePanelWidth;
+            int maxHeight = view.windowHeight - view.topPanelHeight*3;
+
+            if (imageWidth > maxWidth) {
+                double scale = maxWidth / imageWidth;
+                imageWidth = maxWidth;
+                imageHeight *= scale;
+            }
+
+            if (imageHeight > maxHeight) {
+                double scale = maxHeight / imageHeight;
+                imageHeight = maxHeight;
+                imageWidth *= scale;
+            }
         }
+        previousImageWidth = imageWidth;
+        previousImageHeight = imageHeight;
+        return Graphviz.fromGraph(graph).width((int)imageWidth).height((int)imageHeight).render(Format.PNG).toImage();
     }
 
-    protected void loadGraphFromDotString(String dot) {
+    protected void loadGraphFromDotString(final String dot) {
         try {
             InputStream stream = new ByteArrayInputStream(dot.getBytes(StandardCharsets.UTF_8));
             graph = new Parser().read(stream);
+            numberOfPoints = graph.nodes().size();
             graph.graphAttrs()
                     .add(Color.rgb(this.getBackground().getRGB()).background())
                     .nodeAttrs().add(Color.WHITE.fill())
@@ -111,39 +105,64 @@ public class GraphView extends JPanel implements DataVisualizer {
         } catch (Exception e) {}
     }
 
-    public void loadClusters(int[] hardClustering) {
+    public void loadClusters(final int[] hardClustering) {
         if (hardClustering == null) {
             return;
         }
-        loadGraphFromDotString(((GraphDataset)view.getDataset()).asDot());
-        final int[] i = {0};
-        graph.nodes().forEach(node ->
-                        node.add(
-                                Color.rgba(colors[hardClustering[i[0]++]].getRGB()).fill()
-                        ));
+        addColors(hardClustering);
+        //loadGraphFromDotString(((GraphDataset)view.getDataset()).asDot());
+        for (int i = 0; i < hardClustering.length; i++) {
+            graph.nodes().add(mutNode("" + i).add(
+                    Color.rgb(colors[hardClustering[i]].getRGB()).fill()
+            ));
+        }
         image = convertGraphToImage();
         repaint();
     }
 
-    public void loadClusters(int[] hardClustering, double[][] softClustering) {
+    public void loadClusters(final int[] hardClustering, final double[][] softClustering) {
         if (hardClustering == null || softClustering == null) {
             return;
         }
-        loadGraphFromDotString(((GraphDataset)view.getDataset()).asDot());
-        final int[] i = {0};
-        graph.nodes().forEach(node ->
-                node.add(
-                        Color.rgba(colors[hardClustering[i[0]]].getRGB() + ((int)(softClustering[i[0]][hardClustering[i[0]++]] * 200) << 24)).fill()
-                ));
+        addColors(hardClustering);
+        //loadGraphFromDotString(((GraphDataset)view.getDataset()).asDot());
+        for (int i = 0; i < hardClustering.length; i++) {
+            graph.nodes().remove(mutNode("" + i));
+            graph.add(mutNode("" + i).add(
+                    Color.rgba(colors[hardClustering[i]].getRGB()
+                                    + ((int) (softClustering[i][hardClustering[i]] * 200) << 24))
+                            .fill()
+            ));
+        }
         image = convertGraphToImage();
         repaint();
     }
 
-    public int getNumberOfPoints() {
-        if (graph == null) {
-            return 0;
+    private void addColors(final int[] hardClustering) {
+        colors = new java.awt.Color[] { java.awt.Color.RED, java.awt.Color.BLUE, java.awt.Color.YELLOW, java.awt.Color.GREEN, java.awt.Color.ORANGE, java.awt.Color.PINK, java.awt.Color.GRAY };
+
+        int amountOfColors = 0;
+        for (int i = 0; i < hardClustering.length; i++) {
+            if (hardClustering[i] > amountOfColors) {
+                amountOfColors = hardClustering[i];
+            }
         }
-        return graph.nodes().size();
+        amountOfColors++;
+        if (amountOfColors > colors.length) {
+            Random random = new Random();
+            this.colors = new java.awt.Color[amountOfColors];
+            for (int i = 0; i < amountOfColors; i++) {
+                float r = random.nextFloat();
+                float g = random.nextFloat();
+                float b = random.nextFloat();
+                java.awt.Color randomColor = new java.awt.Color(r, g, b);
+                this.colors[i] = randomColor;
+            }
+        }
+    }
+
+    public int getNumberOfPoints() {
+        return numberOfPoints;
     }
 
     public int getOriginalNumberOfPoints() {
@@ -152,5 +171,78 @@ public class GraphView extends JPanel implements DataVisualizer {
 
     public boolean isReady() {
         return true;
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+        Point mousePos = getMousePosition();
+        if (mousePos != null) {
+            mouseOrigVector = new int[]{(int)xOrig - mousePos.x, (int)yOrig - mousePos.y};
+            dragging = true;
+        }
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+        dragging = false;
+        repaint();
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseWheelMoved(MouseWheelEvent e) {
+        if (e.getPreciseWheelRotation() < 0.0 || (imageWidth > 100 && imageHeight > 100)) {
+            double fieldWidthDist = (e.getX() - xOrig)/imageWidth;
+            double fieldHeightDist = (e.getY() - yOrig)/imageHeight;
+            double w = e.getPreciseWheelRotation() * imageWidth / 25.0;
+            double h = e.getPreciseWheelRotation() * imageHeight / 25.0;
+            imageWidth -= w == 0.0 ? e.getPreciseWheelRotation() : w;
+            imageHeight -= h == 0.0 ? e.getPreciseWheelRotation() : h;
+            xOrig -= (fieldWidthDist - (e.getX() - xOrig) / imageWidth) * imageWidth;
+            yOrig -= (fieldHeightDist - (e.getY() - yOrig) / imageHeight) * imageHeight;
+        }
+
+        if (previousImageWidth / imageWidth >= 2 || imageWidth / previousImageWidth >= 2) {
+            previousImageWidth = imageWidth;
+            previousImageHeight = imageHeight;
+            image = Graphviz.fromGraph(graph).width((int)imageWidth).height((int)imageHeight).render(Format.PNG).toImage();
+        }
+        repaint();
+    }
+
+    //Concurrent thread that moves the graph when dragging.
+    private class BoardDragger implements Runnable {
+        @Override
+        public void run() {
+            while (!close) {
+                if (dragging) {
+                    Point mousePos = getMousePosition();
+                    if (mousePos != null) {
+                        xOrig = mousePos.x + mouseOrigVector[0];
+                        yOrig = mousePos.y + mouseOrigVector[1];
+                        repaint();
+                    }
+                }
+                try {
+                    Thread.sleep(10);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 }

@@ -161,7 +161,7 @@ public class View extends JFrame {
 
     public void loadPoints(String graphDotString) {
         ((GraphView)dataVisualizer).loadGraphFromDotString(graphDotString);
-        selectedSidePanel.update(dataVisualizer.getNumberOfPoints());
+        selectedSidePanel.update(dataVisualizer.getOriginalNumberOfPoints());
     }
 
     public void loadClusters(int[] clusters, double[][] softClustering) {
