@@ -61,11 +61,11 @@ public class SidePanel extends JPanel {
             showingLabel.setText(" ");
         }
 
-        //if (NMIScore >= 0) {
+        if (NMIScore >= 0) {
             NMILabel.setText(""+((int)(NMIScore*100000)/100000.0));
-        /*} else {
+        } else {
             NMILabel.setText("None");
-        }*/
+        }
 
         if (clusteringTime >= 0) {
             timeLabel.setText(clusteringTime + " ms");
