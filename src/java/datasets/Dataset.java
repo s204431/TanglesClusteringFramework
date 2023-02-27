@@ -12,7 +12,7 @@ import java.util.Scanner;
 
 public abstract class Dataset {
     public static final String[] supportedDatasetTypes = new String[] {FeatureBasedDataset.name, BinaryQuestionnaire.name, GraphDataset.name};
-    protected BitSet[] initialCuts;
+    public BitSet[] initialCuts;
     protected int[] groundTruth;
 
     public BitSet[] getInitialCuts() {return null;}

@@ -19,6 +19,7 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
+import java.util.List;
 
 public class PlottingView extends JPanel implements DataVisualizer, MouseListener, MouseMotionListener, MouseWheelListener {
     private static final int POINT_SIZE = 8;
@@ -208,21 +209,85 @@ public class PlottingView extends JPanel implements DataVisualizer, MouseListene
                         highestCost = dataset.cutCosts[i];
                     }
                 }
+
+                //Draw cuts.
+                int nSegments = 10;
                 int costIndex = 0;
                 for (int i = 0; i < dataset.axisParallelCuts.length; i++) {
+                    int otherDimension = i == 0 ? 1 : 0;
+                    double[] minPoint = new double[2];
+                    double[] maxPoint = new double[2];
+                    minPoint[otherDimension] = Integer.MAX_VALUE;
+                    maxPoint[otherDimension] = Integer.MIN_VALUE;
+                    for (int j = 0; j < points.length; j++) {
+                        if (points[j][otherDimension] < minPoint[otherDimension]) {
+                            minPoint = points[j];
+                        }
+                        if (points[j][otherDimension] > maxPoint[otherDimension]) {
+                            maxPoint = points[j];
+                        }
+                    }
                     for (int j = 0; j < dataset.axisParallelCuts[i].length; j++) {
                         g2d.setStroke(stroke2);
                         double p = (highestCost - lowestCost) == 0 ? 0.5 : (dataset.cutCosts[costIndex] - lowestCost)/(highestCost - lowestCost);
                         g2d.setColor(p <= 0.5 ? new Color((int)(p*2.0*255), 0, 0) : new Color(255, (int)((p-0.5)*2.0*200), (int)((p-0.5)*2.0*200)));
-                        if (i == 0) {
-                            double pos = convertPointToCoordinateOnScreen(new double[] {dataset.axisParallelCuts[i][j], 0})[0];
-                            g2d.drawLine((int) pos, 0, (int) pos, view.getWindowHeight());
+                        if (((FeatureBasedDataset) view.getDataset()).cutsAreAxisParallel) {
+                            if (i == 0) {
+                                double pos = convertPointToCoordinateOnScreen(new double[] {dataset.axisParallelCuts[i][j], 0})[0];
+                                g2d.drawLine((int) pos, 0, (int) pos, view.getWindowHeight());
+                            }
+                            else {
+                                double pos = convertPointToCoordinateOnScreen(new double[] {0, dataset.axisParallelCuts[i][j]})[1];
+                                g2d.drawLine(0, (int) pos, view.getWindowWidth(), (int) pos);
+                            }
                         }
                         else {
-                            double pos = convertPointToCoordinateOnScreen(new double[] {0, dataset.axisParallelCuts[i][j]})[1];
-                            g2d.drawLine(0, (int) pos, view.getWindowWidth(), (int) pos);
+                            double[][] segmentMax = new double[nSegments][];
+                            double[][] segmentMin = new double[nSegments][];
+                            for (int k = 0; k < segmentMax.length; k++) {
+                                segmentMax[k] = null;
+                                segmentMin[k] = null;
+                            }
+                            for (int k = 0; k < points.length; k++) {
+                                int segment = (int)((points[k][otherDimension] - minPoint[otherDimension])/((maxPoint[otherDimension] - minPoint[otherDimension] + 1)/nSegments));
+                                if (!view.getDataset().initialCuts[costIndex].get(indicesToDraw[k]) && (segmentMax[segment] == null || points[k][i] > segmentMax[segment][i])) {
+                                    segmentMax[segment] = points[k];
+                                }
+                                if (view.getDataset().initialCuts[costIndex].get(indicesToDraw[k]) && (segmentMin[segment] == null || points[k][i] < segmentMin[segment][i])) {
+                                    segmentMin[segment] = points[k];
+                                }
+                            }
+                            List<double[]> segmentPoints = new ArrayList<>();
+                            for (int k = 0; k < segmentMax.length; k++) {
+                                if (segmentMin[k] == null && segmentMax[k] != null) {
+                                    segmentPoints.add(segmentMax[k]);
+                                }
+                                else if (segmentMax[k] == null && segmentMin[k] != null) {
+                                    segmentPoints.add(segmentMin[k]);
+                                }
+                                else if (segmentMin[k] != null && segmentMax[k] != null) {
+                                    segmentPoints.add(new double[] {(segmentMax[k][0]+segmentMin[k][0])/2, (segmentMax[k][1]+segmentMin[k][1])/2});
+                                }
+                            }
+                            for (int k = 0; k < segmentPoints.size()-1; k++) {
+                                int[] pos1 = convertPointToCoordinateOnScreen(segmentPoints.get(k));
+                                int[] pos2 = convertPointToCoordinateOnScreen(segmentPoints.get(k+1));
+                                g2d.drawLine(pos1[0], pos1[1], pos2[0], pos2[1]);
+                            }
+                            int[] firstPos = convertPointToCoordinateOnScreen(segmentPoints.get(0));
+                            int[] lastPos = convertPointToCoordinateOnScreen(segmentPoints.get(segmentPoints.size()-1));
+                            if (i == 0) {
+                                double pos = convertPointToCoordinateOnScreen(new double[] {dataset.axisParallelCuts[i][j], 0})[0];
+                                g2d.drawLine((int) pos, 0, lastPos[0], lastPos[1]);
+                                g2d.drawLine(firstPos[0], firstPos[1], (int) pos, view.getWindowHeight());
+                            }
+                            else {
+                                double pos = convertPointToCoordinateOnScreen(new double[] {0, dataset.axisParallelCuts[i][j]})[1];
+                                g2d.drawLine(0, (int) pos, firstPos[0], firstPos[1]);
+                                g2d.drawLine(lastPos[0], lastPos[1], view.getWindowWidth(), (int) pos);
+                            }
+                            costIndex++;
                         }
-                        costIndex++;
                     }
                 }
             }
