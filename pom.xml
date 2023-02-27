@@ -23,6 +23,13 @@
             <version>3.0.0</version>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/com.github.haifengl/smile-plot -->
+        <dependency>
+            <groupId>com.github.haifengl</groupId>
+            <artifactId>smile-plot</artifactId>
+            <version>3.0.0</version>
+        </dependency>
+
         <!-- https://mvnrepository.com/artifact/com.github.lejon.T-SNE-Java/tsne -->
         <dependency>
             <groupId>com.github.lejon.T-SNE-Java</groupId>

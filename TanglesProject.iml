@@ -16,6 +16,10 @@
     <orderEntry type="library" name="Maven: com.epam:parso:2.0.14" level="project" />
     <orderEntry type="library" name="Maven: org.apache.commons:commons-csv:1.9.0" level="project" />
     <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:2.0.4" level="project" />
+    <orderEntry type="library" name="Maven: com.github.haifengl:smile-plot:3.0.0" level="project" />
+    <orderEntry type="library" name="Maven: org.swinglabs:swingx:1.6.1" level="project" />
+    <orderEntry type="library" name="Maven: com.jhlabs:filters:2.0.235" level="project" />
+    <orderEntry type="library" name="Maven: org.swinglabs:swing-worker:1.1" level="project" />
     <orderEntry type="library" name="Maven: com.github.lejon.T-SNE-Java:tsne:v2.6.3" level="project" />
     <orderEntry type="library" name="Maven: org.bytedeco:arpack-ng-platform:3.8.0-1.5.8" level="project" />
     <orderEntry type="library" name="Maven: org.bytedeco:openblas-platform:0.3.21-1.5.8" level="project" />
