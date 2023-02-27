@@ -258,8 +258,8 @@ public class PlottingView extends JPanel implements DataVisualizer, MouseListene
                                 }
                             }
                             List<double[]> segmentPoints = new ArrayList<>();
-                            segmentPoints.add(new double[] {i == 0 ? dataset.axisParallelCuts[0][j] : -Math.abs(minPoint[0])*2, i == 1 ? dataset.axisParallelCuts[1][j] : -Math.abs(minPoint[1])*2});
-                            segmentPoints.add(new double[] {i == 0 ? dataset.axisParallelCuts[0][j] : -Math.abs(minPoint[0]), i == 1 ? dataset.axisParallelCuts[1][j] : -Math.abs(minPoint[1])});
+                            segmentPoints.add(new double[] {i == 0 ? dataset.axisParallelCuts[0][j] : minPoint[0]-(maxPoint[0]-minPoint[0]), i == 1 ? dataset.axisParallelCuts[1][j] : minPoint[1]-(maxPoint[1]-minPoint[1])});
+                            segmentPoints.add(new double[] {i == 0 ? dataset.axisParallelCuts[0][j] : minPoint[0], i == 1 ? dataset.axisParallelCuts[1][j] : minPoint[1]});
                             for (int k = 0; k < segmentMax.length; k++) {
                                 if (segmentMin[k] == null && segmentMax[k] != null) {
                                     if (dataset.axisParallelCuts[i][j] < segmentMax[k][i]) {
@@ -286,8 +286,8 @@ public class PlottingView extends JPanel implements DataVisualizer, MouseListene
                                     }
                                 }
                             }
-                            segmentPoints.add(new double[] {i == 0 ? dataset.axisParallelCuts[0][j] : Math.abs(maxPoint[0]), i == 1 ? dataset.axisParallelCuts[1][j] : Math.abs(maxPoint[1])});
-                            segmentPoints.add(new double[] {i == 0 ? dataset.axisParallelCuts[0][j] : Math.abs(maxPoint[0])*2, i == 1 ? dataset.axisParallelCuts[1][j] : Math.abs(maxPoint[1])*2});
+                            segmentPoints.add(new double[] {i == 0 ? dataset.axisParallelCuts[0][j] : maxPoint[0], i == 1 ? dataset.axisParallelCuts[1][j] : maxPoint[1]});
+                            segmentPoints.add(new double[] {i == 0 ? dataset.axisParallelCuts[0][j] : maxPoint[0]+(maxPoint[0]-minPoint[0]), i == 1 ? dataset.axisParallelCuts[1][j] : maxPoint[1]+(maxPoint[1]-minPoint[1])});
                             for (int k = 0; k < segmentPoints.size()-1; k++) {
                                 int[] pos1 = convertPointToCoordinateOnScreen(segmentPoints.get(k));
                                 int[] pos2 = convertPointToCoordinateOnScreen(segmentPoints.get(k+1));
