@@ -2,7 +2,7 @@ package test;
 
 import datasets.*;
 import util.BitSet;
-import util.Util.Tuple;
+import util.Tuple;
 
 import java.util.Date;
 

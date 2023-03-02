@@ -2,7 +2,7 @@ package datasets;
 
 import model.Model;
 import util.BitSet;
-import util.Util.Tuple;
+import util.Tuple;
 
 import java.io.BufferedWriter;
 import java.io.File;

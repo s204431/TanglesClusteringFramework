@@ -7,8 +7,7 @@ import smile.clustering.PartitionClustering;
 import smile.clustering.SpectralClustering;
 import smile.clustering.linkage.CompleteLinkage;
 import util.BitSet;
-import util.Util.Tuple;
-import view.View;
+import util.Tuple;
 
 import java.io.BufferedWriter;
 import java.io.File;
