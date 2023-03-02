@@ -4,6 +4,8 @@ import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.table.NumberEditorExt;
 import smile.swing.Table;
 import smile.swing.table.ButtonCellRenderer;
+import test.TestCase;
+import test.TestSet;
 
 import java.awt.event.ActionEvent;
 import java.awt.print.PrinterException;
@@ -173,6 +175,18 @@ public class StatisticsTopPanel extends JPanel {
         toolBar.setBounds(0, 0, view.windowWidth, view.topPanelHeight);
         runButton.setBounds(BUTTON_HEIGHT, view.topPanelHeight / 2 - BUTTON_HEIGHT / 2, BUTTON_WIDTH, BUTTON_HEIGHT);
         plottingButton.setBounds(view.windowWidth - view.sidePanelWidth - BUTTON_WIDTH, view.topPanelHeight / 2 - BUTTON_HEIGHT / 2, BUTTON_WIDTH, BUTTON_HEIGHT);
+    }
+
+    public TestSet convertToTestSet(String dataTypeName, JTable table) {
+        TestSet testSet = new TestSet(dataTypeName);
+        for (int i = 0; i < table.getRowCount(); i++) {
+            int nPoints = (int)table.getValueAt(i, 0);
+            int nDimensions = (int)table.getValueAt(i, 1);
+            int nClusters = (int)table.getValueAt(i, 2);
+            int nRuns = (int)table.getValueAt(i, 3);
+            testSet.add(new TestCase(nPoints, nDimensions, nClusters, nRuns));
+        }
+        return testSet;
     }
 
     private static class CustomTableModel extends DefaultTableModel {
