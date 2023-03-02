@@ -134,7 +134,7 @@ public class DatasetGenerator {
 
         Random r = new Random();
 
-        double maxDist = numOfPoints * 0.1 * numOfClusters;
+        double maxDist = numOfPoints * 0.12 * numOfClusters;
         double maxStd = numOfPoints * 0.1;
         double minStd = numOfPoints * 0.01;
 

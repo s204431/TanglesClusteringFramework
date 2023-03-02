@@ -5,6 +5,8 @@ import datasets.Dataset;
 import datasets.FeatureBasedDataset;
 import view.View;
 import smile.validation.metric.NormalizedMutualInformation;
+
+import javax.xml.crypto.Data;
 import java.util.Date;
 
 public class Model {
@@ -31,6 +33,13 @@ public class Model {
 
     public Dataset getDataset() {
         return dataset;
+    }
+
+    //Generates a hard clustering using tangles without updating the model.
+    public int[] generateClusters(Dataset dataset, int a, int psi) {
+        TangleClusterer clusterer = new TangleClusterer();
+        clusterer.generateClusters(dataset, a, psi);
+        return clusterer.getHardClustering();
     }
 
     public void generateClusters(int a, int psi) {

@@ -1,5 +1,7 @@
 package datasets;
 
+import model.Model;
+import model.TangleClusterer;
 import util.BitSet;
 
 import java.io.BufferedWriter;

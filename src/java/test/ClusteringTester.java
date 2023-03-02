@@ -1,10 +1,15 @@
 package test;
 
 import datasets.*;
+import model.TangleClusterer;
 import util.BitSet;
 import util.Tuple;
 
+import java.io.*;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.Scanner;
 
 import model.Model;
 import smile.validation.metric.NormalizedMutualInformation;
@@ -13,6 +18,15 @@ public class ClusteringTester {
     private static Model model = new Model();
 
     public static void testTangleClusterer() {
+
+        /*TestSet testSet = new TestSet(GraphDataset.name);
+        for (int i = 20; i <= 250; i *= 2) {
+            for (int j = 2; j <= 10; j++) {
+                testSet.add(new TestCase(i, 0, j, 1));
+            }
+        }
+        runTest(testSet, Model.tangleName);*/
+
         System.out.println("Testing tangle clusterer...");
         long time1 = new Date().getTime();
         double[] result1 = testTangleClustererFeatureBased();
@@ -137,6 +151,91 @@ public class ClusteringTester {
         long totalTime2 = new Date().getTime();
         System.out.println("Graph tests finished in " + (totalTime2-totalTime1) + " ms. Average NMI score: " + NMISum/totalCountWithoutNaN);
         return new double[] {NMISum, totalCountWithoutNaN};
+    }
+
+    //Runs a test set on a specific algorithm. Returns {Time, NMI score} for each test case.
+    public static double[][] runTest(TestSet testSet, String algorithmName) {
+        System.out.println("Running tests for " + algorithmName + " on " + testSet.dataTypeName);
+        long totalTime = new Date().getTime();
+        double[][] result = new double[testSet.size()][2];
+        for (int i = 0; i < testSet.size(); i++) {
+            TestCase testCase = testSet.get(i);
+            long testCaseTime = 0;
+            double testCaseNMIScore = 0;
+            for (int j = 0; j < testCase.nRuns; j++) {
+                Dataset dataset = null;
+                if (testSet.dataTypeName.equals(FeatureBasedDataset.name)) {
+                    dataset = new FeatureBasedDataset(DatasetGenerator.generateFeatureBasedDataPoints(testCase.nPoints, testCase.nClusters, testCase.nDimensions));
+                }
+                else if (testSet.dataTypeName.equals(BinaryQuestionnaire.name)) {
+                    dataset = new BinaryQuestionnaire(DatasetGenerator.generateBiasedBinaryQuestionnaireAnswers(testCase.nPoints, testCase.nDimensions, testCase.nClusters));
+                }
+                else if (testSet.dataTypeName.equals(GraphDataset.name)) {
+                    dataset = new GraphDataset(DatasetGenerator.generateRandomGraph(testCase.nPoints, testCase.nClusters));
+                }
+                int[] hardClustering = null;
+                long time1 = new Date().getTime();
+                if (algorithmName.equals(Model.tangleName)) {
+                    int a = (int)((testCase.nPoints/testCase.nClusters)*(1.0/2.0));
+                    hardClustering = model.generateClusters(dataset, a, -1);
+                }
+                else if (algorithmName.equals(Model.kMeansName)) {
+                    hardClustering = dataset.kMeans(testCase.nClusters);
+                }
+                else if (algorithmName.equals(Model.spectralClusteringName)) {
+                    hardClustering = dataset.spectralClustering(testCase.nClusters, testCase.nPoints/10.0);
+                }
+                else if (algorithmName.equals(Model.linkageName)) {
+                    hardClustering = dataset.hierarchicalClustering(testCase.nClusters);
+                }
+                testCaseTime += new Date().getTime() - time1;
+                testCaseNMIScore += NormalizedMutualInformation.joint(hardClustering, dataset.getGroundTruth());
+            }
+            result[i] = new double[] {testCaseTime/testCase.nRuns, testCaseNMIScore/testCase.nRuns};
+            System.out.println(testSet.dataTypeName + " test with " + + testCase.nRuns + " runs, " + testCase.nPoints + " datapoints, " + testCase.nDimensions + " dimensions and " + testCase.nClusters + " clusters took " + ((long)result[i][0]) + " ms on average. Average NMI score: " + ((int)(result[i][1]*10000))/10000.0);
+        }
+        double totalNMI = 0;
+        int notNaNCount = 0;
+        for (int i = 0; i < result.length; i++) {
+            if (!Double.isNaN(result[i][1])) {
+                totalNMI += result[i][1];
+                notNaNCount++;
+            }
+        }
+        System.out.println("Tests for " + algorithmName + " on " + testSet.dataTypeName + " finished in " + (new Date().getTime() - totalTime) + " ms. Average NMI score: " + totalNMI/notNaNCount);
+        return result;
+    }
+
+    //Store a test set in a file.
+    public static void saveTestSet(TestSet testSet, File file) {
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+            writer.write(testSet.dataTypeName + "\n");
+            for (int i = 0; i < testSet.size(); i++) {
+                TestCase testCase = testSet.get(i);
+                writer.write(""+testCase.nPoints);
+                writer.write(" "+testCase.nDimensions);
+                writer.write(" "+testCase.nClusters);
+                writer.write(" "+testCase.nRuns);
+                if (i != testSet.size()-1) {
+                    writer.write("\n");
+                }
+            }
+            writer.close();
+        } catch (IOException e) {}
+    }
+
+    //Load a test set from a file.
+    public static TestSet loadTestSet(File file) {
+        try {
+            Scanner scanner = new Scanner(file);
+            TestSet testSet = new TestSet(scanner.next());
+            while (scanner.hasNextInt()) {
+                testSet.add(new TestCase(scanner.nextInt(), scanner.nextInt(), scanner.nextInt(), scanner.nextInt()));
+            }
+            return testSet;
+        } catch (Exception e) {}
+        return null; //Return null if loading failed.
     }
 
 
