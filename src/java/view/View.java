@@ -28,10 +28,12 @@ public class View extends JFrame {
 
     protected JPanel mainComponent;
     protected DataVisualizer dataVisualizer;
+    protected StatisticsPanel statisticsPanel;
     private JTabbedPane pane;
     private List<SidePanel> sidePanels = new ArrayList<>();
     public SidePanel selectedSidePanel;
     private TopPanel topPanel;
+    private StatisticsTopPanel statisticsTopPanel;
 
     protected int topPanelHeight;
     protected int sidePanelWidth;
@@ -54,6 +56,7 @@ public class View extends JFrame {
         mainComponent.setLayout(null);
 
         dataVisualizer = new PlottingView(this);
+        statisticsPanel = new StatisticsPanel(this);
         pane = new JTabbedPane();
         pane.addChangeListener(new ChangeListener() {
             @Override
@@ -66,6 +69,7 @@ public class View extends JFrame {
         });
 
         topPanel = new TopPanel(this);
+        statisticsTopPanel = new StatisticsTopPanel(this);
 
         SidePanel sidePanel = new SidePanel(this);
         sidePanels.add(sidePanel);
@@ -130,6 +134,8 @@ public class View extends JFrame {
         pane.setBounds(0, topPanelHeight, windowWidth - sidePanelWidth, windowHeight);
         selectedSidePanel.setBounds();
         topPanel.setBounds();
+        statisticsPanel.setBounds();
+        statisticsTopPanel.setBounds();
     }
 
     //Loads the data points from the dataset currently loaded by the model.
@@ -228,6 +234,24 @@ public class View extends JFrame {
             }
         }
         ((JPanel)dataVisualizer).repaint();
+    }
+
+    protected void switchToStatistics() {
+        mainComponent.remove(pane);
+        mainComponent.remove(selectedSidePanel);
+        mainComponent.remove(topPanel);
+        mainComponent.add(statisticsPanel);
+        mainComponent.add(statisticsTopPanel);
+        repaint();
+    }
+
+    protected void switchToPlotting() {
+        mainComponent.remove(statisticsPanel);
+        mainComponent.remove(statisticsTopPanel);
+        mainComponent.add(pane);
+        mainComponent.add(selectedSidePanel);
+        mainComponent.add(topPanel);
+        repaint();
     }
 
     protected void createDataset(String datasetTypeName, int nPoints, int nDimensions, int nClusters) {

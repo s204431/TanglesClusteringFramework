@@ -26,9 +26,9 @@ public class TopPanel extends JPanel {
     private JButton newButton;
     private JPopupMenu newPopup;
     private JButton exportButton;
-    private JButton algorithmButton;
+    private JButton statisticsButton;
 
-    public TopPanel(View view) {
+    protected TopPanel(View view) {
         this.view = view;
 
         setPreferredSize(new Dimension(view.getWindowWidth(), view.getWindowHeight()));
@@ -39,13 +39,13 @@ public class TopPanel extends JPanel {
 
         addNewButton();
         addExportButton();
-        addAlgorithmButton();
+        addStatisticsButton();
 
         add(toolBar);
     }
 
     @Override
-    public void paintComponent(Graphics g) {
+    protected void paintComponent(Graphics g) {
         super.paintComponent(g);
     }
 
@@ -251,14 +251,14 @@ public class TopPanel extends JPanel {
         toolBar.add(exportButton);
     }
 
-    private void addAlgorithmButton() {
-        algorithmButton = new JButton("Algorithm");
-        algorithmButton.addMouseListener(new MouseAdapter() {
+    private void addStatisticsButton() {
+        statisticsButton = new JButton("Statistics");
+        statisticsButton.addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent e) {
-
+                view.switchToStatistics();
             }
         });
-        toolBar.add(algorithmButton);
+        toolBar.add(statisticsButton);
     }
 
     private JButton createOkayButton(JPanel panel) {
@@ -278,7 +278,7 @@ public class TopPanel extends JPanel {
         toolBar.setBounds(0, 0, view.windowWidth, view.topPanelHeight);
         newButton.setBounds(BUTTON_HEIGHT, view.topPanelHeight / 2 - BUTTON_HEIGHT / 2, BUTTON_WIDTH, BUTTON_HEIGHT);
         exportButton.setBounds(BUTTON_HEIGHT + BUTTON_WIDTH, view.topPanelHeight / 2 - BUTTON_HEIGHT / 2, BUTTON_WIDTH, BUTTON_HEIGHT);
-        algorithmButton.setBounds(BUTTON_HEIGHT + BUTTON_WIDTH * 2, view.topPanelHeight / 2 - BUTTON_HEIGHT / 2, BUTTON_WIDTH, BUTTON_HEIGHT);
+        statisticsButton.setBounds(BUTTON_HEIGHT + BUTTON_WIDTH * 2, view.topPanelHeight / 2 - BUTTON_HEIGHT / 2, BUTTON_WIDTH, BUTTON_HEIGHT);
     }
 
     private class ExtendedNumberFormatter extends NumberFormatter {
