@@ -1,20 +1,17 @@
 package view;
 
-import org.jdesktop.swingx.JXTable;
-import org.jdesktop.swingx.table.NumberEditorExt;
+import datasets.Dataset;
+import smile.data.type.DataType;
 import smile.swing.Table;
 import smile.swing.table.ButtonCellRenderer;
+import test.ClusteringTester;
 import test.TestCase;
 import test.TestSet;
 
 import java.awt.event.ActionEvent;
-import java.awt.print.PrinterException;
-import java.util.ArrayList;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableModel;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -30,6 +27,9 @@ public class StatisticsTopPanel extends JPanel {
 
     JButton runButton;
     JButton plottingButton;
+
+    TestSet testSet = null;
+    JTable table = new JTable();
 
     protected StatisticsTopPanel(View view) {
         this.view = view;
@@ -56,26 +56,33 @@ public class StatisticsTopPanel extends JPanel {
         runButton.addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent e) {
                 //TODO: ADD DROP DOWN MENU FOR TYPE OF DATASET
+                JComboBox<String> comboBox = new JComboBox<>();
+                for (String type : Dataset.supportedDatasetTypes) {
+                    comboBox.addItem(type);
+                }
 
+                JPanel dataTypePanel = new JPanel();
+                dataTypePanel.add(comboBox);
+
+                String[] options = new String[] { "Run", "Cancel" };
+                int dataTypeResponse = JOptionPane.showOptionDialog(view, dataTypePanel, "Choose type of test set",
+                        JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE,
+                        null, options, options[0]);
+
+                if (dataTypeResponse != 1) {
+                    String dataType = (String) comboBox.getSelectedItem();
+                }
 
                 Font titleFont = new Font("TimesRoman", Font.BOLD, 25);
 
                 //Create panel with scroll pane of test cases
                 JPanel testSetPane = new JPanel();
-                testSetPane.setLayout(new BoxLayout(testSetPane, BoxLayout.PAGE_AXIS));
-                //Title
-                JLabel testCaseLabel = new JLabel("Test cases");
-                testCaseLabel.setFont(titleFont);
-                testCaseLabel.setAlignmentX(JLabel.CENTER_ALIGNMENT);
-                testSetPane.add(testCaseLabel);
-                //Table of test cases
+
+                table = new JTable();
                 DefaultTableModel tableModel = new CustomTableModel();
                 tableModel.setColumnIdentifiers(new String[] {"Points", "Dimensions", "Clusters", "Runs", "", ""});
-                for (int i = 0; i < 20; i++) {
-                    tableModel.addRow(new Object[] {i, i, i, i, "+", "-"});
-                }
 
-                JTable table = new JTable(tableModel);
+                table.setModel(tableModel);
                 TableCellRenderer tableCellRenderer1 = new ButtonCellRenderer(table, new AbstractAction() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
@@ -103,7 +110,16 @@ public class StatisticsTopPanel extends JPanel {
                 table.getColumnModel().getColumn(4).setPreferredWidth(40);
                 table.getColumnModel().getColumn(5).setPreferredWidth(40);
                 table.setFillsViewportHeight(true);
+
                 JScrollPane tablePane = new JScrollPane(table);
+                testSetPane.setLayout(new BoxLayout(testSetPane, BoxLayout.PAGE_AXIS));
+                //Title
+                JLabel testCaseLabel = new JLabel("Test cases");
+                testCaseLabel.setFont(titleFont);
+                testCaseLabel.setAlignmentX(JLabel.CENTER_ALIGNMENT);
+                testSetPane.add(testCaseLabel);
+                //Table of test cases
+                generateTable(testSet);
                 testSetPane.add(tablePane);
 
                 //Create panel with checkmarks for algorithms to run
@@ -135,10 +151,10 @@ public class StatisticsTopPanel extends JPanel {
 
 
                 //JOption pane with options for running, resetting, loading and saving a test set.
-                String[] options = new String[] { "Run", "Cancel" };
+                String[] options1 = new String[] { "Run", "Cancel" };
                 int response = JOptionPane.showOptionDialog(view, runPane, "Choose test set",
                         JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE,
-                        null, options, options[0]);
+                        null, options1, options1[0]);
             }
         });
         toolBar.add(runButton);
@@ -168,6 +184,21 @@ public class StatisticsTopPanel extends JPanel {
         checkBoxPanel.add(new JLabel(text), BorderLayout.EAST);
         //checkBoxPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
         return checkBoxPanel;
+    }
+
+    private void generateTable(TestSet testSet) {
+        CustomTableModel model  = (CustomTableModel)table.getModel();
+        for (int i = 0; i < table.getRowCount(); i++) {
+            model.removeRow(i);
+        }
+        if (testSet == null) {
+            model.addRow(new Object[] {"", "", "", "", "+", "-"});
+        }
+        else {
+            for (int i = 0; i < 20; i++) {
+                model.addRow(new Object[]{i, i, i, i, "+", "-"});
+            }
+        }
     }
 
     protected void setBounds() {
