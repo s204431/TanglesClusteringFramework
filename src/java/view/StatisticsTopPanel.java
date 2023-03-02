@@ -195,8 +195,9 @@ public class StatisticsTopPanel extends JPanel {
             model.addRow(new Object[] {"", "", "", "", "+", "-"});
         }
         else {
-            for (int i = 0; i < 20; i++) {
-                model.addRow(new Object[]{i, i, i, i, "+", "-"});
+            for (int i = 0; i < testSet.size(); i++) {
+                TestCase testCase = testSet.get(i);
+                model.addRow(new Object[] {testCase.nPoints, testCase.nDimensions, testCase.nClusters, testCase.nRuns, "+", "-"});
             }
         }
     }
