@@ -4,9 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import com.jujutsu.tsne.TSne;
 import util.BitSet;
-import util.Util.Tuple;
+import util.Tuple;
 
 public class DatasetGenerator {
 

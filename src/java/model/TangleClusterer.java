@@ -4,8 +4,8 @@ import java.util.Date;
 
 import datasets.Dataset;
 import util.BitSet;
+import util.Tuple;
 import model.TangleSearchTree.Node;
-import util.Util.Tuple;
 
 public class TangleClusterer {
 
