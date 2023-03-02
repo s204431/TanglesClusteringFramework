@@ -55,29 +55,23 @@ public class StatisticsTopPanel extends JPanel {
         runButton = new JButton("Run");
         runButton.addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent e) {
-                //TODO: ADD DROP DOWN MENU FOR TYPE OF DATASET
-                JComboBox<String> comboBox = new JComboBox<>();
-                for (String type : Dataset.supportedDatasetTypes) {
-                    comboBox.addItem(type);
-                }
-
-                JPanel dataTypePanel = new JPanel();
-                dataTypePanel.add(comboBox);
-
-                String[] options = new String[] { "Run", "Cancel" };
-                int dataTypeResponse = JOptionPane.showOptionDialog(view, dataTypePanel, "Choose type of test set",
-                        JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE,
-                        null, options, options[0]);
-
-                if (dataTypeResponse != 1) {
-                    String dataType = (String) comboBox.getSelectedItem();
-                }
-
                 Font titleFont = new Font("TimesRoman", Font.BOLD, 25);
 
                 //Create panel with scroll pane of test cases
                 JPanel testSetPane = new JPanel();
-
+                testSetPane.setLayout(new BoxLayout(testSetPane, BoxLayout.PAGE_AXIS));
+                //Title
+                JLabel testCaseLabel = new JLabel("Test cases");
+                testCaseLabel.setFont(titleFont);
+                testCaseLabel.setAlignmentX(JLabel.CENTER_ALIGNMENT);
+                testSetPane.add(testCaseLabel);
+                //Drop down menu for choosing type of dataset
+                JComboBox<String> comboBox = new JComboBox<>();
+                for (String type : Dataset.supportedDatasetTypes) {
+                    comboBox.addItem(type);
+                }
+                testSetPane.add(comboBox);
+                //Table of test cases
                 table = new JTable();
                 DefaultTableModel tableModel = new CustomTableModel();
                 tableModel.setColumnIdentifiers(new String[] {"Points", "Dimensions", "Clusters", "Runs", "", ""});
@@ -110,15 +104,7 @@ public class StatisticsTopPanel extends JPanel {
                 table.getColumnModel().getColumn(4).setPreferredWidth(40);
                 table.getColumnModel().getColumn(5).setPreferredWidth(40);
                 table.setFillsViewportHeight(true);
-
                 JScrollPane tablePane = new JScrollPane(table);
-                testSetPane.setLayout(new BoxLayout(testSetPane, BoxLayout.PAGE_AXIS));
-                //Title
-                JLabel testCaseLabel = new JLabel("Test cases");
-                testCaseLabel.setFont(titleFont);
-                testCaseLabel.setAlignmentX(JLabel.CENTER_ALIGNMENT);
-                testSetPane.add(testCaseLabel);
-                //Table of test cases
                 generateTable(testSet);
                 testSetPane.add(tablePane);
 
@@ -139,7 +125,21 @@ public class StatisticsTopPanel extends JPanel {
                 checkBoxPane.add(createCheckBoxPanel(kMeansCheckBox, "K-Means"));
                 checkBoxPane.add(createCheckBoxPanel(spectralCheckBox, "Spectral Clustering"));
                 checkBoxPane.add(createCheckBoxPanel(linkageCheckBox, "Linkage"));
-
+                //Buttons for resetting, saving and loading test set
+                JButton resetButton = new JButton("Reset");
+                JButton saveButton = new JButton("Save");
+                JButton loadButton = new JButton("Load");
+                checkBoxPane.add(Box.createRigidArea(new Dimension(0, 10)));
+                checkBoxPane.add(resetButton);
+                checkBoxPane.add(Box.createRigidArea(new Dimension(0, 10)));
+                JPanel buttonPane = new JPanel();
+                buttonPane.setLayout(new BoxLayout(buttonPane, BoxLayout.LINE_AXIS));
+                buttonPane.add(Box.createHorizontalGlue());
+                buttonPane.add(saveButton);
+                buttonPane.add(Box.createRigidArea(new Dimension(10,0)));
+                buttonPane.add(loadButton);
+                buttonPane.add(Box.createHorizontalGlue());
+                checkBoxPane.add(buttonPane);
 
 
                 //Collect testSetPane and checkBoxPane side to side in a single panel
@@ -151,10 +151,14 @@ public class StatisticsTopPanel extends JPanel {
 
 
                 //JOption pane with options for running, resetting, loading and saving a test set.
-                String[] options1 = new String[] { "Run", "Cancel" };
+                String[] options = new String[] { "Run", "Cancel" };
                 int response = JOptionPane.showOptionDialog(view, runPane, "Choose test set",
                         JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE,
-                        null, options1, options1[0]);
+                        null, options, options[0]);
+
+                if (response == 0) {
+                    //Run testSet
+                }
             }
         });
         toolBar.add(runButton);
@@ -172,8 +176,6 @@ public class StatisticsTopPanel extends JPanel {
 
     private JPanel createCheckBoxPanel(JCheckBox checkBox, String text) {
         JPanel checkBoxPanel = new JPanel();
-        checkBoxPanel.setAlignmentX(LEFT_ALIGNMENT);
-        checkBox.setAlignmentX(LEFT_ALIGNMENT);
         checkBoxPanel.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
@@ -183,6 +185,7 @@ public class StatisticsTopPanel extends JPanel {
         checkBoxPanel.add(checkBox, BorderLayout.WEST);
         checkBoxPanel.add(new JLabel(text), BorderLayout.EAST);
         //checkBoxPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        checkBoxPanel.add(Box.createHorizontalGlue());
         return checkBoxPanel;
     }
 
