@@ -58,7 +58,8 @@ public class StatisticsTopPanel extends JPanel {
         runButton = new JButton("Run");
         runButton.addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent e) {
-                Font titleFont = new Font("TimesRoman", Font.BOLD, 20);
+                Font titleFont = new Font("TimesRoman", Font.BOLD, 25);
+                Font subTitleFont = new Font("TimesRoman", Font.BOLD, 18);
 
                 //Create panel with scroll pane of test cases
                 JPanel testSetPane = new JPanel();
@@ -116,11 +117,12 @@ public class StatisticsTopPanel extends JPanel {
                 //Create panel with checkmarks for algorithms to run
                 JPanel checkBoxPane = new JPanel();
                 checkBoxPane.setLayout(new BoxLayout(checkBoxPane, BoxLayout.PAGE_AXIS));
-                //Algorithms title
+                //Algorithms subtitle
                 JLabel algorithmsLabel = new JLabel("Algorithms");
-                algorithmsLabel.setFont(titleFont);
+                algorithmsLabel.setFont(subTitleFont);
                 JPanel algorithmTitlePane = new JPanel();
                 algorithmTitlePane.add(algorithmsLabel);
+                checkBoxPane.add(Box.createRigidArea(new Dimension(0, 20 + titleFont.getSize())));
                 checkBoxPane.add(algorithmTitlePane);
                 checkBoxPane.add(Box.createRigidArea(new Dimension(0, 20)));
                 //Checkboxes for available algorithms to run on test set
@@ -132,6 +134,7 @@ public class StatisticsTopPanel extends JPanel {
                 checkBoxPane.add(createCheckBoxPanel(kMeansCheckBox, "K-Means"));
                 checkBoxPane.add(createCheckBoxPanel(spectralCheckBox, "Spectral Clustering"));
                 checkBoxPane.add(createCheckBoxPanel(linkageCheckBox, "Linkage"));
+                checkBoxPane.add(Box.createRigidArea(new Dimension(0, 100)));
                 //Buttons for resetting, saving and loading test set
                 JButton resetButton = new JButton("Reset");
                 resetButton.addActionListener(new ActionListener() {
