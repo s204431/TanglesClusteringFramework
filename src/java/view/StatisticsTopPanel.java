@@ -10,11 +10,14 @@ import test.TestSet;
 
 import java.awt.event.ActionEvent;
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import java.awt.*;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
 
 import static view.TopPanel.BUTTON_HEIGHT;
 import static view.TopPanel.BUTTON_WIDTH;
@@ -55,22 +58,17 @@ public class StatisticsTopPanel extends JPanel {
         runButton = new JButton("Run");
         runButton.addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent e) {
-                Font titleFont = new Font("TimesRoman", Font.BOLD, 25);
+                Font titleFont = new Font("TimesRoman", Font.BOLD, 20);
 
                 //Create panel with scroll pane of test cases
                 JPanel testSetPane = new JPanel();
                 testSetPane.setLayout(new BoxLayout(testSetPane, BoxLayout.PAGE_AXIS));
-                //Title
+                //Tests title
                 JLabel testCaseLabel = new JLabel("Test cases");
                 testCaseLabel.setFont(titleFont);
                 testCaseLabel.setAlignmentX(JLabel.CENTER_ALIGNMENT);
                 testSetPane.add(testCaseLabel);
-                //Drop down menu for choosing type of dataset
-                JComboBox<String> comboBox = new JComboBox<>();
-                for (String type : Dataset.supportedDatasetTypes) {
-                    comboBox.addItem(type);
-                }
-                testSetPane.add(comboBox);
+                testSetPane.add(Box.createRigidArea(new Dimension(0, 20)));
                 //Table of test cases
                 table = new JTable();
                 DefaultTableModel tableModel = new CustomTableModel();
@@ -107,15 +105,24 @@ public class StatisticsTopPanel extends JPanel {
                 JScrollPane tablePane = new JScrollPane(table);
                 generateTable(testSet);
                 testSetPane.add(tablePane);
+                //Drop down menu for choosing type of dataset
+                JComboBox<String> comboBox = new JComboBox<>();
+                for (String type : Dataset.supportedDatasetTypes) {
+                    comboBox.addItem(type);
+                }
+                testSetPane.add(Box.createRigidArea(new Dimension(0, 10)));
+                testSetPane.add(comboBox);
 
                 //Create panel with checkmarks for algorithms to run
                 JPanel checkBoxPane = new JPanel();
                 checkBoxPane.setLayout(new BoxLayout(checkBoxPane, BoxLayout.PAGE_AXIS));
-                //Title
+                //Algorithms title
                 JLabel algorithmsLabel = new JLabel("Algorithms");
                 algorithmsLabel.setFont(titleFont);
-                algorithmsLabel.setAlignmentX(LEFT_ALIGNMENT);
-                checkBoxPane.add(algorithmsLabel);
+                JPanel algorithmTitlePane = new JPanel();
+                algorithmTitlePane.add(algorithmsLabel);
+                checkBoxPane.add(algorithmTitlePane);
+                checkBoxPane.add(Box.createRigidArea(new Dimension(0, 20)));
                 //Checkboxes for available algorithms to run on test set
                 JCheckBox tangleCheckBox = new JCheckBox();
                 JCheckBox kMeansCheckBox = new JCheckBox();
@@ -127,19 +134,91 @@ public class StatisticsTopPanel extends JPanel {
                 checkBoxPane.add(createCheckBoxPanel(linkageCheckBox, "Linkage"));
                 //Buttons for resetting, saving and loading test set
                 JButton resetButton = new JButton("Reset");
+                resetButton.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        for (int i = 0; i < table.getRowCount(); i++) {
+                            generateTable(null);
+                        }
+                    }
+                });
                 JButton saveButton = new JButton("Save");
+                saveButton.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        final File[] file = new File[1];
+                        JPanel savePopupPanel = new JPanel();
+                        savePopupPanel.setLayout(new BoxLayout(savePopupPanel, BoxLayout.LINE_AXIS));
+                        JLabel label = new JLabel("No file selected");
+                        JButton fileButton = new JButton("Select File");
+                        fileButton.addActionListener((l) -> {
+                            final JFileChooser fc = new JFileChooser();
+                            FileNameExtensionFilter filter = new FileNameExtensionFilter(".csv", "csv");
+                            fc.setFileFilter(filter);
+                            int returnVal = fc.showDialog(view, "Choose");
+                            if (returnVal == JFileChooser.APPROVE_OPTION) {
+                                file[0] = fc.getSelectedFile();
+                                label.setText(file[0].getName());
+                            }
+                        });
+                        savePopupPanel.add(label);
+                        savePopupPanel.add(Box.createRigidArea(new Dimension(10, 0)));
+                        savePopupPanel.add(fileButton);
+
+                        int saveResult = JOptionPane.showConfirmDialog(view, savePopupPanel,
+                                "Save test set", JOptionPane.OK_CANCEL_OPTION,
+                                JOptionPane.PLAIN_MESSAGE);
+
+                        if (saveResult == JOptionPane.OK_OPTION && file[0] != null) {
+                            //Save test set to file
+                        }
+                    }
+                });
                 JButton loadButton = new JButton("Load");
+                loadButton.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        final File[] file = new File[1];
+                        JPanel loadPopupPanel = new JPanel();
+                        loadPopupPanel.setLayout(new BoxLayout(loadPopupPanel, BoxLayout.LINE_AXIS));
+                        JLabel label = new JLabel("No file selected");
+                        JButton fileButton = new JButton("Select File");
+                        fileButton.addActionListener((l) -> {
+                            final JFileChooser fc = new JFileChooser();
+                            FileNameExtensionFilter filter = new FileNameExtensionFilter(".csv", "csv");
+                            fc.setFileFilter(filter);
+                            int returnVal = fc.showDialog(view, "Choose");
+                            if (returnVal == JFileChooser.APPROVE_OPTION) {
+                                file[0] = fc.getSelectedFile();
+                                label.setText(file[0].getName());
+                            }
+                        });
+                        loadPopupPanel.add(label);
+                        loadPopupPanel.add(Box.createRigidArea(new Dimension(10, 0)));
+                        loadPopupPanel.add(fileButton);
+
+                        int loadResult = JOptionPane.showConfirmDialog(view, loadPopupPanel,
+                                "Load test set", JOptionPane.OK_CANCEL_OPTION,
+                                JOptionPane.PLAIN_MESSAGE);
+
+                        if (loadResult == JOptionPane.OK_OPTION && file[0] != null) {
+                            //Load test set
+                        }
+                    }
+                });
+                JPanel resetPane = new JPanel();
+                resetPane.add(resetButton);
                 checkBoxPane.add(Box.createRigidArea(new Dimension(0, 10)));
-                checkBoxPane.add(resetButton);
+                checkBoxPane.add(resetPane);
                 checkBoxPane.add(Box.createRigidArea(new Dimension(0, 10)));
-                JPanel buttonPane = new JPanel();
-                buttonPane.setLayout(new BoxLayout(buttonPane, BoxLayout.LINE_AXIS));
-                buttonPane.add(Box.createHorizontalGlue());
-                buttonPane.add(saveButton);
-                buttonPane.add(Box.createRigidArea(new Dimension(10,0)));
-                buttonPane.add(loadButton);
-                buttonPane.add(Box.createHorizontalGlue());
-                checkBoxPane.add(buttonPane);
+                JPanel saveLoadPane = new JPanel();
+                saveLoadPane.setLayout(new BoxLayout(saveLoadPane, BoxLayout.LINE_AXIS));
+                saveLoadPane.add(Box.createHorizontalGlue());
+                saveLoadPane.add(saveButton);
+                saveLoadPane.add(Box.createRigidArea(new Dimension(10,0)));
+                saveLoadPane.add(loadButton);
+                saveLoadPane.add(Box.createHorizontalGlue());
+                checkBoxPane.add(saveLoadPane);
 
 
                 //Collect testSetPane and checkBoxPane side to side in a single panel
@@ -176,6 +255,7 @@ public class StatisticsTopPanel extends JPanel {
 
     private JPanel createCheckBoxPanel(JCheckBox checkBox, String text) {
         JPanel checkBoxPanel = new JPanel();
+        checkBoxPanel.setLayout(new BorderLayout());
         checkBoxPanel.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
@@ -183,15 +263,14 @@ public class StatisticsTopPanel extends JPanel {
             }
         });
         checkBoxPanel.add(checkBox, BorderLayout.WEST);
-        checkBoxPanel.add(new JLabel(text), BorderLayout.EAST);
+        checkBoxPanel.add(new JLabel(text), BorderLayout.CENTER);
         //checkBoxPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-        checkBoxPanel.add(Box.createHorizontalGlue());
         return checkBoxPanel;
     }
 
     private void generateTable(TestSet testSet) {
         CustomTableModel model  = (CustomTableModel)table.getModel();
-        for (int i = 0; i < table.getRowCount(); i++) {
+        for (int i = table.getRowCount()-1; i >= 0; i--) {
             model.removeRow(i);
         }
         if (testSet == null) {
