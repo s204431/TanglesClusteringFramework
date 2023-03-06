@@ -206,37 +206,4 @@ public class ClusteringTester {
         return result;
     }
 
-    //Store a test set in a file.
-    public static void saveTestSet(TestSet testSet, File file) {
-        try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-            writer.write(testSet.dataTypeName + "\n");
-            for (int i = 0; i < testSet.size(); i++) {
-                TestCase testCase = testSet.get(i);
-                writer.write(""+testCase.nPoints);
-                writer.write(" "+testCase.nDimensions);
-                writer.write(" "+testCase.nClusters);
-                writer.write(" "+testCase.nRuns);
-                if (i != testSet.size()-1) {
-                    writer.write("\n");
-                }
-            }
-            writer.close();
-        } catch (IOException e) {}
-    }
-
-    //Load a test set from a file.
-    public static TestSet loadTestSet(File file) {
-        try {
-            Scanner scanner = new Scanner(file);
-            TestSet testSet = new TestSet(scanner.next());
-            while (scanner.hasNextInt()) {
-                testSet.add(new TestCase(scanner.nextInt(), scanner.nextInt(), scanner.nextInt(), scanner.nextInt()));
-            }
-            return testSet;
-        } catch (Exception e) {}
-        return null; //Return null if loading failed.
-    }
-
-
 }
