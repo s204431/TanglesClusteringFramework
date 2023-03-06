@@ -51,7 +51,7 @@ public class TestSet {
     public static TestSet loadTestSet(File file) {
         try {
             Scanner scanner = new Scanner(file);
-            TestSet testSet = new TestSet(scanner.next());
+            TestSet testSet = new TestSet(scanner.nextLine());
             while (scanner.hasNextInt()) {
                 testSet.add(new TestCase(scanner.nextInt(), scanner.nextInt(), scanner.nextInt(), scanner.nextInt()));
             }
