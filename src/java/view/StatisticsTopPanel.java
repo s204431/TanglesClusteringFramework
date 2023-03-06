@@ -19,6 +19,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.util.ArrayList;
 
 import static view.TopPanel.BUTTON_HEIGHT;
 import static view.TopPanel.BUTTON_WIDTH;
@@ -114,8 +115,6 @@ public class StatisticsTopPanel extends JPanel {
                 }
                 testSetPane.add(Box.createRigidArea(new Dimension(0, 10)));
                 testSetPane.add(comboBox);
-
-                generateTable(testSet);
 
                 //Create panel with checkmarks for algorithms to run
                 JPanel checkBoxPane = new JPanel();
@@ -243,6 +242,7 @@ public class StatisticsTopPanel extends JPanel {
                 runPane.add(Box.createRigidArea(new Dimension(20, 0)));
                 runPane.add(checkBoxPane);
 
+                generateTable(testSet);
 
                 //JOption pane with options for running, resetting, loading and saving a test set.
                 String[] options = new String[] { "Run", "Cancel" };
@@ -255,12 +255,34 @@ public class StatisticsTopPanel extends JPanel {
                 testSet = convertToTestSet(datatype, table);
 
                 if (response == 0) {
-                    //Run testSet
-
+                    String[] algorithmsNames = getAlgorithmNames(new boolean[] { tangleCheckBox.isSelected(), kMeansCheckBox.isSelected(), spectralCheckBox.isSelected(), linkageCheckBox.isSelected() });
+                    double[][][] testResults = ClusteringTester.runTest(testSet, algorithmsNames);
+                    view.plotTestResults(testResults, testSet, algorithmsNames);
                 }
             }
         });
         toolBar.add(runButton);
+    }
+
+    private String[] getAlgorithmNames(boolean[] algorithmsToRun) {
+        String[] algorithms = { "Tangle", "K-Means", "Spectral", "Linkage" };
+
+        int length = 0;
+        for (boolean b : algorithmsToRun) {
+            if (b) {
+                length++;
+            }
+        }
+
+        String[] result = new String[length];
+        length = 0;
+        for (boolean b : algorithmsToRun) {
+            if (b) {
+                result[length] = algorithms[length];
+                length++;
+            }
+        }
+        return result;
     }
 
     private void addPlottingButton() {

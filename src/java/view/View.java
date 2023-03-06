@@ -6,6 +6,7 @@ import datasets.FeatureBasedDataset;
 import datasets.GraphDataset;
 import main.Controller;
 import model.Model;
+import test.TestSet;
 import util.BitSet;
 
 import javax.swing.*;
@@ -82,8 +83,12 @@ public class View extends JFrame {
 
         mainComponent.add(pane);
         mainComponent.add(topPanel);
+        mainComponent.add(statisticsPanel);
+        mainComponent.add(statisticsTopPanel);
 
         add(mainComponent);
+
+        switchToPlotting();
 
         pack();
         setLocationByPlatform(true);
@@ -237,20 +242,22 @@ public class View extends JFrame {
     }
 
     protected void switchToStatistics() {
-        mainComponent.remove(pane);
-        mainComponent.remove(selectedSidePanel);
-        mainComponent.remove(topPanel);
-        mainComponent.add(statisticsPanel);
-        mainComponent.add(statisticsTopPanel);
+        pane.setVisible(false);
+        selectedSidePanel.setVisible(false);
+        topPanel.setVisible(false);
+        statisticsTopPanel.setVisible(true);
+        statisticsPanel.setVisible(true);
+        setBounds();
         repaint();
     }
 
     protected void switchToPlotting() {
-        mainComponent.remove(statisticsPanel);
-        mainComponent.remove(statisticsTopPanel);
-        mainComponent.add(pane);
-        mainComponent.add(selectedSidePanel);
-        mainComponent.add(topPanel);
+        pane.setVisible(true);
+        selectedSidePanel.setVisible(true);
+        topPanel.setVisible(true);
+        statisticsTopPanel.setVisible(false);
+        statisticsPanel.setVisible(false);
+        setBounds();
         repaint();
     }
 
@@ -260,6 +267,10 @@ public class View extends JFrame {
 
     protected void loadDatasetFromFile(String datasetTypeName, String fileName, int startRow, int endRow, int startColumn, int endColumn) {
         controller.loadDatasetFromFile(datasetTypeName, fileName, startRow, endRow, startColumn, endColumn);
+    }
+
+    protected void plotTestResults(double[][][] testResults, TestSet testSet, String[] algorithmNames) {
+        statisticsPanel.plotTestResults(testResults, testSet, algorithmNames);
     }
 
     protected int getWindowHeight() {
