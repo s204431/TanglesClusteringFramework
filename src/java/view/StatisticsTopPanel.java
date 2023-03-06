@@ -1,6 +1,7 @@
 package view;
 
 import datasets.Dataset;
+import datasets.GraphDataset;
 import smile.data.type.DataType;
 import smile.swing.Table;
 import smile.swing.table.ButtonCellRenderer;
@@ -32,6 +33,7 @@ public class StatisticsTopPanel extends JPanel {
     JButton plottingButton;
 
     TestSet testSet = null;
+    JComboBox<String> comboBox;
     JTable table = new JTable();
 
     protected StatisticsTopPanel(View view) {
@@ -104,15 +106,16 @@ public class StatisticsTopPanel extends JPanel {
                 table.getColumnModel().getColumn(5).setPreferredWidth(40);
                 table.setFillsViewportHeight(true);
                 JScrollPane tablePane = new JScrollPane(table);
-                generateTable(testSet);
                 testSetPane.add(tablePane);
                 //Drop down menu for choosing type of dataset
-                JComboBox<String> comboBox = new JComboBox<>();
+                comboBox = new JComboBox<>();
                 for (String type : Dataset.supportedDatasetTypes) {
                     comboBox.addItem(type);
                 }
                 testSetPane.add(Box.createRigidArea(new Dimension(0, 10)));
                 testSetPane.add(comboBox);
+
+                generateTable(testSet);
 
                 //Create panel with checkmarks for algorithms to run
                 JPanel checkBoxPane = new JPanel();
@@ -155,11 +158,15 @@ public class StatisticsTopPanel extends JPanel {
                         JButton fileButton = new JButton("Select File");
                         fileButton.addActionListener((l) -> {
                             final JFileChooser fc = new JFileChooser();
-                            FileNameExtensionFilter filter = new FileNameExtensionFilter(".csv", "csv");
+                            String extension = "test";
+                            FileNameExtensionFilter filter = new FileNameExtensionFilter("."+extension, extension);
                             fc.setFileFilter(filter);
                             int returnVal = fc.showDialog(view, "Choose");
                             if (returnVal == JFileChooser.APPROVE_OPTION) {
                                 file[0] = fc.getSelectedFile();
+                                if (!file[0].getName().endsWith("."+extension)) {
+                                    file[0] = new File(file[0].getPath()+"."+extension);
+                                }
                                 label.setText(file[0].getName());
                             }
                         });
@@ -172,7 +179,10 @@ public class StatisticsTopPanel extends JPanel {
                                 JOptionPane.PLAIN_MESSAGE);
 
                         if (saveResult == JOptionPane.OK_OPTION && file[0] != null) {
-                            //Save test set to file
+                            //Save test set
+                            String datatype = comboBox.getSelectedItem().toString();
+                            testSet = convertToTestSet(datatype, table);
+                            TestSet.saveTestSet(testSet, file[0]);
                         }
                     }
                 });
@@ -187,7 +197,8 @@ public class StatisticsTopPanel extends JPanel {
                         JButton fileButton = new JButton("Select File");
                         fileButton.addActionListener((l) -> {
                             final JFileChooser fc = new JFileChooser();
-                            FileNameExtensionFilter filter = new FileNameExtensionFilter(".csv", "csv");
+                            String extension = "test";
+                            FileNameExtensionFilter filter = new FileNameExtensionFilter("."+extension, extension);
                             fc.setFileFilter(filter);
                             int returnVal = fc.showDialog(view, "Choose");
                             if (returnVal == JFileChooser.APPROVE_OPTION) {
@@ -205,6 +216,8 @@ public class StatisticsTopPanel extends JPanel {
 
                         if (loadResult == JOptionPane.OK_OPTION && file[0] != null) {
                             //Load test set
+                            testSet = TestSet.loadTestSet(file[0]);
+                            generateTable(testSet);
                         }
                     }
                 });
@@ -237,8 +250,13 @@ public class StatisticsTopPanel extends JPanel {
                         JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE,
                         null, options, options[0]);
 
+                //Save test set
+                String datatype = comboBox.getSelectedItem().toString();
+                testSet = convertToTestSet(datatype, table);
+
                 if (response == 0) {
                     //Run testSet
+
                 }
             }
         });
@@ -271,19 +289,26 @@ public class StatisticsTopPanel extends JPanel {
     }
 
     private void generateTable(TestSet testSet) {
-        CustomTableModel model  = (CustomTableModel)table.getModel();
-        for (int i = table.getRowCount()-1; i >= 0; i--) {
+        CustomTableModel model = (CustomTableModel) table.getModel();
+        for (int i = table.getRowCount() - 1; i >= 0; i--) {
             model.removeRow(i);
         }
         if (testSet == null) {
-            model.addRow(new Object[] {"", "", "", "", "+", "-"});
-        }
-        else {
+            model.addRow(new Object[]{"", "", "", "", "+", "-"});
+            comboBox.setSelectedItem("Feature Based");
+        } else {
             for (int i = 0; i < testSet.size(); i++) {
                 TestCase testCase = testSet.get(i);
-                model.addRow(new Object[] {testCase.nPoints, testCase.nDimensions, testCase.nClusters, testCase.nRuns, "+", "-"});
+                model.addRow(new Object[]{convertInteger(testCase.nPoints), convertInteger(testCase.nDimensions), convertInteger(testCase.nClusters), convertInteger(testCase.nRuns), "+", "-"});
             }
         }
+        if (testSet != null) {
+            comboBox.setSelectedItem(testSet.dataTypeName);
+        }
+    }
+
+    private Object convertInteger(int integer) {
+        return integer == 0 ? "" : integer;
     }
 
     protected void setBounds() {
@@ -296,13 +321,17 @@ public class StatisticsTopPanel extends JPanel {
     public TestSet convertToTestSet(String dataTypeName, JTable table) {
         TestSet testSet = new TestSet(dataTypeName);
         for (int i = 0; i < table.getRowCount(); i++) {
-            int nPoints = (int)table.getValueAt(i, 0);
-            int nDimensions = (int)table.getValueAt(i, 1);
-            int nClusters = (int)table.getValueAt(i, 2);
-            int nRuns = (int)table.getValueAt(i, 3);
+            int nPoints = parseInt(table.getValueAt(i, 0).toString());
+            int nDimensions = parseInt(table.getValueAt(i, 1).toString());
+            int nClusters = parseInt(table.getValueAt(i, 2).toString());
+            int nRuns = parseInt(table.getValueAt(i, 3).toString());
             testSet.add(new TestCase(nPoints, nDimensions, nClusters, nRuns));
         }
         return testSet;
+    }
+
+    private int parseInt(String string) {
+        return string.equals("") ? 0 : Integer.parseInt(string);
     }
 
     private static class CustomTableModel extends DefaultTableModel {
