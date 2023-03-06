@@ -19,13 +19,13 @@ public class ClusteringTester {
 
     public static void testTangleClusterer() {
 
-        TestSet testSet = new TestSet(GraphDataset.name);
-        for (int i = 20; i <= 250; i *= 2) {
+        TestSet testSet = new TestSet(FeatureBasedDataset.name);
+        for (int i = 100; i <= 1000; i *= 10) {
             for (int j = 2; j <= 10; j++) {
-                testSet.add(new TestCase(i, 0, j, 1));
+                testSet.add(new TestCase(i, 2, j, 1));
             }
         }
-        runTest(testSet, new String[] {Model.tangleName});
+        runTest(testSet, new String[] {Model.tangleName, Model.kMeansName, Model.spectralClusteringName, Model.linkageName});
 
         System.out.println("Testing tangle clusterer...");
         long time1 = new Date().getTime();
@@ -156,8 +156,19 @@ public class ClusteringTester {
     //Runs a test set on a specific algorithm. Returns {Time, NMI score} for each test case.
     public static double[][][] runTest(TestSet testSet, String[] algorithmNames) {
         double[][][] result = new double[algorithmNames.length][testSet.size()][2];
-        System.out.println("Running tests for " + algorithmNames[0] + " on " + testSet.dataTypeName);
-        long totalTime = new Date().getTime();
+        System.out.print("Running tests for ");
+        for (int algorithm = 0; algorithm < algorithmNames.length; algorithm++) {
+            if (algorithm == 0) {
+                System.out.print(algorithmNames[algorithm]);
+            }
+            else if (algorithm == algorithmNames.length-1) {
+                System.out.print(" and " + algorithmNames[algorithm]);
+            }
+            else {
+                System.out.print(", " + algorithmNames[algorithm]);
+            }
+        }
+        System.out.println(" on " + testSet.dataTypeName);
         for (int i = 0; i < testSet.size(); i++) {
             TestCase testCase = testSet.get(i);
             long[] testCaseTimes = new long[algorithmNames.length];
@@ -196,18 +207,22 @@ public class ClusteringTester {
             }
             for (int algorithm = 0; algorithm < algorithmNames.length; algorithm++) {
                 result[algorithm][i] = new double[] {testCaseTimes[algorithm]/testCase.nRuns, testCaseNMIScores[algorithm]/testCase.nRuns};
-            }
-            System.out.println(testSet.dataTypeName + " test with " + + testCase.nRuns + " runs, " + testCase.nPoints + " datapoints, " + testCase.nDimensions + " dimensions and " + testCase.nClusters + " clusters took " + ((long)result[0][i][0]) + " ms on average. Average NMI score: " + ((int)(result[0][i][1]*10000))/10000.0);
-        }
-        double totalNMI = 0;
-        int notNaNCount = 0;
-        for (int i = 0; i < result[0].length; i++) {
-            if (!Double.isNaN(result[0][i][1])) {
-                totalNMI += result[0][i][1];
-                notNaNCount++;
+                System.out.println(algorithmNames[algorithm]+" test on " + testSet.dataTypeName + " with " + + testCase.nRuns + " runs, " + testCase.nPoints + " datapoints, " + testCase.nDimensions + " dimensions and " + testCase.nClusters + " clusters took " + ((long)result[algorithm][i][0]) + " ms on average. Average NMI score: " + ((int)(result[algorithm][i][1]*10000))/10000.0);
             }
         }
-        System.out.println("Tests for " + algorithmNames[0] + " on " + testSet.dataTypeName + " finished in " + (new Date().getTime() - totalTime) + " ms. Average NMI score: " + totalNMI/notNaNCount);
+        for (int algorithm = 0; algorithm < algorithmNames.length; algorithm++) {
+            double totalNMI = 0;
+            long totalTime = 0;
+            int notNaNCount = 0;
+            for (int i = 0; i < result[algorithm].length; i++) {
+                totalTime += result[algorithm][i][0];
+                if (!Double.isNaN(result[algorithm][i][1])) {
+                    totalNMI += result[algorithm][i][1];
+                    notNaNCount++;
+                }
+            }
+            System.out.println("Tests for " + algorithmNames[algorithm] + " on " + testSet.dataTypeName + " finished in " + totalTime + " ms. Average NMI score: " + totalNMI/notNaNCount);
+        }
         return result;
     }
 
