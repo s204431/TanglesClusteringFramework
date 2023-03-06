@@ -124,7 +124,6 @@ public class StatisticsTopPanel extends JPanel {
                 algorithmTitlePane.add(algorithmsLabel);
                 checkBoxPane.add(Box.createRigidArea(new Dimension(0, 20 + titleFont.getSize())));
                 checkBoxPane.add(algorithmTitlePane);
-                checkBoxPane.add(Box.createRigidArea(new Dimension(0, 20)));
                 //Checkboxes for available algorithms to run on test set
                 JCheckBox tangleCheckBox = new JCheckBox();
                 JCheckBox kMeansCheckBox = new JCheckBox();
@@ -247,7 +246,7 @@ public class StatisticsTopPanel extends JPanel {
     }
 
     private void addPlottingButton() {
-        plottingButton = new JButton("Plotting");
+        plottingButton = new JButton("Scatter plot");
         plottingButton.addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent e) {
                 view.switchToPlotting();
