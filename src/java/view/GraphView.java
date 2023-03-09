@@ -110,7 +110,7 @@ public class GraphView extends JPanel implements DataVisualizer, MouseListener, 
             return;
         }
         addColors(hardClustering);
-        //loadGraphFromDotString(((GraphDataset)view.getDataset()).asDot());
+        loadGraphFromDotString(((GraphDataset)view.getDataset()).asDot());
         for (int i = 0; i < hardClustering.length; i++) {
             graph.nodes().add(mutNode("" + i).add(
                     Color.rgb(colors[hardClustering[i]].getRGB()).fill()
@@ -125,7 +125,7 @@ public class GraphView extends JPanel implements DataVisualizer, MouseListener, 
             return;
         }
         addColors(hardClustering);
-        //loadGraphFromDotString(((GraphDataset)view.getDataset()).asDot());
+        loadGraphFromDotString(((GraphDataset)view.getDataset()).asDot());
         for (int i = 0; i < hardClustering.length; i++) {
             graph.nodes().remove(mutNode("" + i));
             graph.add(mutNode("" + i).add(
