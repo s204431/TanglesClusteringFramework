@@ -234,7 +234,7 @@ public class FeatureBasedDataset extends Dataset {
 
     @Override
     public double[] getCutCosts(String costFunctionName) {
-        if (costFunctionName == null && costFunctionName.equals(costFunctionDistanceToMean)) {
+        if (costFunctionName == null || costFunctionName.equals(costFunctionDistanceToMean)) {
             cutCosts = distanceToMeanCostFunction();
         }
         else if (costFunctionName.equals(costFunctionPairwiseDistance)) {
