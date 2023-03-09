@@ -27,7 +27,7 @@ public class SidePanel extends JPanel {
         add(Box.createRigidArea(new Dimension(0, 20)));
 
         JLabel[] allLabels = { pointsText, pointsLabel, showingLabel, new JLabel(), NMIText, NMILabel, timeText, timeLabel };
-        Font font = new Font("TimesRoman", Font.BOLD, 18);
+        Font font = new Font("TimesRoman", Font.BOLD, view.getWindowHeight() / 50);
 
         int c = 0;
         for (JLabel label : allLabels) {
@@ -35,7 +35,7 @@ public class SidePanel extends JPanel {
             label.setAlignmentX(CENTER_ALIGNMENT);
             add(label);
             if (c++ % 2 == 1) {
-                add(Box.createRigidArea(new Dimension(0, 20)));
+                add(Box.createRigidArea(new Dimension(0, font.getSize())));
             }
         }
     }
