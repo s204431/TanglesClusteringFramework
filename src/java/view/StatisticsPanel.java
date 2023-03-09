@@ -24,11 +24,13 @@ public class StatisticsPanel extends JPanel {
         setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
 
         leftPicturePanel = new JPanel();
-        leftPicturePanel.setLayout(new BoxLayout(leftPicturePanel, BoxLayout.PAGE_AXIS));
-
         rightPicturePanel = new JPanel();
+        leftPicturePanel.setLayout(new BoxLayout(leftPicturePanel, BoxLayout.PAGE_AXIS));
         rightPicturePanel.setLayout(new BoxLayout(rightPicturePanel, BoxLayout.PAGE_AXIS));
 
+        add(rightPicturePanel);
+        add(Box.createRigidArea(new Dimension(view.windowWidth / 100, 0)));
+        add(leftPicturePanel);
     }
 
     protected void plotTestResults(double[][][] testResults, TestSet testSet, String[] algorithmNames) {
@@ -101,9 +103,6 @@ public class StatisticsPanel extends JPanel {
             leftPicturePanel.add(new JLabel(new ImageIcon(images[i+3])));
         }
 
-        add(rightPicturePanel);
-        add(Box.createRigidArea(new Dimension(view.windowWidth / 100, 0)));
-        add(leftPicturePanel);
         setVisible(false);
         setVisible(true);
     }
