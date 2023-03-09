@@ -2,6 +2,7 @@ package view;
 
 import datasets.Dataset;
 import datasets.GraphDataset;
+import model.Model;
 import smile.data.type.DataType;
 import smile.swing.Table;
 import smile.swing.table.ButtonCellRenderer;
@@ -265,7 +266,7 @@ public class StatisticsTopPanel extends JPanel {
     }
 
     private String[] getAlgorithmNames(boolean[] algorithmsToRun) {
-        String[] algorithms = { "Tangle", "K-Means", "Spectral", "Linkage" };
+        String[] algorithms = { Model.tangleName, Model.kMeansName, Model.spectralClusteringName, Model.linkageName };
 
         int length = 0;
         for (boolean b : algorithmsToRun) {
@@ -276,9 +277,9 @@ public class StatisticsTopPanel extends JPanel {
 
         String[] result = new String[length];
         length = 0;
-        for (boolean b : algorithmsToRun) {
-            if (b) {
-                result[length] = algorithms[length];
+        for (int i = 0; i < algorithmsToRun.length; i++) {
+            if (algorithmsToRun[i]) {
+                result[length] = algorithms[i];
                 length++;
             }
         }
