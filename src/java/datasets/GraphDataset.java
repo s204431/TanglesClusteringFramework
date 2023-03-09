@@ -15,6 +15,9 @@ public class GraphDataset extends Dataset {
     private int[][][] dataPoints;
     private int[][] edges;
 
+    private static String initialCutsKernighanLin = "Kernighan-Lin";
+    private static String costFunctionKernighanLin = "Kernighan-Lin";
+
     public GraphDataset() {
 
     }
@@ -96,7 +99,8 @@ public class GraphDataset extends Dataset {
     }
 
     //Performs the Kernighan–Lin algorithm to generate initial cuts.
-    public BitSet[] getInitialCuts() {
+    @Override
+    public BitSet[] getInitialCuts(String initialCutGenerator) {
         int numberOfCuts = 20;
         BitSet[] cuts = new BitSet[numberOfCuts];
         int maxWeight = Integer.MIN_VALUE;
@@ -176,7 +180,18 @@ public class GraphDataset extends Dataset {
         return cuts;
     }
 
-    public double[] getCutCosts() {
+    @Override
+    public String[] getInitialCutGenerators() {
+        return new String[] {initialCutsKernighanLin};
+    }
+
+    @Override
+    public String[] getCostFunctions() {
+        return new String[] {costFunctionKernighanLin};
+    }
+
+    @Override
+    public double[] getCutCosts(String costFunctionName) {
         int maxWeight = Integer.MIN_VALUE;
         int minWeight = Integer.MAX_VALUE;
         for (int i = 0; i < edges.length; i++) {

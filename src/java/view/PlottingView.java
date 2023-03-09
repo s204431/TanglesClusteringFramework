@@ -305,8 +305,8 @@ public class PlottingView extends JPanel implements DataVisualizer, MouseListene
                                 g2d.drawLine(0, (int) pos, firstPos[0], firstPos[1]);
                                 g2d.drawLine(lastPos[0], lastPos[1], view.getWindowWidth(), (int) pos);
                             }*/
-                            costIndex++;
                         }
+                        costIndex++;
                     }
                 }
             }

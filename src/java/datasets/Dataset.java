@@ -17,9 +17,9 @@ public abstract class Dataset {
     public BitSet[] initialCuts;
     protected int[] groundTruth;
 
-    public BitSet[] getInitialCuts() {return null;}
+    public BitSet[] getInitialCuts(String generatorName) {return null;}
 
-    public double[] getCutCosts() {return null;}
+    public double[] getCutCosts(String costFunctionName) {return null;}
 
     public int[] getGroundTruth() {return null;}
     public void setA(int a) {}
@@ -28,6 +28,8 @@ public abstract class Dataset {
     public int[] hierarchicalClustering(int clusters) {return null;}
     public String getName() {return "Dataset";}
     public String[] getSupportedAlgorithms() {return null;}
+    public String[] getInitialCutGenerators() {return null;}
+    public String[] getCostFunctions() {return null;}
 
     public boolean supportsAlgorithm(String algorithmName) {
         for (String string : getSupportedAlgorithms()) {

@@ -36,15 +36,15 @@ public class Model {
     }
 
     //Generates a hard clustering using tangles without updating the model.
-    public int[] generateClusters(Dataset dataset, int a, int psi) {
+    public int[] generateClusters(Dataset dataset, int a, int psi, String initialCutGenerator, String costFunctionName) {
         TangleClusterer clusterer = new TangleClusterer();
-        clusterer.generateClusters(dataset, a, psi);
+        clusterer.generateClusters(dataset, a, psi, initialCutGenerator, costFunctionName);
         return clusterer.getHardClustering();
     }
 
-    public void generateClusters(int a, int psi) {
+    public void generateClusters(int a, int psi, String initialCutGenerator, String costFunctionName) {
         long time = new Date().getTime();
-        tangleClusterer.generateClusters(dataset, a, psi);
+        tangleClusterer.generateClusters(dataset, a, psi, initialCutGenerator, costFunctionName);
         softClustering = tangleClusterer.getSoftClustering();
         hardClustering = tangleClusterer.getHardClustering();
         clusteringTime = new Date().getTime() - time;

@@ -20,6 +20,9 @@ public class BinaryQuestionnaire extends Dataset {
     public static final String name = "Binary Questionnaire";
     public BitSet[] answers;
 
+    private static String initialCutsQuestionCuts = "Question cuts";
+    private static String costFunctionPairwiseDifference = "Pairwise difference";
+
     public BinaryQuestionnaire() {
 
     }
@@ -109,7 +112,18 @@ public class BinaryQuestionnaire extends Dataset {
         System.out.println(answers.length + " " + answers[0].size());
     }
 
-    public BitSet[] getInitialCuts() {
+    @Override
+    public String[] getInitialCutGenerators() {
+        return new String[] {initialCutsQuestionCuts};
+    }
+
+    @Override
+    public String[] getCostFunctions() {
+        return new String[] {costFunctionPairwiseDifference};
+    }
+
+    @Override
+    public BitSet[] getInitialCuts(String initialCutGenerator) {
         BitSet[] result = new BitSet[getNumberOfQuestions()];
         for (int i = 0; i < getNumberOfQuestions(); i++) {
             result[i] = new BitSet(getNumberOfParticipants());
@@ -123,7 +137,8 @@ public class BinaryQuestionnaire extends Dataset {
         return result;
     }
 
-    public double[] getCutCosts() {
+    @Override
+    public double[] getCutCosts(String costFunctionName) {
         double[] result = new double[getNumberOfQuestions()];
         for (int i = 0; i < getNumberOfQuestions(); i++) {
             double cost = 0;

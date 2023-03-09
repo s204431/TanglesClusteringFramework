@@ -25,6 +25,15 @@ public class FeatureBasedDataset extends Dataset {
     public boolean cutsAreAxisParallel = true;
     public double[] cutCosts; //Used for visualization.
 
+    private static String initialCutsRange = "Range";
+    private static String initialCutsSimple = "Simple";
+    private static String initialCutsLocalMeans = "Local means";
+    private static String initialCutsKMeansAdjust = "K-Means adjust";
+
+    private static String costFunctionPairwiseDistance = "Pairwise Distance";
+    private static String costFunctionDistanceToMean = "Distance to mean";
+    private static String costFunctionLocalMeans = "Local means";
+
     public FeatureBasedDataset() {
 
     }
@@ -46,8 +55,9 @@ public class FeatureBasedDataset extends Dataset {
         this.a = a;
     }
 
-    public BitSet[] getInitialCutsOld() {
+    public BitSet[] getInitialCutsSimple() {
         List<BitSet> cuts = new ArrayList<>();
+        List<Double>[] axisParallelCuts = new ArrayList[dataPoints[0].length]; //For visualization.
         double[][] copy = new double[dataPoints.length][dataPoints[0].length];
         int[] originalIndices = new int[dataPoints.length];
         for (int i = 0; i < dataPoints.length; i++) {
@@ -57,18 +67,21 @@ public class FeatureBasedDataset extends Dataset {
             }
         }
         for (int i = 0; i < dataPoints[0].length; i++) {
+            axisParallelCuts[i] = new ArrayList<>();
             mergeSort(copy, originalIndices, i, 0, dataPoints.length-1);
             //BitSet first = new BitSet(dataPoints.length);
             //first.add(originalIndices[0]);
             //cuts.add(first);
             BitSet currentBitSet = new BitSet(dataPoints.length);
             cuts.add(currentBitSet);
+            axisParallelCuts[i].add(dataPoints[originalIndices[0]][i]);
             for (int j = 0; j < dataPoints.length-1; j++) {
                 currentBitSet.add(originalIndices[j]);
                 if (j > 0 && j % (a/precision) == 0) {
                     if (dataPoints.length - j <= (a/precision) - 1) {
                         break;
                     }
+                    axisParallelCuts[i].add(dataPoints[originalIndices[j]][i]);
                     BitSet newBitSet = new BitSet(dataPoints.length);
                     newBitSet.unionWith(currentBitSet);
                     currentBitSet = newBitSet;
@@ -81,6 +94,14 @@ public class FeatureBasedDataset extends Dataset {
             result[i] = cuts.get(i);
         }
         initialCuts = result;
+        this.axisParallelCuts = new double[axisParallelCuts.length][];
+        for (int i = 0; i < axisParallelCuts.length; i++) {
+            this.axisParallelCuts[i] = new double[axisParallelCuts[i].size()];
+            for (int j = 0; j < axisParallelCuts[i].size(); j++) {
+                this.axisParallelCuts[i][j] = axisParallelCuts[i].get(j);
+            }
+        }
+        cutsAreAxisParallel = true;
         return result;
     }
 
@@ -141,6 +162,7 @@ public class FeatureBasedDataset extends Dataset {
                 this.axisParallelCuts[i][j] = axisParallelCuts[i].get(j);
             }
         }
+        cutsAreAxisParallel = true;
         return result;
     }
 
@@ -184,61 +206,47 @@ public class FeatureBasedDataset extends Dataset {
     }
 
     @Override
-    public double[] getCutCosts() {
-        cutCosts = distanceToMeanCostFunction();
-        /*for (int i = 0; i < initialCuts.length; i++) {
-            System.out.println(costs[i]);
-            int[] clusters = new int[dataPoints.length];
-            for (int j = 0; j < initialCuts[i].size(); j++) {
-                clusters[j] = initialCuts[i].get(j) ? 1 : 0;
-            }
-            Model model = new Model();
-            model.setDataset(this);
-            View view = new View(model);
-            view.loadDataPoints();
-            view.loadClusters(clusters, null);
-            view.selectedSidePanel.setValues(costs[i], 0);
-        }*/
-        return cutCosts;
+    public String[] getInitialCutGenerators() {
+        return new String[] {initialCutsKMeansAdjust, initialCutsRange, initialCutsLocalMeans, initialCutsSimple};
     }
 
-    private double[] testCostFunction() {
-        double[] costs = new double[initialCuts.length];
-        for (int i = 0; i < initialCuts.length; i++) {
-            double[] mean1 = new double[dataPoints[0].length];
-            double[] mean2 = new double[dataPoints[0].length];
-            int n1 = 0;
-            int n2 = 0;
-            for (int k = 0; k < dataPoints.length; k++) {
-                for (int l = 0; l < dataPoints[k].length; l++) {
-                    if (initialCuts[i].get(k)) {
-                        mean1[l] += dataPoints[k][l];
-                        if (l == 0) {
-                            n1++;
-                        }
-                    }
-                    else {
-                        mean2[l] += dataPoints[k][l];
-                        if (l == 0) {
-                            n2++;
-                        }
-                    }
-                }
-            }
-            for (int k = 0; k < mean1.length; k++) {
-                mean1[k] /= n1;
-                mean2[k] /= n2;
-            }
-            for(int j = 0; j < dataPoints.length; j++) {
-                double[] ownMean = initialCuts[i].get(j) ? mean1 : mean2;
-                double[] otherMean = ownMean == mean1 ? mean2 : mean1;
-                if (getDistance(dataPoints[j], otherMean) < getDistance(dataPoints[j], ownMean)) {
-                    costs[i]++;
-                }
-            }
+    @Override
+    public String[] getCostFunctions() {
+        return new String[] {costFunctionDistanceToMean, costFunctionPairwiseDistance, costFunctionLocalMeans};
+    }
+
+    @Override
+    public BitSet[] getInitialCuts(String generatorName) {
+        if (generatorName == null || generatorName.equals(initialCutsKMeansAdjust)) {
+            return getInitialCutsKMeansAdjust();
         }
-        cutCosts = costs;
-        return costs;
+        else if (generatorName.equals(initialCutsRange)) {
+            return getInitialCutsRange();
+        }
+        else if (generatorName.equals(initialCutsSimple)) {
+            return getInitialCutsSimple();
+        }
+        else if (generatorName.equals(initialCutsLocalMeans)) {
+            return getInitialCutsLocalMeans();
+        }
+        return getInitialCutsKMeansAdjust();
+    }
+
+    @Override
+    public double[] getCutCosts(String costFunctionName) {
+        if (costFunctionName == null && costFunctionName.equals(costFunctionDistanceToMean)) {
+            cutCosts = distanceToMeanCostFunction();
+        }
+        else if (costFunctionName.equals(costFunctionPairwiseDistance)) {
+            cutCosts = pairwiseDistanceCostFunction();
+        }
+        else if (costFunctionName.equals(costFunctionLocalMeans)) {
+            //Do nothing
+        }
+        else {
+            cutCosts = distanceToMeanCostFunction();
+        }
+        return cutCosts;
     }
 
     private double[] pairwiseDistanceCostFunction() {
@@ -558,7 +566,7 @@ public class FeatureBasedDataset extends Dataset {
         return result;
     }
 
-    public BitSet[] getInitialCuts() {
+    public BitSet[] getInitialCutsKMeansAdjust() {
         int localK = 4;
         double range = getMaxRange();
         List<Double> costs = new ArrayList<>();

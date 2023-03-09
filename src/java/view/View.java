@@ -180,8 +180,8 @@ public class View extends JFrame {
         dataVisualizer.loadClusters(clusters, softClustering);
     }
 
-    protected void showClustering(int a, int psi) {
-        model.generateClusters(a, -1);
+    protected void showClustering(int a, int psi, String initialCutGenerator, String costFunctionName) {
+        model.generateClusters(a, -1, initialCutGenerator, costFunctionName);
         loadClusters(model.getHardClustering(), model.getSoftClustering());
         selectedSidePanel.setValues(model.getNMIScore(), model.getClusteringTime());
     }

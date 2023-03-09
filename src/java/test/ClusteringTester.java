@@ -59,7 +59,7 @@ public class ClusteringTester {
                 Dataset dataset = new FeatureBasedDataset(generated.x);
                 int[] groundTruth = generated.y;
                 model.setDataset(dataset);
-                model.generateClusters(a, -1);
+                model.generateClusters(a, -1, null, null);
                 model.getSoftClustering();
                 int[] hardClustering = model.getHardClustering();
                 long time2 = new Date().getTime();
@@ -97,7 +97,7 @@ public class ClusteringTester {
                     Dataset dataset = new BinaryQuestionnaire(generated.x);
                     int[] groundTruth = generated.y;
                     model.setDataset(dataset);
-                    model.generateClusters(a, -1);
+                    model.generateClusters(a, -1, null, null);
                     model.getSoftClustering();
                     int[] hardClustering = model.getHardClustering();
                     long time2 = new Date().getTime();
@@ -134,7 +134,7 @@ public class ClusteringTester {
                 Dataset dataset = new GraphDataset(generated.x);
                 int[] groundTruth = generated.y;
                 model.setDataset(dataset);
-                model.generateClusters(a, -1);
+                model.generateClusters(a, -1, null, null);
                 model.getSoftClustering();
                 int[] hardClustering = model.getHardClustering();
                 long time2 = new Date().getTime();
@@ -190,7 +190,7 @@ public class ClusteringTester {
                     long time1 = new Date().getTime();
                     if (algorithmName.equals(Model.tangleName)) {
                         int a = (int)((testCase.nPoints/testCase.nClusters)*(1.0/2.0));
-                        hardClustering = model.generateClusters(dataset, a, -1);
+                        hardClustering = model.generateClusters(dataset, a, -1, null, null);
                     }
                     else if (algorithmName.equals(Model.kMeansName)) {
                         hardClustering = dataset.kMeans(testCase.nClusters);

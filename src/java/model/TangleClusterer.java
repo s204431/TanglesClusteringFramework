@@ -10,18 +10,16 @@ import model.TangleSearchTree.Node;
 public class TangleClusterer {
 
     private TangleSearchTree tangleSearchTree;
-    //private static FeatureBasedDataset data;
 
     protected boolean doneClustering = false;
 
-    protected void generateClusters(Dataset dataset, int a, int psi) {
-        //data = (FeatureBasedDataset) dataset;
+    protected void generateClusters(Dataset dataset, int a, int psi, String initialCutGenerator, String costFunctionName) {
         long time1 = new Date().getTime();
         dataset.setA(a);
-        BitSet[] initialCuts = dataset.getInitialCuts();
+        BitSet[] initialCuts = dataset.getInitialCuts(initialCutGenerator);
         long time2 = new Date().getTime();
         //System.out.println("Initial cuts time: " + (time2-time1) + " ms");
-        double[] costs = dataset.getCutCosts();
+        double[] costs = dataset.getCutCosts(costFunctionName);
         /*for (double cost : costs) {
             System.out.print(cost + " ");
         }*/
