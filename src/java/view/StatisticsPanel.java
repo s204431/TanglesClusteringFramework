@@ -61,10 +61,10 @@ public class StatisticsPanel extends JPanel {
                 nmiPoints[test][0] = testSet.get(test).nPoints;
                 nmiPoints[test][1] = testResults[algorithm][test][1];
 
-                nmiDimensions[test][0] = testSet.get(test).nPoints;
+                nmiDimensions[test][0] = testSet.get(test).nDimensions;
                 nmiDimensions[test][1] = testResults[algorithm][test][1];
 
-                nmiClusters[test][0] = testSet.get(test).nPoints;
+                nmiClusters[test][0] = testSet.get(test).nClusters;
                 nmiClusters[test][1] = testResults[algorithm][test][1];
             }
             linesTime[0][algorithm] = Line.of(timePoints, colors[algorithm]);
