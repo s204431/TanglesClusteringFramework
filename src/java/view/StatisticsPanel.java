@@ -86,7 +86,7 @@ public class StatisticsPanel extends JPanel {
         }
 
         int imageWidth = view.windowWidth * 16 / 33;
-        int imageHeight = (view.windowHeight - view.topPanelHeight) / 4;
+        int imageHeight = (view.windowHeight - view.topPanelHeight) * 2 / 7;
         Canvas[] canvases = new Canvas[6];
         Image[] images = new Image[6];
         for (int i = 0; i < 3; i++) {
@@ -96,8 +96,11 @@ public class StatisticsPanel extends JPanel {
             canvases[i].setAxisLabels(xLabels[i], yLabels[0]);
             canvases[i+3].setAxisLabels(xLabels[i], yLabels[1]);
 
-            images[i] = canvases[i].toBufferedImage(imageWidth, imageHeight);
-            images[i+3] = canvases[i+3].toBufferedImage(imageWidth, imageHeight);
+            images[i] = canvases[i].toBufferedImage(imageWidth * 8 / 7, imageHeight * 8 / 7);
+            images[i+3] = canvases[i+3].toBufferedImage(imageWidth * 8 / 7, imageHeight * 8 / 7);
+
+            images[i] = images[i].getScaledInstance(imageWidth, imageHeight, Image.SCALE_SMOOTH);
+            images[i+3] = images[i].getScaledInstance(imageWidth, imageHeight, Image.SCALE_SMOOTH);
 
             rightPicturePanel.add(new JLabel(new ImageIcon(images[i])));
             leftPicturePanel.add(new JLabel(new ImageIcon(images[i+3])));
