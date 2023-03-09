@@ -55,7 +55,7 @@ public class StatisticsPanel extends JPanel {
                 timeDimensions[test][0] = testSet.get(test).nDimensions;
                 timeDimensions[test][1] = testResults[algorithm][test][0];
 
-                timeClusters[test][0] = testSet.get(test).nDimensions;
+                timeClusters[test][0] = testSet.get(test).nClusters;
                 timeClusters[test][1] = testResults[algorithm][test][0];
 
                 nmiPoints[test][0] = testSet.get(test).nPoints;
@@ -86,7 +86,7 @@ public class StatisticsPanel extends JPanel {
         }
 
         int imageWidth = view.windowWidth * 16 / 33;
-        int imageHeight = (view.windowHeight - view.topPanelHeight) * 2 / 7;
+        int imageHeight = (view.windowHeight - view.topPanelHeight) / 4;
         Canvas[] canvases = new Canvas[6];
         Image[] images = new Image[6];
         for (int i = 0; i < 3; i++) {
@@ -101,6 +101,9 @@ public class StatisticsPanel extends JPanel {
 
             rightPicturePanel.add(new JLabel(new ImageIcon(images[i])));
             leftPicturePanel.add(new JLabel(new ImageIcon(images[i+3])));
+
+            rightPicturePanel.add(Box.createRigidArea(new Dimension(0, view.windowHeight / 100)));
+            leftPicturePanel.add(Box.createRigidArea(new Dimension(0, view.windowHeight / 100)));
         }
 
         setVisible(false);
