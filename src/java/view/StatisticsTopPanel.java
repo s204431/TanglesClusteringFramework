@@ -258,6 +258,9 @@ public class StatisticsTopPanel extends JPanel {
                     String[] algorithmsNames = getAlgorithmNames(new boolean[] { tangleCheckBox.isSelected(), kMeansCheckBox.isSelected(), spectralCheckBox.isSelected(), linkageCheckBox.isSelected() });
                     double[][][] testResults = ClusteringTester.runTest(testSet, algorithmsNames);
                     view.plotTestResults(testResults, testSet, algorithmsNames);
+                    for (int i = 0; i < algorithmsNames.length; i++) {
+                        System.out.println(algorithmsNames[i]);
+                    }
                 }
             }
         });
