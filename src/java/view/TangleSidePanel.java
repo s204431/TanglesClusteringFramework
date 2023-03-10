@@ -93,7 +93,7 @@ public class TangleSidePanel extends SidePanel {
             }
         }
         if (aValueAdjuster.hasValue()) {
-            view.showClustering(aValueAdjuster.getValue(), -1, (String) cutGeneratorDropdown.getSelectedItem(), (String) costFunctionDropdown.getSelectedItem());
+            view.controller.generateClusteringTangles(aValueAdjuster.getValue(), -1, (String) cutGeneratorDropdown.getSelectedItem(), (String) costFunctionDropdown.getSelectedItem());
         }
         repaint();
     }

@@ -43,7 +43,7 @@ public class KMeansSidePanel extends SidePanel {
 
     protected void valueChanged() {
         if (kValueAdjuster.hasValue()) {
-            view.showClusteringKMeans(kValueAdjuster.getValue());
+            view.controller.generateClusteringKMeans(kValueAdjuster.getValue());
         }
     }
 

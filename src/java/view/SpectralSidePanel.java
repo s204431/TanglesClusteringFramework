@@ -58,7 +58,7 @@ public class SpectralSidePanel extends SidePanel {
 
     protected void valueChanged() {
         if (kValueAdjuster.hasValue() && sigmaValueAdjuster.hasValue()) {
-            view.showClusteringSpectral(kValueAdjuster.getValue(), sigmaValueAdjuster.getValue());
+            view.controller.generateClusteringSpectral(kValueAdjuster.getValue(), sigmaValueAdjuster.getValue());
         }
     }
 

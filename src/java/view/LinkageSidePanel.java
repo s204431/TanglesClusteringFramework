@@ -42,7 +42,7 @@ public class LinkageSidePanel extends SidePanel {
 
     protected void valueChanged() {
         if (kValueAdjuster.hasValue()) {
-            view.showClusteringLinkage(kValueAdjuster.getValue());
+            view.controller.generateClusteringLinkage(kValueAdjuster.getValue());
         }
     }
 

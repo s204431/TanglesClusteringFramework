@@ -18,6 +18,8 @@ import java.util.*;
 
 public class FeatureBasedDataset extends Dataset {
 
+    //This class represents a feature based dataset.
+
     public static final String name = "Feature Based";
     private static final int precision = 1; //Determines the number of cuts generated.
     public double[][] dataPoints;

@@ -24,7 +24,7 @@ import java.util.List;
 
 public class View extends JFrame {
     private Model model;
-    private Controller controller;
+    protected Controller controller;
     protected int windowWidth, windowHeight;
 
     protected JPanel mainComponent;
@@ -180,28 +180,8 @@ public class View extends JFrame {
         dataVisualizer.loadClusters(clusters, softClustering);
     }
 
-    protected void showClustering(int a, int psi, String initialCutGenerator, String costFunctionName) {
-        model.generateClusters(a, -1, initialCutGenerator, costFunctionName);
-        loadClusters(model.getHardClustering(), model.getSoftClustering());
-        selectedSidePanel.setValues(model.getNMIScore(), model.getClusteringTime());
-    }
-
-    protected void showClusteringKMeans(int k) {
-        model.generateClustersKMeans(k);
-        loadClusters(model.getHardClustering(), model.getSoftClustering());
-        selectedSidePanel.setValues(model.getNMIScore(), model.getClusteringTime());
-    }
-
-    protected void showClusteringSpectral(int k, double sigma) {
-        model.generateClustersSpectral(k, sigma);
-        loadClusters(model.getHardClustering(), model.getSoftClustering());
-        selectedSidePanel.setValues(model.getNMIScore(), model.getClusteringTime());
-    }
-
-    protected void showClusteringLinkage(int k) {
-        model.generateClustersLinkage(k);
-        loadClusters(model.getHardClustering(), model.getSoftClustering());
-        selectedSidePanel.setValues(model.getNMIScore(), model.getClusteringTime());
+    public void updateSelectedSidePanel(double NMIScore, long clusteringTime) {
+        selectedSidePanel.setValues(NMIScore, clusteringTime);
     }
 
     public void resetView() {

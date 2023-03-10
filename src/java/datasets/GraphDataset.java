@@ -11,6 +11,9 @@ import java.io.IOException;
 import java.util.*;
 
 public class GraphDataset extends Dataset {
+
+    //This class represents a graph dataset.
+
     public static final String name = "Graph";
     private int[][][] dataPoints;
     private int[][] edges;
