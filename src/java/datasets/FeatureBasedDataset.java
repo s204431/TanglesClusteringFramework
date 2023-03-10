@@ -32,7 +32,7 @@ public class FeatureBasedDataset extends Dataset {
     public static final String initialCutsKMeansAdjust = "K-Means adjust";
     public static final String initialCutsTanglesAdjust = "Tangles adjust";
 
-    public static final String costFunctionPairwiseDistance = "Pairwise Distance";
+    public static final String costFunctionPairwiseDistance = "Pairwise distance";
     public static final String costFunctionDistanceToMean = "Distance to mean";
     public static final String costFunctionLocalMeans = "Local means";
 

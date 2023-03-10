@@ -232,4 +232,71 @@ public class DatasetGenerator {
         return new Tuple<>(result, groundTruth);
     }
 
+    //Generates two interleaving half circle clusters.
+    public static Tuple<double[][], int[]> generateFixedMoonFeatureBasedDataPoints(int numOfPoints) {
+        double[][] result = new double[numOfPoints][];
+        int[] groundTruth = new int[numOfPoints];
+
+        Random r = new Random();
+
+        double[] center1 = new double[] {0.0, 0.0};
+        double[] center2 = new double[] {1.0, 0.0};
+        double radius = 1.0;
+        double std = 0.10;
+        int nSteps = 10;
+
+        //First moon
+        int moonSize = numOfPoints/2;
+        int index = 0;
+        for (double v = 0; v <= Math.PI; v += Math.PI/nSteps) {
+            double[] centroid = new double[] {Math.cos(v)*radius + center1[0], Math.sin(v)*radius + center1[1]};
+            for (int j = 0; v == Math.PI ? (index < moonSize) : (j < moonSize/nSteps); j++) {
+                result[index] = new double[] {r.nextGaussian(centroid[0], std), r.nextGaussian(centroid[1], std)};
+                groundTruth[index] = 0;
+                index++;
+            }
+        }
+
+        //Second moon
+        index = moonSize;
+        moonSize = numOfPoints/2 + numOfPoints%2;
+        for (double v = Math.PI; v <= 2*Math.PI; v += Math.PI/nSteps) {
+            double[] centroid = new double[] {Math.cos(v)*radius + center2[0], Math.sin(v)*radius + center2[1]};
+            for (int j = 0; v == Math.PI ? (index < moonSize) : (j < moonSize/nSteps); j++) {
+                result[index] = new double[] {r.nextGaussian(centroid[0], std), r.nextGaussian(centroid[1], std)};
+                groundTruth[index] = 1;
+                index++;
+            }
+        }
+        return new Tuple<>(result, groundTruth);
+    }
+
+    //Generates half circle clusters with random positions, sizes and rotations.
+    public static Tuple<double[][], int[]> generateMoonFeatureBasedDataPoints(int numOfPoints, int numOfClusters) {
+        double[][] result = new double[numOfPoints][];
+        int[] groundTruth = new int[numOfPoints];
+
+        Random r = new Random();
+
+        int nSteps = 10;
+
+        for (int i = 0; i < numOfClusters; i++) {
+            double[] center = new double[] {r.nextDouble(0, 10), r.nextDouble(0, 20)};
+            double radius = r.nextDouble(0.5, 3.0);
+            double std = radius/10;
+            int moonSize = i == numOfClusters-1 ? numOfPoints/numOfClusters + numOfPoints%numOfClusters : numOfPoints/numOfClusters;
+            int index = i*(numOfPoints/numOfClusters);
+            double start = r.nextDouble(0, 2*Math.PI);
+            for (double v = start; v <= start+Math.PI; v += Math.PI/nSteps) {
+                double[] centroid = new double[] {Math.cos(v)*radius + center[0], Math.sin(v)*radius + center[1]};
+                for (int j = 0; v == start+Math.PI ? (index < moonSize) : (j < moonSize/nSteps); j++) {
+                    result[index] = new double[] {r.nextGaussian(centroid[0], std), r.nextGaussian(centroid[1], std)};
+                    groundTruth[index] = i;
+                    index++;
+                }
+            }
+        }
+        return new Tuple<>(result, groundTruth);
+    }
+
 }
