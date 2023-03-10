@@ -5,6 +5,7 @@ import model.TangleClusterer;
 import util.BitSet;
 import util.Tuple;
 
+import java.awt.*;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Date;
@@ -19,13 +20,13 @@ public class ClusteringTester {
 
     public static void testTangleClusterer() {
 
-        TestSet testSet = new TestSet(FeatureBasedDataset.name);
+        /*TestSet testSet = new TestSet(FeatureBasedDataset.name);
         for (int i = 100; i <= 1000; i *= 10) {
             for (int j = 2; j <= 10; j++) {
                 testSet.add(new TestCase(i, 2, j, 1));
             }
         }
-        runTest(testSet, new String[] {Model.tangleName, Model.kMeansName, Model.spectralClusteringName, Model.linkageName});
+        runTest(testSet, new String[] {Model.tangleName, Model.kMeansName, Model.spectralClusteringName, Model.linkageName});*/
 
         System.out.println("Testing tangle clusterer...");
         long time1 = new Date().getTime();

@@ -1,6 +1,7 @@
 package datasets;
 
 import model.Model;
+import model.TangleClusterer;
 import smile.clustering.HierarchicalClustering;
 import smile.clustering.KMeans;
 import smile.clustering.PartitionClustering;
@@ -25,14 +26,15 @@ public class FeatureBasedDataset extends Dataset {
     public boolean cutsAreAxisParallel = true;
     public double[] cutCosts; //Used for visualization.
 
-    private static String initialCutsRange = "Range";
-    private static String initialCutsSimple = "Simple";
-    private static String initialCutsLocalMeans = "Local means";
-    private static String initialCutsKMeansAdjust = "K-Means adjust";
+    public static final String initialCutsRange = "Range";
+    public static final String initialCutsSimple = "Simple";
+    public static final String initialCutsLocalMeans = "Local means";
+    public static final String initialCutsKMeansAdjust = "K-Means adjust";
+    public static final String initialCutsTanglesAdjust = "Tangles adjust";
 
-    private static String costFunctionPairwiseDistance = "Pairwise Distance";
-    private static String costFunctionDistanceToMean = "Distance to mean";
-    private static String costFunctionLocalMeans = "Local means";
+    public static final String costFunctionPairwiseDistance = "Pairwise Distance";
+    public static final String costFunctionDistanceToMean = "Distance to mean";
+    public static final String costFunctionLocalMeans = "Local means";
 
     public FeatureBasedDataset() {
 
@@ -207,7 +209,7 @@ public class FeatureBasedDataset extends Dataset {
 
     @Override
     public String[] getInitialCutGenerators() {
-        return new String[] {initialCutsKMeansAdjust, initialCutsRange, initialCutsLocalMeans, initialCutsSimple};
+        return new String[] {initialCutsKMeansAdjust, initialCutsRange, initialCutsLocalMeans, initialCutsSimple, initialCutsTanglesAdjust};
     }
 
     @Override
@@ -228,6 +230,9 @@ public class FeatureBasedDataset extends Dataset {
         }
         else if (generatorName.equals(initialCutsLocalMeans)) {
             return getInitialCutsLocalMeans();
+        }
+        else if (generatorName.equals(initialCutsTanglesAdjust)) {
+            return getInitialCutsTanglesAdjust();
         }
         return getInitialCutsKMeansAdjust();
     }
@@ -631,6 +636,113 @@ public class FeatureBasedDataset extends Dataset {
                         }
                     }
                     kMeans = PartitionClustering.run(1, () -> KMeans.fit(localCopy, localK));
+                    axisParallelCuts[i].add(dataPoints[originalIndices[cutIndex]][i]);
+                }
+            }
+            costs.add(cost);
+        }
+        BitSet[] result = new BitSet[cuts.size()];
+        for (int i = 0; i < cuts.size(); i++) {
+            result[i] = cuts.get(i);
+        }
+        initialCuts = result;
+        this.axisParallelCuts = new double[axisParallelCuts.length][];
+        for (int i = 0; i < axisParallelCuts.length; i++) {
+            this.axisParallelCuts[i] = new double[axisParallelCuts[i].size()];
+            for (int j = 0; j < axisParallelCuts[i].size(); j++) {
+                this.axisParallelCuts[i][j] = axisParallelCuts[i].get(j);
+            }
+        }
+        cutCosts = new double[costs.size()];
+        for (int i = 0; i < costs.size(); i++) {
+            cutCosts[i] = costs.get(i);
+        }
+        cutsAreAxisParallel = false;
+        return result;
+    }
+
+    public BitSet[] getInitialCutsTanglesAdjust() {
+        int localK = 4;
+        double range = getMaxRange();
+        List<Double> costs = new ArrayList<>();
+        List<BitSet> cuts = new ArrayList<>();
+        List<Double>[] axisParallelCuts = new ArrayList[dataPoints[0].length]; //For visualization.
+        double[][] copy = new double[dataPoints.length][dataPoints[0].length];
+        int[] originalIndices = new int[dataPoints.length];
+        for (int i = 0; i < dataPoints.length; i++) {
+            originalIndices[i] = i;
+            for (int j = 0; j < dataPoints[0].length; j++) {
+                copy[i][j] = dataPoints[i][j];
+            }
+        }
+        for (int i = 0; i < dataPoints[0].length; i++) {
+            axisParallelCuts[i] = new ArrayList<>();
+            mergeSort(copy, originalIndices, i, 0, dataPoints.length-1);
+            BitSet currentBitSet = new BitSet(dataPoints.length);
+            currentBitSet.setAll();
+            cuts.add(currentBitSet);
+            BitSet accumulated = new BitSet(dataPoints.length);
+            accumulated.setAll();
+            axisParallelCuts[i].add(dataPoints[originalIndices[0]][i]);
+            int cutIndex = 0;
+            int[] localClustering = null;
+            double[][] centroids = null;
+            double cost = 0.0;
+            int index = 0;
+            for (int j = 0; j < dataPoints.length; j++) {
+                accumulated.remove(originalIndices[j]);
+                if (localClustering == null || centroids[localClustering[index]][i] <= dataPoints[originalIndices[cutIndex]][i]) {
+                    currentBitSet.remove(originalIndices[j]);
+                }
+                double pointCost = 0.0;
+                if (localClustering != null) {
+                    int count = 0;
+                    for (int k = 0; k < centroids.length; k++) {
+                        if (centroids[localClustering[index]][i] <= dataPoints[originalIndices[cutIndex]][i] != centroids[k][i] <= dataPoints[originalIndices[cutIndex]][i]) {
+                            pointCost += getDistance(dataPoints[originalIndices[j]], centroids[k]);
+                            count++;
+                        }
+                    }
+                    cost += Math.exp(-((1.0/range)*(pointCost/count)));
+                }
+                index++;
+                if (j > 0 && j % (a/precision) == 0) {
+                    if (dataPoints.length - j <= (a/precision) + 1) {
+                        break;
+                    }
+                    index = 0;
+                    currentBitSet = new BitSet(dataPoints.length);
+                    currentBitSet.unionWith(accumulated);
+                    cuts.add(currentBitSet);
+                    costs.add(cost);
+                    cost = 0.0;
+                    //Find where to put the cut.
+                    double[][] localCopy = new double[(j+a/precision+1)-(j+1)][];
+                    double maxRange = -1;
+                    for (int k = j+1; k < j+a/precision+1; k++) {
+                        localCopy[k-(j+1)] = dataPoints[originalIndices[k]];
+                        if (copy[k+1][i] - copy[k][i] > maxRange) {
+                            maxRange = copy[k+1][i] - copy[k][i];
+                            cutIndex = k;
+                        }
+                    }
+                    String initialCutFunction = localCopy.length <= localK*8 ? initialCutsRange : initialCutsTanglesAdjust;
+                    int localA = (int)(localCopy.length/localK*(2.0/3.0)) <= 0 ? 1 : (int)(localCopy.length/localK*(2.0/3.0));
+                    localClustering = new Model().generateClusters(new FeatureBasedDataset(localCopy), localA, -1, initialCutFunction, null);
+                    int max = Arrays.stream(localClustering).max().getAsInt();
+                    centroids = new double[max+1][localCopy[0].length];
+                    int[] count = new int[max+1];
+                    for (int k = 0; k < localClustering.length; k++) {
+                        for (int d = 0; d < localCopy[0].length; d++) {
+                            centroids[localClustering[k]][d] += localCopy[k][d];
+                            count[localClustering[k]]++;
+                        }
+                    }
+                    for (int k = 0; k < centroids.length; k++) {
+                        for (int d = 0; d < localCopy[0].length; d++) {
+                            centroids[k][d] /= count[k];
+                        }
+                    }
                     axisParallelCuts[i].add(dataPoints[originalIndices[cutIndex]][i]);
                 }
             }

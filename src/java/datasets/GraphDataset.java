@@ -15,8 +15,8 @@ public class GraphDataset extends Dataset {
     private int[][][] dataPoints;
     private int[][] edges;
 
-    private static String initialCutsKernighanLin = "Kernighan-Lin";
-    private static String costFunctionKernighanLin = "Kernighan-Lin";
+    public static final String initialCutsKernighanLin = "Kernighan-Lin";
+    public static final String costFunctionKernighanLin = "Kernighan-Lin";
 
     public GraphDataset() {
 

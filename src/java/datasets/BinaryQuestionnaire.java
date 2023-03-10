@@ -20,8 +20,8 @@ public class BinaryQuestionnaire extends Dataset {
     public static final String name = "Binary Questionnaire";
     public BitSet[] answers;
 
-    private static String initialCutsQuestionCuts = "Question cuts";
-    private static String costFunctionPairwiseDifference = "Pairwise difference";
+    public static final String initialCutsQuestionCuts = "Question cuts";
+    public static final String costFunctionPairwiseDifference = "Pairwise difference";
 
     public BinaryQuestionnaire() {
 
