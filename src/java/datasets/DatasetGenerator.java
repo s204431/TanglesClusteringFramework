@@ -24,7 +24,7 @@ public class DatasetGenerator {
         return result;
     }
 
-    //Generates a biased util.BitSet of answers to a binary questionnaire and returns the result
+    //Generates a biased BitSet of answers to a binary questionnaire and returns the result.
     public static Tuple<BitSet[], int[]> generateBiasedBinaryQuestionnaireAnswers(int numberOfAnswers, int numberOfQuestions, double distributionPercentage) {
         if (distributionPercentage < 0 || distributionPercentage > 1) {
             return null;
@@ -59,6 +59,7 @@ public class DatasetGenerator {
         return new Tuple<>(result, groundTruth);
     }
 
+    //Generates a biased BitSet of answers to a binary questionnaire and returns the result. Uses a distribution percentage of 0.5.
     public static Tuple<BitSet[], int[]> generateBiasedBinaryQuestionnaireAnswers(int numberOfAnswers, int numberOfQuestions) {
         return generateBiasedBinaryQuestionnaireAnswers(numberOfAnswers, numberOfQuestions, 0.5);
     }
@@ -128,6 +129,8 @@ public class DatasetGenerator {
         return new Tuple<>(result, groundTruth);
     }
 
+    //Generates a feature based dataset with a given amount of points, clusters and dimensions. Randomizes the standard deviations and centroids.
+    //Makes sure that no clusters are placed too close to each other.
     public static Tuple<double[][], int[]> generateFeatureBasedDataPoints(int numOfPoints, int numOfClusters, int numOfFeatures) {
         double[][] result = new double[numOfPoints][numOfFeatures];
         int[] groundTruth = new int[numOfPoints];
