@@ -17,6 +17,8 @@ import java.util.*;
 
 public class BinaryQuestionnaire extends Dataset {
 
+    //This class represents a binary questionnaire dataset.
+
     public static final String name = "Binary Questionnaire";
     public BitSet[] answers;
 
@@ -39,10 +41,12 @@ public class BinaryQuestionnaire extends Dataset {
     }
 
     //Returns the ground truth (returns null if there is no ground truth).
+    @Override
     public int[] getGroundTruth() {
         return groundTruth;
     }
 
+    //Sets the value of a (agreement parameter) if this type of dataset needs it.
     @Override
     public void setA(int a) {
         //Does not need a. Do nothing.
@@ -133,7 +137,7 @@ public class BinaryQuestionnaire extends Dataset {
         return new String[] {costFunctionPairwiseDifference};
     }
 
-    //Generates initial cuts for this dataset using the giving initial cut generator name and returns it as a BitSet array.
+    //Generates initial cuts for this dataset using the giving initial cut generator name and returns it as a BitSet array (this dataset type only has one initial cut generator).
     @Override
     public BitSet[] getInitialCuts(String initialCutGenerator) {
         BitSet[] result = new BitSet[getNumberOfQuestions()];
@@ -149,7 +153,7 @@ public class BinaryQuestionnaire extends Dataset {
         return result;
     }
 
-    //Generates costs for the initial cuts for this dataset using the giving cost function name and returns it as a double array.
+    //Generates costs for the initial cuts for this dataset using the giving cost function name and returns it as a double array (this dataset type only has one cost function).
     @Override
     public double[] getCutCosts(String costFunctionName) {
         double[] result = new double[getNumberOfQuestions()];
