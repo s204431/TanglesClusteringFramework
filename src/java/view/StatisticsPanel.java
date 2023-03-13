@@ -28,9 +28,9 @@ public class StatisticsPanel extends JPanel {
         leftPicturePanel.setLayout(new BoxLayout(leftPicturePanel, BoxLayout.PAGE_AXIS));
         rightPicturePanel.setLayout(new BoxLayout(rightPicturePanel, BoxLayout.PAGE_AXIS));
 
-        add(rightPicturePanel);
-        add(Box.createRigidArea(new Dimension(view.windowWidth / 100, 0)));
         add(leftPicturePanel);
+        add(Box.createRigidArea(new Dimension(view.windowWidth / 100, 0)));
+        add(rightPicturePanel);
     }
 
     protected void plotTestResults(double[][][] testResults, TestSet testSet, String[] algorithmNames) {
@@ -78,13 +78,14 @@ public class StatisticsPanel extends JPanel {
 
         LinePlot[] timePlots = new LinePlot[3];
         LinePlot[] nmiPlots = new LinePlot[3];
-        String[] xLabels = { "Points", "Dimensions", "Clusters" };
-        String[] yLabels = { "Time (ms)", "NMI score" };
+
         for (int i = 0; i < 3; i++) {
             timePlots[i] = new LinePlot(linesTime[i], legends);
             nmiPlots[i] = new LinePlot(linesNMI[i], legends);
         }
 
+        String[] xLabels = { "Points", "Dimensions", "Clusters" };
+        String[] yLabels = { "Time (ms)", "NMI score" };
         int imageWidth = view.windowWidth * 16 / 33;
         int imageHeight = (view.windowHeight - view.topPanelHeight) * 2 / 7;
         Canvas[] canvases = new Canvas[6];
@@ -100,13 +101,13 @@ public class StatisticsPanel extends JPanel {
             images[i+3] = canvases[i+3].toBufferedImage(imageWidth * 8 / 7, imageHeight * 8 / 7);
 
             images[i] = images[i].getScaledInstance(imageWidth, imageHeight, Image.SCALE_SMOOTH);
-            images[i+3] = images[i].getScaledInstance(imageWidth, imageHeight, Image.SCALE_SMOOTH);
+            images[i+3] = images[i+3].getScaledInstance(imageWidth, imageHeight, Image.SCALE_SMOOTH);
 
-            rightPicturePanel.add(new JLabel(new ImageIcon(images[i])));
-            leftPicturePanel.add(new JLabel(new ImageIcon(images[i+3])));
+            leftPicturePanel.add(new JLabel(new ImageIcon(images[i])));
+            rightPicturePanel.add(new JLabel(new ImageIcon(images[i+3])));
 
-            rightPicturePanel.add(Box.createRigidArea(new Dimension(0, view.windowHeight / 100)));
             leftPicturePanel.add(Box.createRigidArea(new Dimension(0, view.windowHeight / 100)));
+            rightPicturePanel.add(Box.createRigidArea(new Dimension(0, view.windowHeight / 100)));
         }
 
         setVisible(false);

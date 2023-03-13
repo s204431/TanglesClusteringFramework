@@ -10,15 +10,14 @@ import test.ClusteringTester;
 import test.TestCase;
 import test.TestSet;
 
-import java.awt.event.ActionEvent;
+import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import java.awt.*;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.util.ArrayList;
 
@@ -64,16 +63,24 @@ public class StatisticsTopPanel extends JPanel {
             public void mousePressed(MouseEvent e) {
                 Font titleFont = new Font("TimesRoman", Font.BOLD, 25);
                 Font subTitleFont = new Font("TimesRoman", Font.BOLD, 18);
+                Font errorFont = new Font("TimesRoman", Font.BOLD, 12);
 
                 //Create panel with scroll pane of test cases
                 JPanel testSetPane = new JPanel();
                 testSetPane.setLayout(new BoxLayout(testSetPane, BoxLayout.PAGE_AXIS));
                 //Tests title
-                JLabel testCaseLabel = new JLabel("Test cases");
-                testCaseLabel.setFont(titleFont);
-                testCaseLabel.setAlignmentX(JLabel.CENTER_ALIGNMENT);
-                testSetPane.add(testCaseLabel);
+                JLabel testCaseTitle = new JLabel("Test cases");
+                testCaseTitle.setFont(titleFont);
+                testCaseTitle.setAlignmentX(JLabel.CENTER_ALIGNMENT);
+                testSetPane.add(testCaseTitle);
                 testSetPane.add(Box.createRigidArea(new Dimension(0, 20)));
+                //Error label
+                JLabel testSetErrorLabel = new JLabel("Table values cannot be empty or zero.");
+                testSetErrorLabel.setAlignmentX(CENTER_ALIGNMENT);
+                testSetErrorLabel.setFont(errorFont);
+                testSetErrorLabel.setForeground(Color.RED);
+                testSetPane.add(testSetErrorLabel);
+                testSetErrorLabel.setVisible(false);
                 //Table of test cases
                 table = new JTable();
                 DefaultTableModel tableModel = new CustomTableModel();
@@ -127,6 +134,13 @@ public class StatisticsTopPanel extends JPanel {
                 algorithmTitlePane.add(algorithmsLabel);
                 checkBoxPane.add(Box.createRigidArea(new Dimension(0, 20 + titleFont.getSize())));
                 checkBoxPane.add(algorithmTitlePane);
+                //Error label
+                JLabel algorithmsErrorLabel = new JLabel("Please select an algorithm");
+                algorithmsErrorLabel.setAlignmentX(CENTER_ALIGNMENT);
+                algorithmsErrorLabel.setFont(errorFont);
+                algorithmsErrorLabel.setForeground(Color.RED);
+                checkBoxPane.add(algorithmsErrorLabel);
+                algorithmsErrorLabel.setVisible(false);
                 //Checkboxes for available algorithms to run on test set
                 JCheckBox tangleCheckBox = new JCheckBox();
                 JCheckBox kMeansCheckBox = new JCheckBox();
@@ -234,9 +248,9 @@ public class StatisticsTopPanel extends JPanel {
                 saveLoadPane.add(loadButton);
                 saveLoadPane.add(Box.createHorizontalGlue());
                 checkBoxPane.add(saveLoadPane);
+                checkBoxPane.add(Box.createRigidArea(new Dimension(0,30)));
 
-
-                //Collect testSetPane and checkBoxPane side to side in a single panel
+                //Collect testSetPane and checkBoxPane side to side in runPane
                 JPanel runPane = new JPanel();
                 runPane.setLayout(new BoxLayout(runPane, BoxLayout.LINE_AXIS));
                 runPane.add(testSetPane);
@@ -246,20 +260,69 @@ public class StatisticsTopPanel extends JPanel {
                 generateTable(testSet);
 
                 //JOption pane with options for running, resetting, loading and saving a test set.
-                String[] options = new String[] { "Run", "Cancel" };
-                int response = JOptionPane.showOptionDialog(view, runPane, "Choose test set",
-                        JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE,
-                        null, options, options[0]);
+                final JOptionPane optionPane = new JOptionPane(runPane, JOptionPane.PLAIN_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, new Object[]{}, null);
+                final JDialog dialog = new JDialog(view, "Choose test set", true);
+                dialog.setContentPane(optionPane);
+                dialog.pack();
+                dialog.setLocationRelativeTo(null);
 
-                //Save test set
-                String datatype = comboBox.getSelectedItem().toString();
-                testSet = convertToTestSet(datatype, table);
+                //Run and cancel button
+                JButton runButton = new JButton("Run");
+                runButton.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        //Prevent running of test set if table has 0 values or if no checkboxes are selected.
+                        for (int i = 0; i < tableModel.getRowCount(); i++) {
+                            for (int j = 0; j < tableModel.getColumnCount(); j++) {
+                                if (table.getValueAt(i,j).equals("") || table.getValueAt(i,j).equals("0")) {
+                                    testSetErrorLabel.setVisible(true);
+                                    return;
+                                }
+                            }
+                        }
+                        testSetErrorLabel.setVisible(false);
 
-                if (response == 0) {
-                    String[] algorithmsNames = getAlgorithmNames(new boolean[] { tangleCheckBox.isSelected(), kMeansCheckBox.isSelected(), spectralCheckBox.isSelected(), linkageCheckBox.isSelected() });
-                    double[][][] testResults = ClusteringTester.runTest(testSet, algorithmsNames);
-                    view.plotTestResults(testResults, testSet, algorithmsNames);
-                }
+                        if (!(tangleCheckBox.isSelected() || kMeansCheckBox.isSelected() || spectralCheckBox.isSelected() || linkageCheckBox.isSelected())) {
+                            System.out.println("Please select a checkbox");
+                            algorithmsErrorLabel.setVisible(true);
+                            return;
+                        }
+                        testSetErrorLabel.setVisible(false);
+
+                        //Save test set
+                        String datatype = comboBox.getSelectedItem().toString();
+                        testSet = convertToTestSet(datatype, table);
+
+                        //Run test set
+                        String[] algorithmsNames = getAlgorithmNames(new boolean[] { tangleCheckBox.isSelected(), kMeansCheckBox.isSelected(), spectralCheckBox.isSelected(), linkageCheckBox.isSelected() });
+                        double[][][] testResults = ClusteringTester.runTest(testSet, algorithmsNames);
+                        view.plotTestResults(testResults, testSet, algorithmsNames);
+
+                        dialog.setVisible(false);
+                    }
+                });
+                JButton cancelButton = new JButton("Cancel");
+                cancelButton.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        //Save test set
+                        String datatype = comboBox.getSelectedItem().toString();
+                        testSet = convertToTestSet(datatype, table);
+
+                        dialog.setVisible(false);
+                    }
+                });
+
+                JPanel runCancelPane = new JPanel();
+                runCancelPane.setLayout(new BoxLayout(runCancelPane, BoxLayout.LINE_AXIS));
+                runCancelPane.add(runButton);
+                runCancelPane.add(Box.createRigidArea(new Dimension(20,0)));
+                runCancelPane.add(cancelButton);
+
+                testSetPane.add(Box.createRigidArea(new Dimension(0, 10)));
+                testSetPane.add(runCancelPane);
+
+                dialog.setVisible(true);
             }
         });
         toolBar.add(runButton);
