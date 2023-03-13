@@ -4,6 +4,7 @@ import datasets.Dataset;
 import datasets.GraphDataset;
 import util.ExtendedNumberFormatter;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.NumberFormatter;
@@ -11,8 +12,10 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FilenameFilter;
+import java.io.IOException;
 import java.text.NumberFormat;
 import java.text.ParseException;
 
@@ -243,6 +246,49 @@ public class TopPanel extends JPanel {
                 }
             }
         }));
+        exportPopup.add(new JMenuItem(new AbstractAction("As PNG") {
+            public void actionPerformed(ActionEvent e) {
+                final File[] file = new File[1];
+                JPanel savePopupPanel = new JPanel();
+                savePopupPanel.setLayout(new BoxLayout(savePopupPanel, BoxLayout.LINE_AXIS));
+                JLabel label = new JLabel("No file selected");
+                JButton button = new JButton("Select File");
+                button.addActionListener((l) -> {
+                    final JFileChooser fc = new JFileChooser();
+                    String extension = "png";
+                    FileNameExtensionFilter filter = new FileNameExtensionFilter("."+extension, extension);
+                    fc.setFileFilter(filter);
+                    int returnVal = fc.showDialog(view, "Choose");
+                    if (returnVal == JFileChooser.APPROVE_OPTION) {
+                        file[0] = fc.getSelectedFile();
+                        if (!file[0].getName().endsWith("."+extension)) {
+                            file[0] = new File(file[0].getPath()+"."+extension);
+                        }
+                        label.setText(file[0].getName());
+                    }
+                });
+                savePopupPanel.add(label);
+                savePopupPanel.add(Box.createRigidArea(new Dimension(10, 0)));
+                savePopupPanel.add(button);
+                int saveResult = JOptionPane.showConfirmDialog(view, savePopupPanel,
+                        "Export as PNG", JOptionPane.OK_CANCEL_OPTION,
+                        JOptionPane.PLAIN_MESSAGE);
+                if (saveResult == JOptionPane.OK_OPTION && file[0] != null) {
+                    try {
+                        ((PlottingView)view.dataVisualizer).coordinates.setVisible(false);
+                        JPanel panel = ((JPanel)view.dataVisualizer);
+                        BufferedImage image = new BufferedImage(panel.getWidth(), panel.getHeight(), BufferedImage.TYPE_INT_RGB);
+                        Graphics2D g = image.createGraphics();
+                        panel.paint(g);
+                        g.dispose();
+                        ImageIO.write(image, "png", file[0]);
+                        ((PlottingView)view.dataVisualizer).coordinates.setVisible(true);
+                    } catch (IOException e1) {}
+                }
+            }
+        }));
+
+
         exportButton = new JButton("Export");
         exportButton.addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent e) {

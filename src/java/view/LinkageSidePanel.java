@@ -9,8 +9,6 @@ import java.awt.*;
 
 public class LinkageSidePanel extends SidePanel {
 
-    private static final int MAX_K = 20;
-
     private ValueAdjuster kValueAdjuster; //Slider for the "k" parameter.
 
     public LinkageSidePanel(View view) {
