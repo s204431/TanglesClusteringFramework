@@ -1,10 +1,14 @@
 package util;
 
+import view.TopPanel;
+
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.text.NumberFormatter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.text.NumberFormat;
 
 public class ValueAdjuster extends JComponent {
     //This class represents a JSlider with a corresponding JTextField that follow each other.
@@ -44,7 +48,14 @@ public class ValueAdjuster extends JComponent {
         });
         add(slider);
 
-        textField = new JTextField("");
+        NumberFormat format = NumberFormat.getIntegerInstance();
+        format.setGroupingUsed(false);
+        ExtendedNumberFormatter formatter = new ExtendedNumberFormatter(format);
+        formatter.setMinimum(0);
+        formatter.setMaximum(Integer.MAX_VALUE);
+        formatter.setAllowsInvalid(false);
+
+        textField = new JFormattedTextField(formatter);
         textField.setHorizontalAlignment(JTextField.CENTER);
         add(textField);
 

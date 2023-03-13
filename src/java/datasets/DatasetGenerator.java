@@ -245,9 +245,9 @@ public class DatasetGenerator {
         Random r = new Random();
 
         double[] center1 = new double[] {0.0, 0.0};
-        double[] center2 = new double[] {1.0, 0.0};
-        double radius = 1.0;
-        double std = 0.10;
+        double[] center2 = new double[] {100.0, 0.0};
+        double radius = 100.0;
+        double std = 10.0;
         int nSteps = 10;
 
         //First moon

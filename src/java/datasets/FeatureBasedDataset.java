@@ -680,6 +680,7 @@ public class FeatureBasedDataset extends Dataset {
             }
         }
         for (int i = 0; i < dataPoints[0].length; i++) {
+            costs.add(Double.MAX_VALUE);
             axisParallelCuts[i] = new ArrayList<>();
             mergeSort(copy, originalIndices, i, 0, dataPoints.length-1);
             BitSet currentBitSet = new BitSet(dataPoints.length);
@@ -691,23 +692,11 @@ public class FeatureBasedDataset extends Dataset {
             int cutIndex = 0;
             int[] localClustering = null;
             double[][] centroids = null;
-            double cost = 0.0;
             int index = 0;
             for (int j = 0; j < dataPoints.length; j++) {
                 accumulated.remove(originalIndices[j]);
                 if (localClustering == null || centroids[localClustering[index]][i] <= dataPoints[originalIndices[cutIndex]][i]) {
                     currentBitSet.remove(originalIndices[j]);
-                }
-                double pointCost = 0.0;
-                if (localClustering != null) {
-                    int count = 0;
-                    for (int k = 0; k < centroids.length; k++) {
-                        if (centroids[localClustering[index]][i] <= dataPoints[originalIndices[cutIndex]][i] != centroids[k][i] <= dataPoints[originalIndices[cutIndex]][i]) {
-                            pointCost += getDistance(dataPoints[originalIndices[j]], centroids[k]);
-                            count++;
-                        }
-                    }
-                    cost += Math.exp(-((1.0/range)*(pointCost/count)));
                 }
                 index++;
                 if (j > 0 && j % (a/precision) == 0) {
@@ -718,8 +707,6 @@ public class FeatureBasedDataset extends Dataset {
                     currentBitSet = new BitSet(dataPoints.length);
                     currentBitSet.unionWith(accumulated);
                     cuts.add(currentBitSet);
-                    costs.add(cost);
-                    cost = 0.0;
                     //Find where to put the cut.
                     double[][] localCopy = new double[(j+a/precision+1)-(j+1)][];
                     double maxRange = -1;
@@ -750,7 +737,6 @@ public class FeatureBasedDataset extends Dataset {
                     axisParallelCuts[i].add(dataPoints[originalIndices[cutIndex]][i]);
                 }
             }
-            costs.add(cost);
         }
         BitSet[] result = new BitSet[cuts.size()];
         for (int i = 0; i < cuts.size(); i++) {

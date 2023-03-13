@@ -2,6 +2,7 @@ package view;
 
 import datasets.Dataset;
 import datasets.GraphDataset;
+import util.ExtendedNumberFormatter;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -279,20 +280,6 @@ public class TopPanel extends JPanel {
         newButton.setBounds(BUTTON_HEIGHT, view.topPanelHeight / 2 - BUTTON_HEIGHT / 2, BUTTON_WIDTH, BUTTON_HEIGHT);
         exportButton.setBounds(BUTTON_HEIGHT + BUTTON_WIDTH, view.topPanelHeight / 2 - BUTTON_HEIGHT / 2, BUTTON_WIDTH, BUTTON_HEIGHT);
         statisticsButton.setBounds(view.windowWidth - view.sidePanelWidth - BUTTON_WIDTH, view.topPanelHeight / 2 - BUTTON_HEIGHT / 2, BUTTON_WIDTH, BUTTON_HEIGHT);
-    }
-
-    private class ExtendedNumberFormatter extends NumberFormatter {
-        public ExtendedNumberFormatter(NumberFormat f) {
-            super(f);
-        }
-
-        @Override
-        public Object stringToValue(String text) throws ParseException {
-            if (text == "") {
-                return null;
-            }
-            return super.stringToValue(text);
-        }
     }
 
     private String getTextFieldValue(JFormattedTextField textfield, int defaultValue) {

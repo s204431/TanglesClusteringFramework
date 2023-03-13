@@ -9,6 +9,8 @@ import model.TangleSearchTree.Node;
 
 public class TangleClusterer {
 
+    protected TangleClusterer() {}
+
     private TangleSearchTree tangleSearchTree;
 
     protected boolean doneClustering = false;
