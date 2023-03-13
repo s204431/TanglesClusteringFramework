@@ -11,17 +11,22 @@ import java.io.IOException;
 import java.util.*;
 
 public class GraphDataset extends Dataset {
+
+    //This class represents a graph dataset.
+
     public static final String name = "Graph";
     private int[][][] dataPoints;
     private int[][] edges;
 
-    private static String initialCutsKernighanLin = "Kernighan-Lin";
-    private static String costFunctionKernighanLin = "Kernighan-Lin";
+    public static final String initialCutsKernighanLin = "Kernighan-Lin";
+    public static final String costFunctionKernighanLin = "Kernighan-Lin";
 
+    //Empty constructor.
     public GraphDataset() {
 
     }
 
+    //Constructor taking an integer 3D array where first dimension is a node, second dimension is an edge for the node and third dimension is the end node of the edge and weight of the edge.
     public GraphDataset(int[][][] dataPoints) {
         this.dataPoints = dataPoints;
         List<int[]> edgesList = new ArrayList<>();
@@ -36,6 +41,7 @@ public class GraphDataset extends Dataset {
         }
     }
 
+    //Constructor taking both the graph and a ground truth.
     public GraphDataset(Tuple<int[][][], int[]> dataPointsWithGroundTruth) {
         this(dataPointsWithGroundTruth.x);
         groundTruth = dataPointsWithGroundTruth.y;
@@ -180,16 +186,19 @@ public class GraphDataset extends Dataset {
         return cuts;
     }
 
+    //Returns the names of the supported initial cut generators.
     @Override
     public String[] getInitialCutGenerators() {
         return new String[] {initialCutsKernighanLin};
     }
 
+    //Returns the names of the supported cost functions.
     @Override
     public String[] getCostFunctions() {
         return new String[] {costFunctionKernighanLin};
     }
 
+    //Calculates cut costs using the Kernighan–Lin cost function.
     @Override
     public double[] getCutCosts(String costFunctionName) {
         int maxWeight = Integer.MIN_VALUE;
@@ -211,6 +220,7 @@ public class GraphDataset extends Dataset {
         return costs;
     }
 
+    //Generates a random cut as a BitSet.
     private BitSet getRandomBitSet() {
         BitSet result = new BitSet(dataPoints.length);
         int n0 = 0;
@@ -237,6 +247,7 @@ public class GraphDataset extends Dataset {
         return result;
     }
 
+    //Calculates the cost of an edge (0 if there is no edge).
     private int getCost(int node1, int node2, int minWeight, int maxWeight) {
         int weight = getEdgeWeight(node1, node2);
         if (weight == Integer.MIN_VALUE) {
@@ -247,6 +258,7 @@ public class GraphDataset extends Dataset {
         }
     }
 
+    //Calculates the D value for the Kernighan–Lin algorithm.
     private int getDValue(BitSet cut, int node, int minWeight, int maxWeight) {
         int internalCost = 0;
         int externalCost = 0;
@@ -261,6 +273,7 @@ public class GraphDataset extends Dataset {
         return externalCost - internalCost;
     }
 
+    //Returns the weight of the edge between two nodes (returns Integer.MIN_VALUE if there is no edge between the nodes).
     private int getEdgeWeight(int node1, int node2) {
         for (int i = 0; i < dataPoints[node1].length; i++) {
             if (dataPoints[node1][i][0] == node2) {
@@ -275,12 +288,22 @@ public class GraphDataset extends Dataset {
         return Integer.MIN_VALUE;
     }
 
+    //Returns the name of the dataset type.
+    @Override
     public String getName() {return name;}
+
+    //Returns the algorithms that we support for the type of dataset.
+    @Override
     public String[] getSupportedAlgorithms() {
         return new String[] {Model.tangleName};
     }
+
+    //Returns the ground truth (returns null if there is no ground truth).
+    @Override
     public int[] getGroundTruth() {return groundTruth;}
 
+    //Saves the dataset to a file as dot format.
+    @Override
     public void saveToFile(File file) {
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(file));

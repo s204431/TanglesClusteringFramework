@@ -47,7 +47,7 @@ public class PlottingView extends JPanel implements DataVisualizer, MouseListene
     private int lineGap;
     private int lines;
 
-    private JLabel coordinates = new JLabel();
+    protected JLabel coordinates = new JLabel();
 
     //Often used strokes
     private final BasicStroke stroke1 = new BasicStroke(1);
@@ -191,9 +191,11 @@ public class PlottingView extends JPanel implements DataVisualizer, MouseListene
         }
 
         //Box behind coordinate text
-        g2d.setColor(new Color(255, 255, 255, 200));
-        g2d.fillRect(5, 5, 150, 30);
-        updateCoordinateText();
+        if (coordinates.isVisible()) {
+            g2d.setColor(new Color(255, 255, 255, 200));
+            g2d.fillRect(5, 5, 150, 30);
+            updateCoordinateText();
+        }
 
         //Show cuts.
         if (points != null && view.selectedSidePanel instanceof TangleSidePanel && ((TangleSidePanel) view.selectedSidePanel).showCuts()) {

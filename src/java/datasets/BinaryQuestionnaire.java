@@ -17,41 +17,52 @@ import java.util.*;
 
 public class BinaryQuestionnaire extends Dataset {
 
+    //This class represents a binary questionnaire dataset.
+
     public static final String name = "Binary Questionnaire";
     public BitSet[] answers;
 
-    private static String initialCutsQuestionCuts = "Question cuts";
-    private static String costFunctionPairwiseDifference = "Pairwise difference";
+    public static final String initialCutsQuestionCuts = "Question cuts";
+    public static final String costFunctionPairwiseDifference = "Pairwise difference";
 
     public BinaryQuestionnaire() {
 
     }
 
+    //Constructor taking answers as a BitSet array.
     public BinaryQuestionnaire(BitSet[] answers) {
         this.answers = answers;
     }
 
+    //Constructor taking answers as a BitSet array and ground truth as an integer array.
     public BinaryQuestionnaire(Tuple<BitSet[], int[]> answersWithGroundTruth) {
         answers = answersWithGroundTruth.x;
         groundTruth = answersWithGroundTruth.y;
     }
 
+    //Returns the ground truth (returns null if there is no ground truth).
+    @Override
     public int[] getGroundTruth() {
         return groundTruth;
     }
 
+    //Sets the value of a (agreement parameter) if this type of dataset needs it.
+    @Override
     public void setA(int a) {
         //Does not need a. Do nothing.
     }
 
+    //Returns the number of participants of the questionnaire (the number of data points).
     private int getNumberOfParticipants() {
         return answers.length;
     }
 
+    //Returns the number of questions of the questionnaire (the number of dimensions).
     private int getNumberOfQuestions() {
         return answers[0].size();
     }
 
+    //Loads a binary questionnaire from a file and overrides this object.
     public void loadAnswersFromFile(String fileName, int startRow, int endRow, int startColumn, int endColumn) {
         try {
             List<List<Boolean>> result = new ArrayList<>();
@@ -98,10 +109,12 @@ public class BinaryQuestionnaire extends Dataset {
         }
     }
 
+    //Returns the answer giving by participant r to question c.
     private boolean getAnswer(int r, int c) {
         return answers[r].get(c);
     }
 
+    //Prints the data set (for debugging).
     public void print() {
         for (int i = 0; i < answers.length; i++) {
             for (int j = 0; j < answers[i].size(); j++) {
@@ -112,16 +125,19 @@ public class BinaryQuestionnaire extends Dataset {
         System.out.println(answers.length + " " + answers[0].size());
     }
 
+    //Returns the names of the supported initial cut generators.
     @Override
     public String[] getInitialCutGenerators() {
         return new String[] {initialCutsQuestionCuts};
     }
 
+    //Returns the names of the supported cost functions.
     @Override
     public String[] getCostFunctions() {
         return new String[] {costFunctionPairwiseDifference};
     }
 
+    //Generates initial cuts for this dataset using the giving initial cut generator name and returns it as a BitSet array (this dataset type only has one initial cut generator).
     @Override
     public BitSet[] getInitialCuts(String initialCutGenerator) {
         BitSet[] result = new BitSet[getNumberOfQuestions()];
@@ -137,6 +153,7 @@ public class BinaryQuestionnaire extends Dataset {
         return result;
     }
 
+    //Generates costs for the initial cuts for this dataset using the giving cost function name and returns it as a double array (this dataset type only has one cost function).
     @Override
     public double[] getCutCosts(String costFunctionName) {
         double[] result = new double[getNumberOfQuestions()];
@@ -160,95 +177,9 @@ public class BinaryQuestionnaire extends Dataset {
         return result;
     }
 
-    private int calculateSimilarity(int p1, int p2) {
-        return BitSet.XNor(answers[p1], answers[p2]);
-    }
-
     //Returns the number of participants on one side of a cut.
     private int getCutSize(int cut) {
         return initialCuts[cut].count();
-    }
-
-
-    //Performs K-means clustering on a binary dataset
-    public int[] kMeansOld(int clusters) {
-        int K = clusters;  //Amount of clusters
-        int[] resultingClustering = new int[getNumberOfParticipants()];   //The resulting cluster each participant is assigned to
-
-        //Place centroids randomly
-        Random r = new Random();
-        BitSet[] centroids = new BitSet[K]; //K randomly generated participants used as centroids
-        BitSet[] tempCentroids = new util.BitSet[K];
-        for (int k = 0; k < K; k++) {
-            centroids[k] = new BitSet(getNumberOfQuestions());
-            tempCentroids[k] = new BitSet(getNumberOfQuestions());
-            for (int i = 0; i < getNumberOfQuestions(); i++) {
-                if (r.nextBoolean()) {
-                    centroids[k].add(i);
-                    tempCentroids[k].add(i);
-                }
-            }
-        }
-
-        while (true) {
-            for (int i = 0; i < getNumberOfParticipants(); i++) {
-
-                //Find nearest centroid
-                int min = Integer.MAX_VALUE;
-                int cluster = -1;
-                for (int k = 0; k < K; k++) {
-                    //Calculate distance between participant and centroids
-                    int dist = getNumberOfQuestions() - BitSet.XNor(centroids[k], answers[i]);
-                    if (dist < min) {
-                        min = dist;
-                        cluster = k;
-                    }
-                }
-                //Assign participant to cluster
-                resultingClustering[i] = cluster;
-            }
-
-            //Update centroid means
-            for (int k = 0; k < K; k++) {
-                for (int i = 0; i < getNumberOfQuestions(); i++) {
-                    int trueCount = 0;
-                    int count = 0;
-                    for (int j = 0; j < getNumberOfParticipants(); j++) {
-                        if (resultingClustering[j] == k) {
-                            count++;
-                            if (answers[j].get(i)) {
-                                trueCount++;
-                            }
-                        }
-                    }
-                    if (trueCount >= count / 2) {
-                        centroids[k].add(i);
-                    } else {
-                        centroids[k].remove(i);
-                    }
-                }
-            }
-
-            //Break loop if centroids haven't moved; else update temporary centroids
-            boolean b = true;
-            for (int k = 0; k < K; k++) {
-                for (int i = 0; i < getNumberOfQuestions(); i++) {
-                    if (tempCentroids[k].get(i) != centroids[k].get(i)) {
-                        b = false;
-                        if (centroids[k].get(i)) {
-                            tempCentroids[k].add(i);
-                        } else {
-                            tempCentroids[k].remove(i);
-                        }
-                    }
-                }
-            }
-
-            if (b) {
-                break;
-            }
-        }
-        return resultingClustering;
     }
 
     //Performs k-means clustering on a binary questionnaire
@@ -281,6 +212,8 @@ public class BinaryQuestionnaire extends Dataset {
         return clusters.partition(k);
     }
 
+    //Converts data set to a double 2D array where the first possible answer to a question is represented by a 0 and the second possible answer is represented by a 1.
+    //This practically converts the dataset to a feature based dataset, so we can use the other clustering algorithms.
     private double[][] convertAnswersToDataPoints() {
         double[][] dataPoints = new double[answers.length][answers[0].size()];
         for (int i = 0; i < dataPoints.length; i++) {
@@ -291,10 +224,14 @@ public class BinaryQuestionnaire extends Dataset {
         return dataPoints;
     }
 
+    //Returns the algorithms that we support for this type of dataset.
+    @Override
     public String[] getSupportedAlgorithms() {
         return new String[] {Model.tangleName, Model.kMeansName, Model.spectralClusteringName, Model.linkageName};
     }
 
+    //Saves the dataset to a file.
+    @Override
     public void saveToFile(File file) {
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(file));
@@ -314,6 +251,8 @@ public class BinaryQuestionnaire extends Dataset {
         } catch (IOException e) {}
     }
 
+    //Returns the name of this type of dataset.
+    @Override
     public String getName() {
         return name;
     }

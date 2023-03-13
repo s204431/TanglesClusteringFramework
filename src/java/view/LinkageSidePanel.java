@@ -9,8 +9,6 @@ import java.awt.*;
 
 public class LinkageSidePanel extends SidePanel {
 
-    private static final int MAX_K = 20;
-
     private ValueAdjuster kValueAdjuster; //Slider for the "k" parameter.
 
     public LinkageSidePanel(View view) {
@@ -23,7 +21,7 @@ public class LinkageSidePanel extends SidePanel {
         kLabel.setAlignmentX(CENTER_ALIGNMENT);
         add(kLabel);
 
-        kValueAdjuster = new ValueAdjuster(1, 20);
+        kValueAdjuster = new ValueAdjuster(2, 20);
         kValueAdjuster.setMaximumSize(new Dimension(view.sidePanelWidth - view.sidePanelWidth / 2, view.windowHeight / 6));
         kValueAdjuster.setEnabled(false);
         kValueAdjuster.addChangeListener(new ChangeListener() {
@@ -42,7 +40,7 @@ public class LinkageSidePanel extends SidePanel {
 
     protected void valueChanged() {
         if (kValueAdjuster.hasValue()) {
-            view.showClusteringLinkage(kValueAdjuster.getValue());
+            view.controller.generateClusteringLinkage(kValueAdjuster.getValue());
         }
     }
 

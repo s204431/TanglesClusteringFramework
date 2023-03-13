@@ -55,4 +55,28 @@ public class Controller {
         view.loadDataPoints();
     }
 
+    public void generateClusteringTangles(int a, int psi, String initialCutGenerator, String costFunctionName) {
+        model.generateClusters(a, psi, initialCutGenerator, costFunctionName);
+        view.loadClusters(model.getHardClustering(), model.getSoftClustering());
+        view.updateSelectedSidePanel(model.getNMIScore(), model.getClusteringTime());
+    }
+
+    public void generateClusteringKMeans(int k) {
+        model.generateClustersKMeans(k);
+        view.loadClusters(model.getHardClustering(), model.getSoftClustering());
+        view.updateSelectedSidePanel(model.getNMIScore(), model.getClusteringTime());
+    }
+
+    public void generateClusteringSpectral(int k, double sigma) {
+        model.generateClustersSpectral(k, sigma);
+        view.loadClusters(model.getHardClustering(), model.getSoftClustering());
+        view.updateSelectedSidePanel(model.getNMIScore(), model.getClusteringTime());
+    }
+
+    public void generateClusteringLinkage(int k) {
+        model.generateClustersLinkage(k);
+        view.loadClusters(model.getHardClustering(), model.getSoftClustering());
+        view.updateSelectedSidePanel(model.getNMIScore(), model.getClusteringTime());
+    }
+
 }

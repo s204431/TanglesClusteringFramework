@@ -22,7 +22,7 @@ public class SpectralSidePanel extends SidePanel {
         kLabel.setAlignmentX(CENTER_ALIGNMENT);
         add(kLabel);
 
-        kValueAdjuster = new ValueAdjuster(1, 20);
+        kValueAdjuster = new ValueAdjuster(2, 20);
         kValueAdjuster.setMaximumSize(new Dimension(view.sidePanelWidth - view.sidePanelWidth / 2, view.windowHeight / 6));
         kValueAdjuster.setEnabled(false);
         kValueAdjuster.addChangeListener(new ChangeListener() {
@@ -58,7 +58,7 @@ public class SpectralSidePanel extends SidePanel {
 
     protected void valueChanged() {
         if (kValueAdjuster.hasValue() && sigmaValueAdjuster.hasValue()) {
-            view.showClusteringSpectral(kValueAdjuster.getValue(), sigmaValueAdjuster.getValue());
+            view.controller.generateClusteringSpectral(kValueAdjuster.getValue(), sigmaValueAdjuster.getValue());
         }
     }
 

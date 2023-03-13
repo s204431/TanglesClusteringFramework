@@ -1,6 +1,7 @@
 package datasets;
 
 import model.Model;
+import model.TangleClusterer;
 import smile.clustering.HierarchicalClustering;
 import smile.clustering.KMeans;
 import smile.clustering.PartitionClustering;
@@ -17,6 +18,8 @@ import java.util.*;
 
 public class FeatureBasedDataset extends Dataset {
 
+    //This class represents a feature based dataset.
+
     public static final String name = "Feature Based";
     private static final int precision = 1; //Determines the number of cuts generated.
     public double[][] dataPoints;
@@ -25,36 +28,44 @@ public class FeatureBasedDataset extends Dataset {
     public boolean cutsAreAxisParallel = true;
     public double[] cutCosts; //Used for visualization.
 
-    private static String initialCutsRange = "Range";
-    private static String initialCutsSimple = "Simple";
-    private static String initialCutsLocalMeans = "Local means";
-    private static String initialCutsKMeansAdjust = "K-Means adjust";
+    public static final String initialCutsRange = "Range";
+    public static final String initialCutsSimple = "Simple";
+    public static final String initialCutsLocalMeans = "Local means";
+    public static final String initialCutsKMeansAdjust = "K-Means adjust";
+    public static final String initialCutsTanglesAdjust = "Tangles adjust";
 
-    private static String costFunctionPairwiseDistance = "Pairwise Distance";
-    private static String costFunctionDistanceToMean = "Distance to mean";
-    private static String costFunctionLocalMeans = "Local means";
+    public static final String costFunctionPairwiseDistance = "Pairwise distance";
+    public static final String costFunctionDistanceToMean = "Distance to mean";
+    public static final String costFunctionLocalMeans = "Local means";
 
+    //Empty constructor.
     public FeatureBasedDataset() {
 
     }
 
+    //Constructor taking data points as a double 2D array.
     public FeatureBasedDataset(double[][] dataPoints) {
         this.dataPoints = dataPoints;
     }
 
+    //Constructor taking data points and a ground truth.
     public FeatureBasedDataset(Tuple<double[][], int[]> dataPointsWithGroundTruth) {
         dataPoints = dataPointsWithGroundTruth.x;
         groundTruth = dataPointsWithGroundTruth.y;
     }
 
+    //Returns the ground truth (returns null if there is no ground truth).
+    @Override
     public int[] getGroundTruth() {
         return groundTruth;
     }
 
+    //Sets the value of a (agreement parameter).
     public void setA(int a) {
         this.a = a;
     }
 
+    //Original initial cut generator using simple axis parallel cuts with specific amount of points between them.
     public BitSet[] getInitialCutsSimple() {
         List<BitSet> cuts = new ArrayList<>();
         List<Double>[] axisParallelCuts = new ArrayList[dataPoints[0].length]; //For visualization.
@@ -105,6 +116,8 @@ public class FeatureBasedDataset extends Dataset {
         return result;
     }
 
+    //Initial cut generator using axis parallel cuts. Has a number of intervals with the same amount of points in each.
+    //Each interval has one cut and each cut is placed at the largest range between two points in the interval.
     public BitSet[] getInitialCutsRange() {
         List<BitSet> cuts = new ArrayList<>();
         List<Double>[] axisParallelCuts = new ArrayList[dataPoints[0].length]; //For visualization.
@@ -176,6 +189,7 @@ public class FeatureBasedDataset extends Dataset {
         merge(points, originalIndices, dimension, l, h);
     }
 
+    //Merge part of the merge sort algorithm.
     private static void merge(double[][] points, int[] originalIndices, int dimension, int l, int h) {
         double[][] L = new double[(h-l)/2+1][];
         double[][] R = new double[(h-l) % 2 == 0 ? (h-l)/2 : (h-l)/2+1][];
@@ -205,16 +219,19 @@ public class FeatureBasedDataset extends Dataset {
         }
     }
 
+    //Returns the names of the supported initial cut generators.
     @Override
     public String[] getInitialCutGenerators() {
-        return new String[] {initialCutsKMeansAdjust, initialCutsRange, initialCutsLocalMeans, initialCutsSimple};
+        return new String[] {initialCutsKMeansAdjust, initialCutsRange, initialCutsLocalMeans, initialCutsSimple, initialCutsTanglesAdjust};
     }
 
+    //Returns the names of the supported cost functions.
     @Override
     public String[] getCostFunctions() {
         return new String[] {costFunctionDistanceToMean, costFunctionPairwiseDistance, costFunctionLocalMeans};
     }
 
+    //Generates initial cuts for this dataset using the giving initial cut generator name and returns it as a BitSet array.
     @Override
     public BitSet[] getInitialCuts(String generatorName) {
         if (generatorName == null || generatorName.equals(initialCutsKMeansAdjust)) {
@@ -229,9 +246,13 @@ public class FeatureBasedDataset extends Dataset {
         else if (generatorName.equals(initialCutsLocalMeans)) {
             return getInitialCutsLocalMeans();
         }
+        else if (generatorName.equals(initialCutsTanglesAdjust)) {
+            return getInitialCutsTanglesAdjust();
+        }
         return getInitialCutsKMeansAdjust();
     }
 
+    //Generates costs for the initial cuts for this dataset using the giving cost function name and returns it as a double array.
     @Override
     public double[] getCutCosts(String costFunctionName) {
         if (costFunctionName == null || costFunctionName.equals(costFunctionDistanceToMean)) {
@@ -249,6 +270,7 @@ public class FeatureBasedDataset extends Dataset {
         return cutCosts;
     }
 
+    //Pairwise distance cost function, which uses the sum of the pairwise distances of every pair on different sides of the cut.
     private double[] pairwiseDistanceCostFunction() {
         double[] costs = new double[initialCuts.length];
         double maxRange = getMaxRange();
@@ -271,6 +293,7 @@ public class FeatureBasedDataset extends Dataset {
         return costs;
     }
 
+    //Distance to mean cost function, which uses the sum of the distance to the opposite side mean for every point (has linear time complexity).
     private double[] distanceToMeanCostFunction() {
         double[] costs = new double[initialCuts.length];
         double maxRange = getMaxRange();
@@ -305,6 +328,7 @@ public class FeatureBasedDataset extends Dataset {
         return costs;
     }
 
+    //Calculates the largest range in a dimension between two points.
     private double getMaxRange() {
         double maxRange = 0;
         for (int i = 0; i < dataPoints.length; i++) {
@@ -325,20 +349,7 @@ public class FeatureBasedDataset extends Dataset {
         return maxRange;
     }
 
-    private double getMaxRange(int dimension) {
-        double minValue = Integer.MAX_VALUE;
-        double maxValue = Integer.MIN_VALUE;
-        for (int i = 0; i < dataPoints.length; i++) {
-            if (dataPoints[i][dimension] < minValue) {
-                minValue = dataPoints[i][dimension];
-            }
-            if (dataPoints[i][dimension] > maxValue) {
-                maxValue = dataPoints[i][dimension];
-            }
-        }
-        return maxValue - minValue;
-    }
-
+    //Returns the euclidean distance between two points.
     private double getDistance(double[] point1, double[] point2) {
         double length = 0;
         for (int i = 0; i < point1.length; i++) {
@@ -347,6 +358,7 @@ public class FeatureBasedDataset extends Dataset {
         return Math.sqrt(length);
     }
 
+    //Loads the dataset from a file.
     public void loadDataFromFile(String fileName, int startRow, int endRow, int startColumn, int endColumn) {
         try {
             List<List<Double>> result = new ArrayList<>();
@@ -391,6 +403,7 @@ public class FeatureBasedDataset extends Dataset {
         }
     }
 
+    //Prints the dataset (for debugging).
     public void print() {
         for (int i = 0; i < dataPoints.length; i++) {
             for (int j = 0; j < dataPoints[i].length; j++) {
@@ -419,24 +432,14 @@ public class FeatureBasedDataset extends Dataset {
         return clusters.partition(k);
     }
 
-    public void printKMeansResults(int[] resultingClustering) {
-
-        //Print ground truth vs k-means clusters
-        System.out.println("Ground truth: ");
-        for (int i = 0; i < groundTruth.length; i++) {
-            System.out.print(groundTruth[i] + " ");
-        }
-        System.out.println("\nK-means: ");
-        for (int i = 0; i < resultingClustering.length; i++) {
-            System.out.print(resultingClustering[i] + " ");
-        }
-
-    }
-
+    //Returns the algorithms that we support for the type of dataset.
+    @Override
     public String[] getSupportedAlgorithms() {
         return new String[] {Model.tangleName, Model.kMeansName, Model.spectralClusteringName, Model.linkageName};
     }
 
+    //Saves the dataset to a file.
+    @Override
     public void saveToFile(File file) {
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(file));
@@ -456,10 +459,14 @@ public class FeatureBasedDataset extends Dataset {
         } catch (IOException e) {}
     }
 
+    //Returns the name of the dataset type.
+    @Override
     public String getName() {
         return name;
     }
 
+    //Initial cut generator that uses axis parallel cuts and adjusts them using distances to local means in the interval on each side of the cut. Generates non axis parallel cuts.
+    //This initial cut generator also has its own cost function built in.
     public BitSet[] getInitialCutsLocalMeans() {
         double range = getMaxRange();
         List<Double> costs = new ArrayList<>();
@@ -566,6 +573,7 @@ public class FeatureBasedDataset extends Dataset {
         return result;
     }
 
+    //Initial cut generator that uses axis parallel cuts and adjusts them using local clusters generated with K-Means in the interval. Generates non axis parallel cuts.
     public BitSet[] getInitialCutsKMeansAdjust() {
         int localK = 4;
         double range = getMaxRange();
@@ -635,6 +643,100 @@ public class FeatureBasedDataset extends Dataset {
                 }
             }
             costs.add(cost);
+        }
+        BitSet[] result = new BitSet[cuts.size()];
+        for (int i = 0; i < cuts.size(); i++) {
+            result[i] = cuts.get(i);
+        }
+        initialCuts = result;
+        this.axisParallelCuts = new double[axisParallelCuts.length][];
+        for (int i = 0; i < axisParallelCuts.length; i++) {
+            this.axisParallelCuts[i] = new double[axisParallelCuts[i].size()];
+            for (int j = 0; j < axisParallelCuts[i].size(); j++) {
+                this.axisParallelCuts[i][j] = axisParallelCuts[i].get(j);
+            }
+        }
+        cutCosts = new double[costs.size()];
+        for (int i = 0; i < costs.size(); i++) {
+            cutCosts[i] = costs.get(i);
+        }
+        cutsAreAxisParallel = false;
+        return result;
+    }
+
+    //Similar to the K-Means adjust initial cut generator, but recursively uses clustering with tangles instead.
+    public BitSet[] getInitialCutsTanglesAdjust() {
+        int localK = 4;
+        double range = getMaxRange();
+        List<Double> costs = new ArrayList<>();
+        List<BitSet> cuts = new ArrayList<>();
+        List<Double>[] axisParallelCuts = new ArrayList[dataPoints[0].length]; //For visualization.
+        double[][] copy = new double[dataPoints.length][dataPoints[0].length];
+        int[] originalIndices = new int[dataPoints.length];
+        for (int i = 0; i < dataPoints.length; i++) {
+            originalIndices[i] = i;
+            for (int j = 0; j < dataPoints[0].length; j++) {
+                copy[i][j] = dataPoints[i][j];
+            }
+        }
+        for (int i = 0; i < dataPoints[0].length; i++) {
+            costs.add(Double.MAX_VALUE);
+            axisParallelCuts[i] = new ArrayList<>();
+            mergeSort(copy, originalIndices, i, 0, dataPoints.length-1);
+            BitSet currentBitSet = new BitSet(dataPoints.length);
+            currentBitSet.setAll();
+            cuts.add(currentBitSet);
+            BitSet accumulated = new BitSet(dataPoints.length);
+            accumulated.setAll();
+            axisParallelCuts[i].add(dataPoints[originalIndices[0]][i]);
+            int cutIndex = 0;
+            int[] localClustering = null;
+            double[][] centroids = null;
+            int index = 0;
+            for (int j = 0; j < dataPoints.length; j++) {
+                accumulated.remove(originalIndices[j]);
+                if (localClustering == null || centroids[localClustering[index]][i] <= dataPoints[originalIndices[cutIndex]][i]) {
+                    currentBitSet.remove(originalIndices[j]);
+                }
+                index++;
+                if (j > 0 && j % (a/precision) == 0) {
+                    if (dataPoints.length - j <= (a/precision) + 1) {
+                        break;
+                    }
+                    index = 0;
+                    currentBitSet = new BitSet(dataPoints.length);
+                    currentBitSet.unionWith(accumulated);
+                    cuts.add(currentBitSet);
+                    //Find where to put the cut.
+                    double[][] localCopy = new double[(j+a/precision+1)-(j+1)][];
+                    double maxRange = -1;
+                    for (int k = j+1; k < j+a/precision+1; k++) {
+                        localCopy[k-(j+1)] = dataPoints[originalIndices[k]];
+                        if (copy[k+1][i] - copy[k][i] > maxRange) {
+                            maxRange = copy[k+1][i] - copy[k][i];
+                            cutIndex = k;
+                        }
+                    }
+                    String initialCutFunction = localCopy.length <= localK*8 ? initialCutsRange : initialCutsTanglesAdjust;
+                    int localA = (int)(localCopy.length/localK*(2.0/3.0)) <= 0 ? 1 : (int)(localCopy.length/localK*(2.0/3.0));
+                    localClustering = new Model().generateClusters(new FeatureBasedDataset(localCopy), localA, -1, initialCutFunction, null);
+                    int max = Arrays.stream(localClustering).max().getAsInt();
+                    centroids = new double[max+1][localCopy[0].length];
+                    int[] count = new int[max+1];
+                    for (int k = 0; k < localClustering.length; k++) {
+                        for (int d = 0; d < localCopy[0].length; d++) {
+                            centroids[localClustering[k]][d] += localCopy[k][d];
+                            count[localClustering[k]]++;
+                        }
+                    }
+                    for (int k = 0; k < centroids.length; k++) {
+                        for (int d = 0; d < localCopy[0].length; d++) {
+                            centroids[k][d] /= count[k];
+                        }
+                    }
+                    axisParallelCuts[i].add(dataPoints[originalIndices[cutIndex]][i]);
+                }
+            }
         }
         BitSet[] result = new BitSet[cuts.size()];
         for (int i = 0; i < cuts.size(); i++) {
