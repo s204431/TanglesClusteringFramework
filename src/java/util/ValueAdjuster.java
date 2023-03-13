@@ -14,6 +14,7 @@ public class ValueAdjuster extends JComponent {
     //This class represents a JSlider with a corresponding JTextField that follow each other.
     private JSlider slider;
     private JTextField textField;
+    private ExtendedNumberFormatter numberFormatter;
     private boolean valueEntered = false;
     private int maximumValue;
     private ChangeListener changeListener;
@@ -50,12 +51,12 @@ public class ValueAdjuster extends JComponent {
 
         NumberFormat format = NumberFormat.getIntegerInstance();
         format.setGroupingUsed(false);
-        ExtendedNumberFormatter formatter = new ExtendedNumberFormatter(format);
-        formatter.setMinimum(0);
-        formatter.setMaximum(Integer.MAX_VALUE);
-        formatter.setAllowsInvalid(false);
+        numberFormatter = new ExtendedNumberFormatter(format);
+        numberFormatter.setMinimum(minSliderValue);
+        numberFormatter.setMaximum(Integer.MAX_VALUE);
+        numberFormatter.setAllowsInvalid(false);
 
-        textField = new JFormattedTextField(formatter);
+        textField = new JFormattedTextField(numberFormatter);
         textField.setHorizontalAlignment(JTextField.CENTER);
         add(textField);
 
