@@ -253,6 +253,14 @@ public class View extends JFrame {
         statisticsPanel.plotTestResults(testResults, testSet, algorithmNames);
     }
 
+    protected void startStatisticsPanelRunPhase() {
+        statisticsPanel.startRunPhase();
+    }
+
+    protected void endStatisticsPanelRunPhase() {
+        statisticsPanel.endRunPhase();
+    }
+
     protected int getWindowHeight() {
         return windowHeight;
     }

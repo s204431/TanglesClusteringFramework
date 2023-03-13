@@ -293,12 +293,22 @@ public class StatisticsTopPanel extends JPanel {
                         String datatype = comboBox.getSelectedItem().toString();
                         testSet = convertToTestSet(datatype, table);
 
-                        //Run test set
-                        String[] algorithmsNames = getAlgorithmNames(new boolean[] { tangleCheckBox.isSelected(), kMeansCheckBox.isSelected(), spectralCheckBox.isSelected(), linkageCheckBox.isSelected() });
-                        double[][][] testResults = ClusteringTester.runTest(testSet, algorithmsNames);
-                        view.plotTestResults(testResults, testSet, algorithmsNames);
-
                         dialog.setVisible(false);
+
+                        //Run test set
+                        view.startStatisticsPanelRunPhase();
+
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                setVisible(false);
+                                String[] algorithmsNames = getAlgorithmNames(new boolean[]{tangleCheckBox.isSelected(), kMeansCheckBox.isSelected(), spectralCheckBox.isSelected(), linkageCheckBox.isSelected()});
+                                double[][][] testResults = ClusteringTester.runTest(testSet, algorithmsNames);
+                                view.plotTestResults(testResults,testSet,algorithmsNames);
+                                view.endStatisticsPanelRunPhase();
+                                setVisible(true);
+                            }
+                        }).start();
                     }
                 });
                 JButton cancelButton = new JButton("Cancel");

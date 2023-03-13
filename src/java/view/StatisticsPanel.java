@@ -17,6 +17,8 @@ public class StatisticsPanel extends JPanel {
     private JPanel leftPicturePanel;
     private JPanel rightPicturePanel;
 
+    private JLabel preRunLabel, runLabel;
+
     public StatisticsPanel(View view) {
         this.view = view;
 
@@ -31,6 +33,22 @@ public class StatisticsPanel extends JPanel {
         add(leftPicturePanel);
         add(Box.createRigidArea(new Dimension(view.windowWidth / 100, 0)));
         add(rightPicturePanel);
+
+        Font font = new Font("TimesRoman", Font.BOLD, 25);
+        preRunLabel = new JLabel("Please run a test set");
+        runLabel = new JLabel("Running test set...");
+        runLabel.setAlignmentX(CENTER_ALIGNMENT);
+        preRunLabel.setAlignmentX(CENTER_ALIGNMENT);
+        runLabel.setAlignmentY(TOP_ALIGNMENT);
+        preRunLabel.setAlignmentY(TOP_ALIGNMENT);
+        runLabel.setFont(font);
+        preRunLabel.setFont(font);
+        runLabel.setVisible(false);
+
+        JPanel labelPane = new JPanel();
+        labelPane.add(preRunLabel);
+        labelPane.add(runLabel);
+        add(labelPane);
     }
 
     protected void plotTestResults(double[][][] testResults, TestSet testSet, String[] algorithmNames) {
@@ -112,6 +130,15 @@ public class StatisticsPanel extends JPanel {
 
         setVisible(false);
         setVisible(true);
+    }
+
+    protected void startRunPhase() {
+        preRunLabel.setVisible(false);
+        runLabel.setVisible(true);
+    }
+
+    protected void endRunPhase() {
+        runLabel.setVisible(false);
     }
 
     protected void setBounds() {
