@@ -35,6 +35,7 @@ public class FeatureBasedDataset extends Dataset {
     public static final String initialCutsTanglesAdjust = "Tangles adjust";
 
     public static final String costFunctionPairwiseDistance = "Pairwise distance";
+    public static final String costFunctionPairwiseSquaredDistance = "Squared distances";
     public static final String costFunctionDistanceToMean = "Distance to mean";
     public static final String costFunctionLocalMeans = "Local means";
 
@@ -228,7 +229,7 @@ public class FeatureBasedDataset extends Dataset {
     //Returns the names of the supported cost functions.
     @Override
     public String[] getCostFunctions() {
-        return new String[] {costFunctionDistanceToMean, costFunctionPairwiseDistance, costFunctionLocalMeans};
+        return new String[] {costFunctionDistanceToMean, costFunctionPairwiseDistance, costFunctionPairwiseSquaredDistance, costFunctionLocalMeans};
     }
 
     //Generates initial cuts for this dataset using the giving initial cut generator name and returns it as a BitSet array.
@@ -261,6 +262,9 @@ public class FeatureBasedDataset extends Dataset {
         else if (costFunctionName.equals(costFunctionPairwiseDistance)) {
             cutCosts = pairwiseDistanceCostFunction();
         }
+        else if (costFunctionName.equals(costFunctionPairwiseSquaredDistance)) {
+            cutCosts = pairwiseSquaredDistanceCostFunction();
+        }
         else if (costFunctionName.equals(costFunctionLocalMeans)) {
             //Do nothing
         }
@@ -288,6 +292,36 @@ public class FeatureBasedDataset extends Dataset {
                 }
             }
             costs[i] = cost/(initialCuts[i].count()*(initialCuts[i].size()-initialCuts[i].count()));
+        }
+        cutCosts = costs;
+        return costs;
+    }
+
+    //Cost function using pairwise squared distance efficiently.
+    private double[] pairwiseSquaredDistanceCostFunction() {
+        double[] costs = new double[initialCuts.length];
+        double maxRange = getMaxRange();
+        for (int i = 0; i < initialCuts.length; i++) {
+            double[] squaredSums1 = new double[dataPoints[0].length];
+            double[] sums1 = new double[dataPoints[0].length];
+            double[] squaredSums2 = new double[dataPoints[0].length];
+            double[] sums2 = new double[dataPoints[0].length];
+            for (int j = 0; j < dataPoints.length; j++) {
+                for (int k = 0; k < dataPoints[j].length; k++) {
+                    if (initialCuts[i].get(j)) {
+                        sums1[k] += dataPoints[j][k];
+                        squaredSums1[k] += dataPoints[j][k]*dataPoints[j][k];
+                    }
+                    else {
+                        sums2[k] += dataPoints[j][k];
+                        squaredSums2[k] += dataPoints[j][k]*dataPoints[j][k];
+                    }
+                }
+            }
+            for (int j = 0; j < sums1.length; j++) {
+                costs[i] += -sums1[j]*sums2[j] + squaredSums1[j] + squaredSums2[j];
+            }
+            costs[i] *= -2.0;
         }
         cutCosts = costs;
         return costs;
