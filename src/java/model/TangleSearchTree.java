@@ -6,29 +6,34 @@ import java.util.*;
 
 public class TangleSearchTree {
 
+    //This class represents a tangle search tree.
+
     private static final boolean USE_HASHING = false; //Determines if hashing of intersections is used.
-    private int a;
+    private final int a;
     protected Node root;
     protected List<Node> lowestDepthNodes = new ArrayList<>();
     private int currentDepth = -1;
 
-    private BitSet[] orientations;
-    private double[] cutCosts;
+    private final BitSet[] cuts;
+    private final double[] cutCosts;
     private double minCost;
     private double maxCost;
-    private int integerBits; //Number of bits to represent the index of an orientation.
-    private Hashtable<Long, Integer> hashtable = new Hashtable();
+    private final int integerBits; //Number of bits to represent the index of an orientation.
+    private final Hashtable<Long, Integer> hashtable = new Hashtable<>();
     protected double[][] softClustering;
+    protected int[] hardClustering;
 
-    protected TangleSearchTree(int a, BitSet[] orientations, double[] cutCosts) {
+    //Constructor receiving a, all cuts and the cost for each cut.
+    protected TangleSearchTree(int a, BitSet[] cuts, double[] cutCosts) {
         this.a = a;
-        this.orientations = orientations;
+        this.cuts = cuts;
         this.cutCosts = cutCosts;
         integerBits = (int)(Math.log(cutCosts.length)/Math.log(2))+1;
         root = new Node();
         lowestDepthNodes.add(root);
     }
 
+    //Adds an orientation as a child of the specified node with direction specified by "left". orientationIndex is the index of the cut in the "cuts" array.
     protected boolean addOrientation(Node node, int orientationIndex, boolean left) {
         Node newNode = new Node(orientationIndex, left);
         newNode.parent = node;
@@ -59,24 +64,15 @@ public class TangleSearchTree {
         return consistent;
     }
 
+    //Checks whether the tree is still consistent after adding "newNode".
     private boolean isConsistent(Node newNode) {
         int depth = getDepth(newNode);
         if (depth < 2) {
-            if (orientations[newNode.originalOrientation].size() < a) {
-                return false;
-            }
-            else {
-                return true;
-            }
+            return cuts[newNode.originalOrientation].size() >= a;
         }
         if (depth == 2) {
-            int intersection = BitSet.intersectionEarlyStop(orientations[newNode.originalOrientation], orientations[newNode.parent.originalOrientation], newNode.side, newNode.parent.side, a);
-            if (intersection < a) {
-                return false;
-            }
-            else {
-                return true;
-            }
+            int intersection = BitSet.intersectionEarlyStop(cuts[newNode.originalOrientation], cuts[newNode.parent.originalOrientation], newNode.side, newNode.parent.side, a);
+            return intersection >= a;
         }
         Node[] otherNodes = new Node[depth-1];
         otherNodes[0] = newNode.parent;
@@ -92,12 +88,12 @@ public class TangleSearchTree {
                         intersection = hashed;
                     }
                     else {
-                        intersection = BitSet.intersectionEarlyStop(orientations[newNode.originalOrientation], orientations[otherNodes[i].originalOrientation], orientations[otherNodes[j].originalOrientation], newNode.side, otherNodes[i].side, otherNodes[j].side, a);
+                        intersection = BitSet.intersectionEarlyStop(cuts[newNode.originalOrientation], cuts[otherNodes[i].originalOrientation], cuts[otherNodes[j].originalOrientation], newNode.side, otherNodes[i].side, otherNodes[j].side, a);
                         addToHash(newNode.originalOrientation, otherNodes[i].originalOrientation, otherNodes[j].originalOrientation, newNode.side, otherNodes[i].side, otherNodes[j].side, intersection);
                     }
                 }
                 else {
-                    intersection = BitSet.intersectionEarlyStop(orientations[newNode.originalOrientation], orientations[otherNodes[i].originalOrientation], orientations[otherNodes[j].originalOrientation], newNode.side, otherNodes[i].side, otherNodes[j].side, a);
+                    intersection = BitSet.intersectionEarlyStop(cuts[newNode.originalOrientation], cuts[otherNodes[i].originalOrientation], cuts[otherNodes[j].originalOrientation], newNode.side, otherNodes[i].side, otherNodes[j].side, a);
                 }
                 if (intersection < a) {
                     return false;
@@ -107,6 +103,7 @@ public class TangleSearchTree {
         return true;
     }
 
+    //Returns the depth of the specified node.
     private int getDepth(Node node) {
         int depth = 0;
         while (node.parent != null) {
@@ -116,7 +113,8 @@ public class TangleSearchTree {
         return depth;
     }
 
-    protected int[] calculateHardClustering() {
+    //Calculates the hard clustering of each point.
+    protected void calculateHardClustering() {
         if (softClustering == null) {
             calculateSoftClustering();
         }
@@ -132,47 +130,50 @@ public class TangleSearchTree {
             }
             hardClustering[i] = maxCluster;
         }
-        return hardClustering;
+        this.hardClustering = hardClustering;
     }
 
-    protected double[][] calculateSoftClustering() {
+    //Calculates the soft clustering of each point.
+    protected void calculateSoftClustering() {
         calculateMinMaxCost(cutCosts);
         int clusters = getNumberOfClusters(root);
-        double[][] result = new double[orientations[0].size()][clusters];
-        for (int i = 0; i < orientations[0].size(); i++) {
+        double[][] result = new double[cuts[0].size()][clusters];
+        for (int i = 0; i < cuts[0].size(); i++) {
             getSoftClustering(root, i, 0, 1, result[i]);
         }
         softClustering = result;
-        return result;
     }
 
+    //Calculates the minimum and maximum cost of a cut.
     private void calculateMinMaxCost(double[] cutCosts) {
         minCost = Double.MAX_VALUE;
         maxCost = Double.MIN_VALUE;
-        for (int i = 0; i < cutCosts.length; i++) {
-            if (cutCosts[i] > 0 && cutCosts[i] < minCost) {
-                minCost = cutCosts[i];
+        for (double cutCost : cutCosts) {
+            if (cutCost > 0 && cutCost < minCost) {
+                minCost = cutCost;
             }
-            if (cutCosts[i] > maxCost) {
-                maxCost = cutCosts[i];
+            if (cutCost > maxCost) {
+                maxCost = cutCost;
             }
         }
     }
 
     //Generates a default clustering with one cluster.
-    protected double[][] generateDefaultClustering() {
-        double[][] result = new double[orientations[0].size()][1];
-        for (int i = 0; i < orientations[0].size(); i++) {
+    protected void generateDefaultClustering() {
+        double[][] result = new double[cuts[0].size()][1];
+        for (int i = 0; i < cuts[0].size(); i++) {
             result[i][0] = 1;
         }
         softClustering = result;
-        return result;
+        calculateHardClustering();
     }
 
+    //Returns the weight assigned to a specific cost.
     private double getWeight(double cost) {
         return cost == 0.0 || (maxCost-minCost) == 0.0 ? 1.0 : Math.exp(-((cost-minCost)/(maxCost-minCost)));
     }
 
+    //Calculates the soft clustering for a specific data point recursively.
     private int getSoftClustering(Node node, int datapoint, int index, double accumulated, double[] result) {
         if (node.getChildCount() == 0) {
             result[index] = accumulated;
@@ -184,13 +185,13 @@ public class TangleSearchTree {
             for (int distinguished : node.distinguishedCuts) {
                 if (node.leftChild.condensedOrientations.get(distinguished)) {
                     sum2 += getWeight(cutCosts[distinguished]);
-                    if (!orientations[distinguished].get(datapoint)) {
+                    if (!cuts[distinguished].get(datapoint)) {
                         sum1 += getWeight(cutCosts[distinguished]);
                     }
                 }
                 if (node.leftChild.condensedOrientations.get(distinguished+node.leftChild.condensedOrientations.size()/2)) {
                     sum2 += getWeight(cutCosts[distinguished]);
-                    if (orientations[distinguished].get(datapoint)) {
+                    if (cuts[distinguished].get(datapoint)) {
                         sum1 += getWeight(cutCosts[distinguished]);
                     }
                 }
@@ -202,6 +203,7 @@ public class TangleSearchTree {
         }
     }
 
+    //Returns the number of clusters found by the algorithm.
     private int getNumberOfClusters(Node node) {
         if (node.getChildCount() == 0) {
             return 1;
@@ -211,10 +213,12 @@ public class TangleSearchTree {
         }
     }
 
+    //Contracts the tree.
     protected void contractTree() {
         contractTree(root);
     }
 
+    //Recursively contracts the tree.
     private void contractTree(Node node) {
         if (node.getChildCount() > 0) { //This is not a leaf.
             contractTree(node.leftChild);
@@ -233,12 +237,13 @@ public class TangleSearchTree {
         }
     }
 
-    //Removes branches of length "pruneDepth" or lower from the tree.
+    //Removes internal nodes with exactly one child and removes branches of length "pruneDepth" or lower from the tree.
     protected void condenseTree(int pruneDepth) {
         removeInternalNodes(root);
         pruneBranches(root, pruneDepth);
     }
 
+    //Removes branches of length "pruneDepth" or lower from the tree.
     private void pruneBranches(Node node, int pruneDepth) {
         if (node.getChildCount() == 0) { //This is a leaf.
             if (node.originalDepth <= pruneDepth) {
@@ -259,6 +264,7 @@ public class TangleSearchTree {
         }
     }
 
+    //Removes the specified node from the tree.
     private void removeNode(Node node) {
         Node child = node.leftChild == null ? node.rightChild : node.leftChild;
         child.originalDepth++;
@@ -277,6 +283,7 @@ public class TangleSearchTree {
         child.condensedOrientations.unionWith(node.condensedOrientations);
     }
 
+    //Removes internal nodes with exactly one child.
     private void removeInternalNodes(Node node) {
         if (node.leftChild != null) {
             removeInternalNodes(node.leftChild);
@@ -298,9 +305,9 @@ public class TangleSearchTree {
         currentNodes.add(root);
         int depth = 0;
         while (!currentNodes.isEmpty()) {
-            for (int i = 0; i < currentNodes.size(); i++) {
+            for (Node currentNode : currentNodes) {
                 if (!asGraphviz) {
-                    System.out.print(currentNodes.get(i).side + " " + currentNodes.get(i).getChildCount());
+                    System.out.print(currentNode.side + " " + currentNode.getChildCount());
                 }
             }
             int index1 = 0;
@@ -336,11 +343,13 @@ public class TangleSearchTree {
         }
     }
 
+    //Adds an intersection to the hash table.
     private void addToHash(long cut1, long cut2, long cut3, boolean side1, boolean side2, boolean side3, int value) {
         long hashKey = getHashKey(cut1, cut2, cut3, side1, side2, side3);
         hashtable.put(hashKey, value);
     }
 
+    //Returns the hashed value of an intersection.
     private int getHashValue(long cut1, long cut2, long cut3, boolean side1, boolean side2, boolean side3) {
         long hashKey = getHashKey(cut1, cut2, cut3, side1, side2, side3);
         Integer hashValue = hashtable.get(hashKey);
@@ -350,6 +359,7 @@ public class TangleSearchTree {
         return -1;
     }
 
+    //Calculates the hash key of an intersection.
     private long getHashKey(long cut1, long cut2, long cut3, boolean side1, boolean side2, boolean side3) {
         long l1 = ((side1 ? 0L : 1L) << ((integerBits+1)*3-1)) | (cut1 << (integerBits+1)*2);
         long l2 = ((side2 ? 0L : 1L) << ((integerBits+1)*2-1)) | (cut2 << (integerBits+1));
@@ -359,26 +369,31 @@ public class TangleSearchTree {
 
     protected class Node {
 
+        //This class represents the node of the tree.
+
         private int originalOrientation;
-        private BitSet condensedOrientations;
-        private List<Integer> distinguishedCuts = new ArrayList<>();
+        private final BitSet condensedOrientations;
+        private final List<Integer> distinguishedCuts = new ArrayList<>();
         private Node leftChild;
         private Node rightChild;
         private Node parent;
         private boolean side;
         private int originalDepth = 1;
 
+        //Creates a default node (used to generate the root).
         private Node() {
-            condensedOrientations = new util.BitSet(orientations.length*2);
+            condensedOrientations = new BitSet(cuts.length*2);
         }
 
+        //Creates a node with a specific orientation.
         private Node(int orientationIndex, boolean side) {
             this.originalOrientation = orientationIndex;
             this.side = side;
-            condensedOrientations = new BitSet(orientations.length*2);
+            condensedOrientations = new BitSet(cuts.length*2);
             condensedOrientations.add(side ? orientationIndex : orientationIndex+condensedOrientations.size()/2);
         }
 
+        //Returns the child count of the node.
         private int getChildCount() {
             int count = 0;
             if (leftChild != null) {

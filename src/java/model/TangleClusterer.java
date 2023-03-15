@@ -1,7 +1,5 @@
 package model;
 
-import java.util.Date;
-
 import datasets.Dataset;
 import util.BitSet;
 import util.Tuple;
@@ -9,96 +7,53 @@ import model.TangleSearchTree.Node;
 
 public class TangleClusterer {
 
-    protected TangleClusterer() {}
+    //This class is used to generate a clustering with tangles.
 
     private TangleSearchTree tangleSearchTree;
 
-    protected boolean doneClustering = false;
+    //Ensure that it can only be created within this package.
+    protected TangleClusterer() {}
 
+    //Generates a soft- and hard clustering for the provided dataset with a specific value of a and psi, and a specific initial cut generator and cost function.
     protected void generateClusters(Dataset dataset, int a, int psi, String initialCutGenerator, String costFunctionName) {
-        long time1 = new Date().getTime();
         dataset.setA(a);
         BitSet[] initialCuts = dataset.getInitialCuts(initialCutGenerator);
-        long time2 = new Date().getTime();
-        //System.out.println("Initial cuts time: " + (time2-time1) + " ms");
         double[] costs = dataset.getCutCosts(costFunctionName);
-        /*for (double cost : costs) {
-            System.out.print(cost + " ");
-        }*/
         Tuple<BitSet[], double[]> redundancyRemoved = removeRedundantCuts(initialCuts, costs, 1.0); //Set factor to 1 to turn it off.
         initialCuts = redundancyRemoved.x;
         costs = redundancyRemoved.y;
-        long time3 = new Date().getTime();
-        //System.out.println();
-        //System.out.println("Cost function time: " + (time3-time2) + " ms");
         TangleSearchTree tree = generateTangleSearchTree(initialCuts, costs, a, psi);
-        //tree.printTree(true, false);
         tangleSearchTree = tree;
-        long time4 = new Date().getTime();
-        //System.out.println("Tree generation time: " + (time4-time3) + " ms");
-        //System.out.println("Nodes at lowest depth: " + tree.lowestDepthNodes.size());
-        //System.out.println("Depth of tree: " + tree.getDepth(tree.lowestDepthNodes.get(0)));
-        //System.out.println("Total nodes in tree: " + tree.n);
         try {
             tree.condenseTree(1);
         } catch (NullPointerException e) {
             tree.generateDefaultClustering();
+            return;
         }
-        //tree.printTree(true, true);
-        long time5 = new Date().getTime();
-        //System.out.println("Condensing time: " + (time5-time4) + " ms");
         tree.contractTree();
-        //tree.printTree(true, true);
-        long time6 = new Date().getTime();
-        //System.out.println("Contracting time: " + (time6-time5) + " ms");
-        double[][] softClustering = tree.calculateSoftClustering();
-        /*long time7 = new Date().getTime();
-        System.out.println("Clustering time: " + (time7-time6) + " ms");
-        for (int i = 0; i < softClustering.length; i++) {
-            for (double d : softClustering[i]) {
-                System.out.print(d + " ");
-            }
-            System.out.println();
-        }
-        System.out.println("Number of clusters found: " + softClustering[0].length);
-        long time8 = new Date().getTime();
-        System.out.println("Total tangle search tree time: " + (time8-time3) + " ms");
-        System.out.println();*/
-        doneClustering = true;
+        tree.calculateSoftClustering();
+        tree.calculateHardClustering();
     }
 
+    //Returns the last generated soft clustering.
     protected double[][] getSoftClustering() {
         return tangleSearchTree.softClustering;
     }
 
+    //Returns the last generated hard clustering.
     protected int[] getHardClustering() {
-        if (tangleSearchTree.softClustering == null) {
-            tangleSearchTree.calculateSoftClustering();
-        }
-        return tangleSearchTree.calculateHardClustering();
+        return tangleSearchTree.hardClustering;
     }
 
+    //Generates the tangle search tree by ordering the cuts and adding nodes one at a time to the tree.
     private TangleSearchTree generateTangleSearchTree(BitSet[] initialCuts, double[] costs, int a, int psi) {
         int[] indices = new int[costs.length];
         for (int i = 0; i < indices.length; i++) {
             indices[i] = i;
         }
         double[] costsOrdered = new double[costs.length];
-        for (int i = 0; i < costs.length; i++) {
-            costsOrdered[i] = costs[i];
-        }
+        System.arraycopy(costs, 0, costsOrdered, 0, costs.length);
         quicksort(costsOrdered, indices, 0, costsOrdered.length-1);
-        /*int n = 5;
-        for (int i = 0; i < n; i++) {
-            int[] hardClustering = new int[initialCuts[indices[i]].size()];
-            double[][] softClustering = new double[initialCuts[indices[n]].size()][initialCuts.length];
-            for (int j = 0; j < initialCuts[indices[i]].size(); j++) {
-                hardClustering[j] = initialCuts[indices[i]].get(j) ? 0 : 1;
-                softClustering[j][0] = initialCuts[indices[i]].get(j) ? 1 : 0;
-                softClustering[j][1] = initialCuts[indices[i]].get(j) ? 0 : 1;
-            }
-            new PlottingView().loadPointsWithClustering(data.dataPoints, hardClustering, softClustering);
-        }*/
         TangleSearchTree tree = new TangleSearchTree(a, initialCuts, costs);
         for (int i = 0; i < costsOrdered.length; i++) {
             if (psi > 0 && costsOrdered[i] > psi) {
@@ -122,7 +77,7 @@ public class TangleClusterer {
         for (int i = 0; i < initialCuts.length; i++) {
             for (int j = 0; j < initialCuts.length; j++) {
                 if (i != j && !toBeRemoved[i] && !toBeRemoved[j] && BitSet.XNor(initialCuts[i], initialCuts[j]) > initialCuts[i].size()*factor) {
-                    //Remove cut with largest cost.
+                    //Remove cut with the largest cost.
                     int largest = costs[i] > costs[j] ? i : j;
                     toBeRemoved[largest] = true;
                 }
@@ -144,9 +99,10 @@ public class TangleClusterer {
                 index++;
             }
         }
-        return new Tuple(newInitialCuts, newCosts);
+        return new Tuple<>(newInitialCuts, newCosts);
     }
 
+    //Runs the quicksort algorithm on the costs. Ensures that indices follows the same ordering as costs.
     private void quicksort(double[] costs, int[] indices, int l, int h) {
         if (l >= h || l < 0) {
             return;
@@ -156,6 +112,7 @@ public class TangleClusterer {
         quicksort(costs, indices, p+1, h);
     }
 
+    //The partition part of the quicksort algorithm.
     private int partition(double[] costs, int[] indices, int l, int h) {
         double pivot = costs[h];
         int i = l-1;
