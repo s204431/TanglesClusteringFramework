@@ -7,22 +7,17 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.List;
 
 public class TangleSidePanel extends SidePanel {
 
     private ValueAdjuster aValueAdjuster; //Slider for the "a" parameter.
-    private JCheckBox showCutsCheckBox;
+    private JCheckBox showHorizontalCutsCheckBox;
+    private JCheckBox showVerticalCutsCheckBox;
     private JComboBox<String> cutGeneratorDropdown;
     private JComboBox<String> costFunctionDropdown;
 
     public TangleSidePanel(View view) {
         super(view);
-
-        add(Box.createRigidArea(new Dimension(0, 20)));
 
         JLabel aLabel = new JLabel("a");
         aLabel.setFont(super.font);
@@ -42,15 +37,14 @@ public class TangleSidePanel extends SidePanel {
         add(aValueAdjuster);
 
         if (view.getDataset() instanceof FeatureBasedDataset && ((FeatureBasedDataset) view.getDataset()).dataPoints[0].length <= 2) {
-            showCutsCheckBox = new JCheckBox("Show Cuts");
-            showCutsCheckBox.setAlignmentX(CENTER_ALIGNMENT);
-            showCutsCheckBox.addChangeListener(new ChangeListener() {
-                @Override
-                public void stateChanged(ChangeEvent e) {
-                    ((JPanel)view.dataVisualizer).repaint();
-                }
-            });
-            add(showCutsCheckBox);
+            showHorizontalCutsCheckBox = new JCheckBox("Show Horizontal Cuts");
+            showHorizontalCutsCheckBox.setAlignmentX(CENTER_ALIGNMENT);
+            showHorizontalCutsCheckBox.addChangeListener(e -> ((JPanel)view.dataVisualizer).repaint());
+            showVerticalCutsCheckBox = new JCheckBox("Show Vertical Cuts");
+            showVerticalCutsCheckBox.setAlignmentX(CENTER_ALIGNMENT);
+            showVerticalCutsCheckBox.addChangeListener(e -> ((JPanel)view.dataVisualizer).repaint());
+            add(showHorizontalCutsCheckBox);
+            add(showVerticalCutsCheckBox);
         }
         cutGeneratorDropdown = new JComboBox<>(view.getDataset().getInitialCutGenerators());
         cutGeneratorDropdown.addActionListener(e -> valueChanged());
@@ -112,7 +106,10 @@ public class TangleSidePanel extends SidePanel {
         }
     }*/
 
-    protected boolean showCuts() {
-        return showCutsCheckBox == null ? false : showCutsCheckBox.isSelected();
+    protected boolean showHorizontalCuts() {
+        return showHorizontalCutsCheckBox == null ? false : showHorizontalCutsCheckBox.isSelected();
+    }
+    protected boolean showVerticalCuts() {
+        return showVerticalCutsCheckBox == null ? false : showVerticalCutsCheckBox.isSelected();
     }
 }
