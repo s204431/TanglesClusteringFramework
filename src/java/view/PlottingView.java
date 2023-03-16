@@ -219,7 +219,7 @@ public class PlottingView extends JPanel implements DataVisualizer, MouseListene
         }
 
         //Show cuts.
-        if (points != null && view.selectedSidePanel instanceof TangleSidePanel && ((TangleSidePanel) view.selectedSidePanel).showCuts()) {
+        if (points != null && view.selectedSidePanel instanceof TangleSidePanel && (((TangleSidePanel) view.selectedSidePanel).showHorizontalCuts() || ((TangleSidePanel) view.selectedSidePanel).showVerticalCuts())) {
             FeatureBasedDataset dataset = (FeatureBasedDataset) view.getDataset();
             if (dataset.axisParallelCuts != null && dataset.cutCosts != null) {
                 double lowestCost = Double.MAX_VALUE;
@@ -237,6 +237,9 @@ public class PlottingView extends JPanel implements DataVisualizer, MouseListene
                 int nSegments = 20;
                 int costIndex = 0;
                 for (int i = 0; i < dataset.axisParallelCuts.length; i++) {
+                    if ((i == 0 && !((TangleSidePanel) view.selectedSidePanel).showVerticalCuts()) || (i == 1 && !((TangleSidePanel) view.selectedSidePanel).showHorizontalCuts())) {
+                        continue;
+                    }
                     int otherDimension = i == 0 ? 1 : 0;
                     double[] minPoint = new double[2];
                     double[] maxPoint = new double[2];
