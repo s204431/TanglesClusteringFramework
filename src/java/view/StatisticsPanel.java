@@ -136,6 +136,8 @@ public class StatisticsPanel extends JPanel {
     }
 
     protected void startRunPhase() {
+        leftPicturePanel.removeAll();
+        rightPicturePanel.removeAll();
         preRunLabel.setVisible(false);
         runLabel.setVisible(true);
         runLabel.setText("Running test set... 0%");
