@@ -55,9 +55,6 @@ public class StatisticsPanel extends JPanel {
     }
 
     protected void plotTestResults(double[][][] testResults, TestSet testSet, String[] algorithmNames) {
-        leftPicturePanel.removeAll();
-        rightPicturePanel.removeAll();
-
         Color[] colors = new Color[] {Color.RED, Color.BLUE, Color.GREEN, Color.ORANGE};
         Line[][] linesTime = new Line[3][algorithmNames.length];
         Line[][] linesNMI = new Line[3][algorithmNames.length];
