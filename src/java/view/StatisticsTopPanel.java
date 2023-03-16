@@ -37,8 +37,11 @@ public class StatisticsTopPanel extends JPanel {
     JComboBox<String> comboBox;
     JTable table = new JTable();
 
-    protected StatisticsTopPanel(View view) {
+    private StatisticsPanel statisticsPanel;
+
+    protected StatisticsTopPanel(View view, StatisticsPanel statisticsPanel) {
         this.view = view;
+        this.statisticsPanel = statisticsPanel;
 
         setPreferredSize(new Dimension(view.getWindowWidth(), view.getWindowHeight()));
         setLayout(null);
@@ -298,16 +301,16 @@ public class StatisticsTopPanel extends JPanel {
                         dialog.setVisible(false);
 
                         //Run test set
-                        view.startStatisticsPanelRunPhase();
+                        statisticsPanel.startRunPhase();
 
                         new Thread(new Runnable() {
                             @Override
                             public void run() {
                                 setVisible(false);
                                 String[] algorithmsNames = getAlgorithmNames(new boolean[]{tangleCheckBox.isSelected(), kMeansCheckBox.isSelected(), spectralCheckBox.isSelected(), linkageCheckBox.isSelected()});
-                                double[][][] testResults = ClusteringTester.runTest(testSet, algorithmsNames);
-                                view.plotTestResults(testResults,testSet,algorithmsNames);
-                                view.endStatisticsPanelRunPhase();
+                                double[][][] testResults = ClusteringTester.runTest(testSet, algorithmsNames, statisticsPanel);
+                                statisticsPanel.plotTestResults(testResults,testSet,algorithmsNames);
+                                statisticsPanel.endRunPhase();
                                 setVisible(true);
                             }
                         }).start();

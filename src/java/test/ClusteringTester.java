@@ -15,7 +15,12 @@ import java.util.Scanner;
 import model.Model;
 import smile.validation.metric.NormalizedMutualInformation;
 
+import javax.swing.*;
+
 public class ClusteringTester {
+
+    public static double testProgress = 0.0;
+
     private static Model model = new Model();
 
     public static void testTangleClusterer() {
@@ -155,7 +160,8 @@ public class ClusteringTester {
     }
 
     //Runs a test set on a specific algorithm. Returns {Time, NMI score} for each test case.
-    public static double[][][] runTest(TestSet testSet, String[] algorithmNames) {
+    //Optionally takes a JPanel to be repainted when progress is made.
+    public static double[][][] runTest(TestSet testSet, String[] algorithmNames, JPanel repaintPanel) {
         double[][][] result = new double[algorithmNames.length][testSet.size()][2];
         System.out.print("Running tests for ");
         for (int algorithm = 0; algorithm < algorithmNames.length; algorithm++) {
@@ -171,6 +177,10 @@ public class ClusteringTester {
         }
         System.out.println(" on " + testSet.dataTypeName);
         for (int i = 0; i < testSet.size(); i++) {
+            testProgress = i/(double)testSet.size();
+            if (repaintPanel != null) {
+                repaintPanel.repaint();
+            }
             TestCase testCase = testSet.get(i);
             long[] testCaseTimes = new long[algorithmNames.length];
             double[] testCaseNMIScores = new double[algorithmNames.length];

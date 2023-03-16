@@ -70,7 +70,7 @@ public class View extends JFrame {
         });
 
         topPanel = new TopPanel(this);
-        statisticsTopPanel = new StatisticsTopPanel(this);
+        statisticsTopPanel = new StatisticsTopPanel(this, statisticsPanel);
 
         SidePanel sidePanel = new SidePanel(this);
         sidePanels.add(sidePanel);
@@ -254,10 +254,6 @@ public class View extends JFrame {
         controller.loadDatasetFromFile(datasetTypeName, fileName, startRow, endRow, startColumn, endColumn);
     }
 
-    protected void plotTestResults(double[][][] testResults, TestSet testSet, String[] algorithmNames) {
-        statisticsPanel.plotTestResults(testResults, testSet, algorithmNames);
-    }
-
     protected void switchShowingOfAxes() {
         if (dataVisualizer instanceof PlottingView) {
             ((PlottingView) dataVisualizer).switchShowingOfAxes();
@@ -270,14 +266,6 @@ public class View extends JFrame {
             ((PlottingView) dataVisualizer).switchShowingOfGridlines();
         }
         repaint();
-    }
-
-    protected void startStatisticsPanelRunPhase() {
-        statisticsPanel.startRunPhase();
-    }
-
-    protected void endStatisticsPanelRunPhase() {
-        statisticsPanel.endRunPhase();
     }
 
     protected int getWindowHeight() {

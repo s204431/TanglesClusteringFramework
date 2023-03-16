@@ -2,10 +2,13 @@ package view;
 
 import smile.plot.swing.*;
 import smile.plot.swing.Canvas;
+import smile.regression.Regression;
+import test.ClusteringTester;
 import test.TestSet;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.lang.reflect.InvocationTargetException;
 
@@ -135,6 +138,15 @@ public class StatisticsPanel extends JPanel {
     protected void startRunPhase() {
         preRunLabel.setVisible(false);
         runLabel.setVisible(true);
+        runLabel.setText("Running test set... 0%");
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        if (runLabel.isVisible()) {
+            runLabel.setText("Running test set... " + (int)(ClusteringTester.testProgress*100)+"%");
+        }
     }
 
     protected void endRunPhase() {
