@@ -71,8 +71,13 @@ public class TangleSidePanel extends SidePanel {
         aValueAdjuster.setValue(a);
     }
 
-    String removedCostFunction = null;
+    private String removedCostFunction = null;
+    private boolean valueChangedDone = true;
     protected void valueChanged() {
+        if (!valueChangedDone) {
+            return;
+        }
+        valueChangedDone = false;
         if (removedCostFunction != null) {
             costFunctionDropdown.addItem(removedCostFunction);
         }
@@ -81,7 +86,7 @@ public class TangleSidePanel extends SidePanel {
             for (int j = 0; j < costFunctionDropdown.getItemCount(); j++) {
                 if (cutGeneratorDropdown.getSelectedIndex() != i && cutGeneratorDropdown.getItemAt(i).equals(costFunctionDropdown.getItemAt(j))) {
                     removedCostFunction = costFunctionDropdown.getItemAt(j);
-                    costFunctionDropdown.removeItemAt(j);
+                    costFunctionDropdown.removeItem(removedCostFunction);
                     break;
                 }
             }
@@ -90,6 +95,7 @@ public class TangleSidePanel extends SidePanel {
             view.controller.generateClusteringTangles(aValueAdjuster.getValue(), -1, (String) cutGeneratorDropdown.getSelectedItem(), (String) costFunctionDropdown.getSelectedItem());
         }
         repaint();
+        valueChangedDone = true;
     }
 
     protected void update(int n) {
