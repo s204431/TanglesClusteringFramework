@@ -43,8 +43,8 @@ public class View extends JFrame {
         this.model = model;
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 
-        windowWidth = screenSize.width - screenSize.width / 3;
-        windowHeight = screenSize.height - screenSize.height / 3;
+        windowWidth = screenSize.width - screenSize.width / 10;
+        windowHeight = screenSize.height - screenSize.height / 10;
 
         //Create frame
         setTitle("View");
