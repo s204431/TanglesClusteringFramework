@@ -4,7 +4,7 @@ import datasets.BinaryQuestionnaire;
 import datasets.Dataset;
 import datasets.FeatureBasedDataset;
 import datasets.GraphDataset;
-import main.Controller;
+import controller.Controller;
 import model.Model;
 import test.TestSet;
 import util.BitSet;
