@@ -94,6 +94,17 @@ public class PlottingView extends JPanel implements DataVisualizer, MouseListene
             return;
         }
 
+        //Draws string if TSNE is running.
+        if (runningTSNE) {
+            g2d.setColor(Color.BLACK);
+            int textHeight = 35;
+            g2d.setFont(getFont().deriveFont((float)textHeight));
+            String text = "Converting data points to 2D...";
+            int textWidth = g2d.getFontMetrics().stringWidth(text);
+            g2d.drawString(text, (view.windowWidth - view.sidePanelWidth) / 2 - textWidth / 2, (view.windowHeight - view.topPanelHeight) / 2 - textHeight);
+            return;
+        }
+
         //Update necessary values.
         windowMax = Math.max(view.getWindowHeight(), view.getWindowWidth());
         if (lineGap == 0) {
@@ -103,7 +114,7 @@ public class PlottingView extends JPanel implements DataVisualizer, MouseListene
 
         //Draw axes.
         if (showAxes) {
-            g2d.setStroke(stroke4);
+            g2d.setStroke(stroke3);
             g2d.setColor(Color.BLACK);
             g2d.drawLine(0, yOrig, view.getWindowWidth(), yOrig);
             g2d.drawLine(xOrig, 0, xOrig, view.getWindowHeight());
@@ -322,12 +333,6 @@ public class PlottingView extends JPanel implements DataVisualizer, MouseListene
                     }
                 }
             }
-        }
-
-        if (runningTSNE) {
-            g2d.setColor(Color.BLACK);
-            g2d.setFont(getFont().deriveFont(35f));
-            g2d.drawString("Converting data points to 2D...", getWidth()/10, getHeight()/3);
         }
     }
 
