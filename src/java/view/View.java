@@ -218,6 +218,11 @@ public class View extends JFrame {
                 addSidePanel(new LinkageSidePanel(this), Model.linkageName);
             }
         }
+
+        //Determine if axes and gridlines should be shown
+        if (!topPanel.showAxesButtonIsOn()) switchShowingOfAxes();
+        if (!topPanel.showGridlinesButtonIsOn()) switchShowingOfGridlines();
+
         ((JPanel)dataVisualizer).repaint();
     }
 

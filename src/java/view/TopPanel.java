@@ -31,6 +31,9 @@ public class TopPanel extends JPanel {
     private JButton showGridLinesButton;
     private JButton statisticsButton;
 
+    private String axesOnText = "Axes ON";
+    private String gridlinesOnText = "Grid lines ON";
+
     protected TopPanel(View view) {
         this.view = view;
 
@@ -300,15 +303,15 @@ public class TopPanel extends JPanel {
     }
 
     private void addAxesButton() {
-        showAxesButton = new JButton("Axes ON");
+        showAxesButton = new JButton(axesOnText);
         showAxesButton.setBackground(new JButton().getBackground());
         showAxesButton.addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent e) {
-                if (showAxesButton.getText().equals("Axes ON")) {
-                    showAxesButton.setText("Axes OFF");
+                if (showAxesButton.getText().equals(axesOnText)) {
+                    showAxesButton.setText(axesOnText.substring(0, axesOnText.length() - 2) + "OFF");
                     showAxesButton.setBackground(Color.GRAY);
                 } else {
-                    showAxesButton.setText("Axes ON");
+                    showAxesButton.setText(axesOnText);
                     showAxesButton.setBackground(new JButton().getBackground());
                 }
                 view.switchShowingOfAxes();
@@ -318,15 +321,15 @@ public class TopPanel extends JPanel {
     }
 
     private void addGridLinesButton() {
-        showGridLinesButton = new JButton("Grid lines ON");
+        showGridLinesButton = new JButton(gridlinesOnText);
         showGridLinesButton.setBackground(new JButton().getBackground());
         showGridLinesButton.addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent e) {
-                if (showGridLinesButton.getText().equals("Grid lines ON")) {
-                    showGridLinesButton.setText("Grid lines OFF");
+                if (showGridLinesButton.getText().equals(gridlinesOnText)) {
+                    showGridLinesButton.setText(gridlinesOnText.substring(0, gridlinesOnText.length() - 2) + "OFF");
                     showGridLinesButton.setBackground(Color.GRAY);
                 } else {
-                    showGridLinesButton.setText("Grid lines ON");
+                    showGridLinesButton.setText(gridlinesOnText);
                     showGridLinesButton.setBackground(new JButton().getBackground());
                 }
                 view.switchShowingOfGridlines();
@@ -345,16 +348,12 @@ public class TopPanel extends JPanel {
         toolBar.add(statisticsButton);
     }
 
-    private JButton createOkayButton(JPanel panel) {
-        JButton okayButton = new JButton("Okay");
-        okayButton.setPreferredSize(new Dimension(BUTTON_WIDTH, BUTTON_HEIGHT));
-        return okayButton;
+    protected boolean showAxesButtonIsOn() {
+        return showAxesButton.getText().equals(axesOnText);
     }
 
-    private JButton createCancelButton(JPanel panel) {
-        JButton cancelButton = new JButton("Cancel");
-        cancelButton.setPreferredSize(new Dimension(BUTTON_WIDTH, BUTTON_HEIGHT));
-        return cancelButton;
+    protected boolean showGridlinesButtonIsOn() {
+        return showGridLinesButton.getText().equals(gridlinesOnText);
     }
 
     protected void setBounds() {
