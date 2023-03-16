@@ -147,7 +147,8 @@ public class ValueAdjuster extends JComponent {
     @Override
     public void setBounds(int x, int y, int width, int height) {
         super.setBounds(x, y, width, height);
-        slider.setBounds(0, 0, getWidth(), (int)((50.0/130.0)*getHeight()));
-        textField.setBounds(0, (int)((50.0/130.0)*getHeight()), getWidth(), (int)((30.0/130.0)*getHeight()));
+        int sliderHeight = getHeight() * 40 / 130;
+        slider.setBounds(0, 0, getWidth(), sliderHeight);
+        textField.setBounds(0, sliderHeight, getWidth(), getHeight() * 30 / 130);
     }
 }

@@ -18,7 +18,7 @@ public class SpectralSidePanel extends SidePanel {
         add(Box.createRigidArea(new Dimension(0, 20)));
 
         JLabel kLabel = new JLabel("k");
-        kLabel.setFont(new Font("TimesRoman", Font.BOLD, 18));
+        kLabel.setFont(super.font);
         kLabel.setAlignmentX(CENTER_ALIGNMENT);
         add(kLabel);
 
@@ -35,7 +35,7 @@ public class SpectralSidePanel extends SidePanel {
         add(kValueAdjuster);
 
         JLabel sigmaLabel = new JLabel("sigma");
-        sigmaLabel.setFont(new Font("TimesRoman", Font.BOLD, 18));
+        sigmaLabel.setFont(super.font);
         sigmaLabel.setAlignmentX(CENTER_ALIGNMENT);
         add(sigmaLabel);
 

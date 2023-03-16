@@ -274,8 +274,10 @@ public class StatisticsTopPanel extends JPanel {
                         //Prevent running of test set if table has 0 values or if no checkboxes are selected.
                         for (int i = 0; i < tableModel.getRowCount(); i++) {
                             for (int j = 0; j < tableModel.getColumnCount(); j++) {
-                                if (table.getValueAt(i,j).equals("") || table.getValueAt(i,j).equals("0")) {
+                                Object value = table.getValueAt(i,j);
+                                if (value == null || value.toString().equals("") || value.toString().equals("0")) {
                                     testSetErrorLabel.setVisible(true);
+                                    algorithmsErrorLabel.setVisible(false);
                                     return;
                                 }
                             }
@@ -416,12 +418,13 @@ public class StatisticsTopPanel extends JPanel {
 
     public TestSet convertToTestSet(String dataTypeName, JTable table) {
         TestSet testSet = new TestSet(dataTypeName);
+        int[] values = new int[4];  //nPoints, nDimensions, nClusters, nRuns
         for (int i = 0; i < table.getRowCount(); i++) {
-            int nPoints = parseInt(table.getValueAt(i, 0).toString());
-            int nDimensions = parseInt(table.getValueAt(i, 1).toString());
-            int nClusters = parseInt(table.getValueAt(i, 2).toString());
-            int nRuns = parseInt(table.getValueAt(i, 3).toString());
-            testSet.add(new TestCase(nPoints, nDimensions, nClusters, nRuns));
+            for (int j = 0; j < 4; j++) {
+                Object value = table.getValueAt(i,j);
+                values[j] = value != null ? parseInt(value.toString()) : 0;
+            }
+            testSet.add(new TestCase(values[0], values[1], values[2], values[3]));
         }
         return testSet;
     }

@@ -18,6 +18,8 @@ public class SidePanel extends JPanel {
     private JLabel timeText = new JLabel("Clustering time: ");
     private JLabel timeLabel = new JLabel();
 
+    protected Font font;
+
     public SidePanel(View view) {
         this.view = view;
 
@@ -27,7 +29,7 @@ public class SidePanel extends JPanel {
         add(Box.createRigidArea(new Dimension(0, 20)));
 
         JLabel[] allLabels = { pointsText, pointsLabel, showingLabel, new JLabel(), NMIText, NMILabel, timeText, timeLabel };
-        Font font = new Font("TimesRoman", Font.BOLD, view.getWindowHeight() / 50);
+        font = new Font("TimesRoman", Font.BOLD, view.getWindowHeight() / 50);
 
         int c = 0;
         for (JLabel label : allLabels) {
@@ -51,7 +53,7 @@ public class SidePanel extends JPanel {
         Graphics2D g2d = (Graphics2D) g;
 
         g2d.setColor(Color.BLACK);
-        g2d.setFont(new Font("TimesRoman", Font.BOLD, 18));
+        g2d.setFont(font);
 
         pointsLabel.setText(""+view.dataVisualizer.getOriginalNumberOfPoints());
 

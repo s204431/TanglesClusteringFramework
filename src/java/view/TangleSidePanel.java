@@ -25,7 +25,7 @@ public class TangleSidePanel extends SidePanel {
         add(Box.createRigidArea(new Dimension(0, 20)));
 
         JLabel aLabel = new JLabel("a");
-        aLabel.setFont(new Font("TimesRoman", Font.BOLD, 18));
+        aLabel.setFont(super.font);
         aLabel.setAlignmentX(CENTER_ALIGNMENT);
         add(aLabel);
 
