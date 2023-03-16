@@ -253,6 +253,20 @@ public class View extends JFrame {
         statisticsPanel.plotTestResults(testResults, testSet, algorithmNames);
     }
 
+    protected void switchShowingOfAxes() {
+        if (dataVisualizer instanceof PlottingView) {
+            ((PlottingView) dataVisualizer).switchShowingOfAxes();
+        }
+        repaint();
+    }
+
+    protected void switchShowingOfGridlines() {
+        if (dataVisualizer instanceof PlottingView) {
+            ((PlottingView) dataVisualizer).switchShowingOfGridlines();
+        }
+        repaint();
+    }
+
     protected void startStatisticsPanelRunPhase() {
         statisticsPanel.startRunPhase();
     }

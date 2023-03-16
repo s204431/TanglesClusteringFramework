@@ -7,17 +7,14 @@ import util.ExtendedNumberFormatter;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.text.NumberFormatter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.text.NumberFormat;
-import java.text.ParseException;
 
 public class TopPanel extends JPanel {
     public static final int BUTTON_WIDTH = 100;
@@ -30,6 +27,8 @@ public class TopPanel extends JPanel {
     private JButton newButton;
     private JPopupMenu newPopup;
     private JButton exportButton;
+    private JButton showAxesButton;
+    private JButton showGridLinesButton;
     private JButton statisticsButton;
 
     protected TopPanel(View view) {
@@ -43,6 +42,8 @@ public class TopPanel extends JPanel {
 
         addNewButton();
         addExportButton();
+        addAxesButton();
+        addGridLinesButton();
         addStatisticsButton();
 
         add(toolBar);
@@ -298,6 +299,42 @@ public class TopPanel extends JPanel {
         toolBar.add(exportButton);
     }
 
+    private void addAxesButton() {
+        showAxesButton = new JButton("Axes ON");
+        showAxesButton.setBackground(new JButton().getBackground());
+        showAxesButton.addMouseListener(new MouseAdapter() {
+            public void mousePressed(MouseEvent e) {
+                if (showAxesButton.getText().equals("Axes ON")) {
+                    showAxesButton.setText("Axes OFF");
+                    showAxesButton.setBackground(Color.GRAY);
+                } else {
+                    showAxesButton.setText("Axes ON");
+                    showAxesButton.setBackground(new JButton().getBackground());
+                }
+                view.switchShowingOfAxes();
+            }
+        });
+        toolBar.add(showAxesButton);
+    }
+
+    private void addGridLinesButton() {
+        showGridLinesButton = new JButton("Grid lines ON");
+        showGridLinesButton.setBackground(new JButton().getBackground());
+        showGridLinesButton.addMouseListener(new MouseAdapter() {
+            public void mousePressed(MouseEvent e) {
+                if (showGridLinesButton.getText().equals("Grid lines ON")) {
+                    showGridLinesButton.setText("Grid lines OFF");
+                    showGridLinesButton.setBackground(Color.GRAY);
+                } else {
+                    showGridLinesButton.setText("Grid lines ON");
+                    showGridLinesButton.setBackground(new JButton().getBackground());
+                }
+                view.switchShowingOfGridlines();
+            }
+        });
+        toolBar.add(showGridLinesButton);
+    }
+
     private void addStatisticsButton() {
         statisticsButton = new JButton("Statistics");
         statisticsButton.addMouseListener(new MouseAdapter() {
@@ -325,6 +362,10 @@ public class TopPanel extends JPanel {
         toolBar.setBounds(0, 0, view.windowWidth, view.topPanelHeight);
         newButton.setBounds(BUTTON_HEIGHT, view.topPanelHeight / 2 - BUTTON_HEIGHT / 2, BUTTON_WIDTH, BUTTON_HEIGHT);
         exportButton.setBounds(BUTTON_HEIGHT + BUTTON_WIDTH, view.topPanelHeight / 2 - BUTTON_HEIGHT / 2, BUTTON_WIDTH, BUTTON_HEIGHT);
+
+        showAxesButton.setBounds(BUTTON_HEIGHT + BUTTON_WIDTH * 3, view.topPanelHeight / 2 - BUTTON_HEIGHT / 2, BUTTON_WIDTH, BUTTON_HEIGHT);
+        showGridLinesButton.setBounds(BUTTON_HEIGHT + BUTTON_WIDTH * 4, view.topPanelHeight / 2 - BUTTON_HEIGHT / 2, BUTTON_WIDTH, BUTTON_HEIGHT);
+
         statisticsButton.setBounds(view.windowWidth - view.sidePanelWidth - BUTTON_WIDTH, view.topPanelHeight / 2 - BUTTON_HEIGHT / 2, BUTTON_WIDTH, BUTTON_HEIGHT);
     }
 

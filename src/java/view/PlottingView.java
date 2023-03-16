@@ -58,6 +58,8 @@ public class PlottingView extends JPanel implements DataVisualizer, MouseListene
     private int[] indicesToDraw; //Indices of points to draw when there are too many points.
     protected int originalNumberOfPoints; //Number of points before reducing the number of points.
     protected boolean runningTSNE = false;
+    protected boolean showAxes = true;
+    protected boolean showGridLines = true;
 
     public PlottingView(View view) {
         super();
@@ -92,27 +94,31 @@ public class PlottingView extends JPanel implements DataVisualizer, MouseListene
             return;
         }
 
-        //Draw axes
-        g2d.setStroke(stroke4);
-        g2d.setColor(Color.BLACK);
-        g2d.drawLine(0, yOrig, view.getWindowWidth(), yOrig);
-        g2d.drawLine(xOrig, 0, xOrig, view.getWindowHeight());
-
-        //Draw lines, grid lines and numbers on axes
+        //Update necessary values.
         windowMax = Math.max(view.getWindowHeight(), view.getWindowWidth());
-        int lineSize1 = windowMax/150;
-        int lineSize2 = windowMax/75;
-        int fontSize = windowMax / 70;
-        g2d.setFont(new Font("TimesRoman", Font.BOLD, Math.max(fontSize, 12)));
-        g2d.setStroke(stroke2);
         if (lineGap == 0) {
             lineGap = windowMax / 30;
         }
         lines = (windowMax + windowMax * zoomFactor * 4) / lineGap;
+
+        //Draw axes.
+        if (showAxes) {
+            g2d.setStroke(stroke4);
+            g2d.setColor(Color.BLACK);
+            g2d.drawLine(0, yOrig, view.getWindowWidth(), yOrig);
+            g2d.drawLine(xOrig, 0, xOrig, view.getWindowHeight());
+        }
+
+        //Draw lines, grid lines and numbers on axes.
+        int lineSize1 = windowMax / 150;
+        int lineSize2 = windowMax / 75;
+        int fontSize = windowMax / 70;
+        g2d.setFont(new Font("TimesRoman", Font.BOLD, Math.max(fontSize, 12)));
+        g2d.setStroke(stroke2);
         int lineSize;
         boolean drawNumber;
-        for (int i = 1; i < lines; i++) {
-            if (i%5 == 0) {
+        for (int i = showAxes ? 1 : 0; i < lines; i++) {
+            if (i % 5 == 0) {
                 g2d.setStroke(stroke3);
                 lineSize = lineSize2;
                 drawNumber = true;
@@ -122,54 +128,58 @@ public class PlottingView extends JPanel implements DataVisualizer, MouseListene
                 drawNumber = false;
             }
 
-            //Define useful values
+            //Define useful values.
             int posX = xOrig + lineGap * i;
             int posY = yOrig + lineGap * i;
             int negX = xOrig - lineGap * i;
             int negY = yOrig - lineGap * i;
 
-            //Draw gridlines
-            g2d.setColor(Color.LIGHT_GRAY);
+            //Draw gridlines.
             g2d.setStroke(stroke1);
-            g2d.drawLine(posX, 0, posX, view.getWindowHeight()); //Positive direction on x-axis
-            g2d.drawLine(0, posY, view.getWindowWidth(), posY); //Positive direction on y-axis
-            g2d.drawLine(negX, 0, negX, view.getWindowHeight()); //Negative direction on x-axis
-            g2d.drawLine(0, negY, view.getWindowWidth(), negY); //Negative direction on y-axis
+            if (showGridLines) {
+                g2d.setColor(Color.LIGHT_GRAY);
+                g2d.drawLine(posX, 0, posX, view.getWindowHeight()); //Positive direction on x-axis
+                g2d.drawLine(0, posY, view.getWindowWidth(), posY); //Positive direction on y-axis
+                g2d.drawLine(negX, 0, negX, view.getWindowHeight()); //Negative direction on x-axis
+                g2d.drawLine(0, negY, view.getWindowWidth(), negY); //Negative direction on y-axis
+            }
 
-            //Draw lines on axes
-            g2d.setColor(Color.BLACK);
-            g2d.drawLine(posX, yOrig - lineSize, posX, yOrig + lineSize); //Positive direction on x-axis
-            g2d.drawLine(xOrig - lineSize, posY, xOrig + lineSize, posY); //Positive direction on y-axis
-            g2d.drawLine(negX, yOrig - lineSize, negX, yOrig + lineSize); //Negative direction on x-axis
-            g2d.drawLine(xOrig - lineSize, negY, xOrig + lineSize, negY); //Negative direction on y-axis
+            //Draw lines on axes.
+            if (showAxes) {
+                g2d.setColor(Color.BLACK);
+                g2d.drawLine(posX, yOrig - lineSize, posX, yOrig + lineSize); //Positive direction on x-axis
+                g2d.drawLine(xOrig - lineSize, posY, xOrig + lineSize, posY); //Positive direction on y-axis
+                g2d.drawLine(negX, yOrig - lineSize, negX, yOrig + lineSize); //Negative direction on x-axis
+                g2d.drawLine(xOrig - lineSize, negY, xOrig + lineSize, negY); //Negative direction on y-axis
 
-            //Draw numbers on axes
-            if (drawNumber) {
-                double num = i * factor;
-                String posText;
-                String negText;
-                if (num < 10) {
-                    posText = "" + round(num, 2);
-                    negText = "-" + round(num, 2);
-                } else if (num > 9999) {
-                    posText = "" + convertNumberToScientificNotation(num);
-                    negText = "-" + convertNumberToScientificNotation(num);
-                } else {
-                    posText = "" + (int)(num);
-                    negText = "-" + (int)(num);
+                //Draw numbers on axes.
+                if (drawNumber) {
+                    double num = i * factor;
+                    String posText;
+                    String negText;
+                    if (num < 10) {
+                        posText = "" + round(num, 2);
+                        negText = "-" + round(num, 2);
+                    } else if (num > 9999) {
+                        posText = "" + convertNumberToScientificNotation(num);
+                        negText = "-" + convertNumberToScientificNotation(num);
+                    } else {
+                        posText = "" + (int) (num);
+                        negText = "-" + (int) (num);
+                    }
+                    int fontHeight = g2d.getFontMetrics().getHeight();
+                    int fontWidth = g2d.getFontMetrics().stringWidth(posText);
+                    g2d.drawString(posText, posX - fontWidth / 2, yOrig + lineSize + fontHeight); //Positive direction on x-axis
+                    g2d.drawString(posText, xOrig - lineSize - fontWidth * 3 / 2, negY + fontHeight / 4); //Positive direction on y-axis
+
+                    fontWidth = g2d.getFontMetrics().stringWidth(negText);
+                    g2d.drawString(negText, negX - fontWidth / 2, yOrig + lineSize + fontHeight); //Negative direction on x-axis
+                    g2d.drawString(negText, xOrig - lineSize - fontWidth * 3 / 2, posY + fontHeight / 4); //Negative direction on y-axis
                 }
-                int fontHeight = g2d.getFontMetrics().getHeight();
-                int fontWidth = g2d.getFontMetrics().stringWidth(posText);
-                g2d.drawString(posText, posX - fontWidth / 2, yOrig + lineSize + fontHeight); //Positive direction on x-axis
-                g2d.drawString(posText, xOrig - lineSize - fontWidth * 3 / 2, negY + fontHeight / 4); //Positive direction on y-axis
-
-                fontWidth = g2d.getFontMetrics().stringWidth(negText);
-                g2d.drawString(negText, negX - fontWidth / 2, yOrig + lineSize + fontHeight); //Negative direction on x-axis
-                g2d.drawString(negText, xOrig - lineSize - fontWidth * 3 / 2, posY + fontHeight / 4); //Negative direction on y-axis
             }
         }
 
-        //Plot points
+        //Plot points.
         if (points != null) {
             int bound = MAX_POINTS_TO_DRAW_WHEN_MOVING < points.length && dragging ? MAX_POINTS_TO_DRAW_WHEN_MOVING : points.length;
             for (int i = 0; i < bound; i++) {
@@ -190,7 +200,7 @@ public class PlottingView extends JPanel implements DataVisualizer, MouseListene
             }
         }
 
-        //Box behind coordinate text
+        //Box behind coordinate text.
         if (coordinates.isVisible()) {
             g2d.setColor(new Color(255, 255, 255, 200));
             g2d.fillRect(5, 5, 150, 30);
@@ -499,8 +509,8 @@ public class PlottingView extends JPanel implements DataVisualizer, MouseListene
             max = Math.max(Math.abs(bound), max);
         }
         factor = Math.max((int)(max / 6), 1);
-        xOrig = view.getWindowWidth() / 2 + (int)((bounds[0] + bounds[2]) / factor);
-        yOrig = view.getWindowHeight() / 2 - (int)((bounds[1] + bounds[3]) / factor);
+        xOrig = (view.windowWidth - view.sidePanelWidth) / 2 + (int)((bounds[0] + bounds[2]) / factor);
+        yOrig = (view.windowHeight - view.topPanelHeight) / 2 - (int)((bounds[1] + bounds[3]) / factor);
     }
 
     private double round(double d, int decimalPlaces) {
@@ -531,6 +541,14 @@ public class PlottingView extends JPanel implements DataVisualizer, MouseListene
     private String convertNumberToScientificNotation(double n) {
         NumberFormat numberFormat = new DecimalFormat("0.00E0");
         return numberFormat.format(n);
+    }
+
+    protected void switchShowingOfAxes() {
+        showAxes = !showAxes;
+    }
+
+    protected void switchShowingOfGridlines() {
+        showGridLines = !showGridLines;
     }
 
     //Returns an array of "amount" random distinct numbers between 0 (inclusive) and "maxNumber" (exclusive).
