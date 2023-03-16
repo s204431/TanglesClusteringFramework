@@ -1,15 +1,11 @@
 package datasets;
 
-import model.Model;
-import model.TangleClusterer;
 import util.BitSet;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
 
 public abstract class Dataset {
@@ -84,7 +80,7 @@ public abstract class Dataset {
                     groundTruth[i] = scanner.nextInt();
                 }
             }
-        } catch(IOException e) {}
+        } catch(IOException ignored) {}
     }
 
     //Saves the ground truth of this dataset (if it has a ground truth).
@@ -100,7 +96,7 @@ public abstract class Dataset {
                 }
             }
             writer.close();
-        } catch (IOException e) {}
+        } catch (IOException ignored) {}
     }
 
 }

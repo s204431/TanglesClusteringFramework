@@ -1,4 +1,4 @@
-package main;
+package controller;
 
 import datasets.*;
 import model.Model;

@@ -1,7 +1,6 @@
 package datasets;
 
 import model.Model;
-import model.TangleClusterer;
 import smile.clustering.HierarchicalClustering;
 import smile.clustering.KMeans;
 import smile.clustering.PartitionClustering;
@@ -74,9 +73,7 @@ public class FeatureBasedDataset extends Dataset {
         int[] originalIndices = new int[dataPoints.length];
         for (int i = 0; i < dataPoints.length; i++) {
             originalIndices[i] = i;
-            for (int j = 0; j < dataPoints[0].length; j++) {
-                copy[i][j] = dataPoints[i][j];
-            }
+            System.arraycopy(dataPoints[i], 0, copy[i], 0, dataPoints[0].length);
         }
         for (int i = 0; i < dataPoints[0].length; i++) {
             axisParallelCuts[i] = new ArrayList<>();
@@ -126,9 +123,7 @@ public class FeatureBasedDataset extends Dataset {
         int[] originalIndices = new int[dataPoints.length];
         for (int i = 0; i < dataPoints.length; i++) {
             originalIndices[i] = i;
-            for (int j = 0; j < dataPoints[0].length; j++) {
-                copy[i][j] = dataPoints[i][j];
-            }
+            System.arraycopy(dataPoints[i], 0, copy[i], 0, dataPoints[0].length);
         }
         for (int i = 0; i < dataPoints[0].length; i++) {
             axisParallelCuts[i] = new ArrayList<>();
@@ -490,7 +485,7 @@ public class FeatureBasedDataset extends Dataset {
             }
             writer.close();
             saveGroundTruth(file);
-        } catch (IOException e) {}
+        } catch (IOException ignored) {}
     }
 
     //Returns the name of the dataset type.
@@ -510,9 +505,7 @@ public class FeatureBasedDataset extends Dataset {
         int[] originalIndices = new int[dataPoints.length];
         for (int i = 0; i < dataPoints.length; i++) {
             originalIndices[i] = i;
-            for (int j = 0; j < dataPoints[0].length; j++) {
-                copy[i][j] = dataPoints[i][j];
-            }
+            System.arraycopy(dataPoints[i], 0, copy[i], 0, dataPoints[0].length);
         }
         for (int i = 0; i < dataPoints[0].length; i++) {
             axisParallelCuts[i] = new ArrayList<>();
@@ -571,7 +564,7 @@ public class FeatureBasedDataset extends Dataset {
                                     n1++;
                                 }
                             }
-                            else if (k > cutIndex) {
+                            else {
                                 mean2[l] += dataPoints[originalIndices[k]][l];
                                 if (l == 0) {
                                     n2++;
@@ -618,9 +611,7 @@ public class FeatureBasedDataset extends Dataset {
         int[] originalIndices = new int[dataPoints.length];
         for (int i = 0; i < dataPoints.length; i++) {
             originalIndices[i] = i;
-            for (int j = 0; j < dataPoints[0].length; j++) {
-                copy[i][j] = dataPoints[i][j];
-            }
+            System.arraycopy(dataPoints[i], 0, copy[i], 0, dataPoints[0].length);
         }
         for (int i = 0; i < dataPoints[0].length; i++) {
             axisParallelCuts[i] = new ArrayList<>();
@@ -709,9 +700,7 @@ public class FeatureBasedDataset extends Dataset {
         int[] originalIndices = new int[dataPoints.length];
         for (int i = 0; i < dataPoints.length; i++) {
             originalIndices[i] = i;
-            for (int j = 0; j < dataPoints[0].length; j++) {
-                copy[i][j] = dataPoints[i][j];
-            }
+            System.arraycopy(dataPoints[i], 0, copy[i], 0, dataPoints[0].length);
         }
         for (int i = 0; i < dataPoints[0].length; i++) {
             costs.add(Double.MAX_VALUE);

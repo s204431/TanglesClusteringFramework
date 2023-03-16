@@ -119,7 +119,6 @@ public class DatasetGenerator {
         }
 
         //Generate points around means
-        double std = numberOfPoints * 0.02;
         for (int i = 0; i < numberOfPoints; i++) {
             int j = i % K;
             double meanX = meanPoints[j][0];

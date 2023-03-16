@@ -86,7 +86,7 @@ public class BinaryQuestionnaire extends Dataset {
                         result.remove(result.size()-1);
                         break;
                     }
-                    result.get(result.size()-1).add(nextInt == 1 ? false : true);
+                    result.get(result.size()-1).add(nextInt != 1);
                     column++;
                 }
                 line++;
@@ -248,7 +248,7 @@ public class BinaryQuestionnaire extends Dataset {
             }
             writer.close();
             saveGroundTruth(file);
-        } catch (IOException e) {}
+        } catch (IOException ignored) {}
     }
 
     //Returns the name of this type of dataset.
