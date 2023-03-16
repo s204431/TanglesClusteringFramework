@@ -219,9 +219,14 @@ public class View extends JFrame {
             }
         }
 
-        //Determine if axes and gridlines should be shown
-        if (!topPanel.showAxesButtonIsOn()) switchShowingOfAxes();
-        if (!topPanel.showGridlinesButtonIsOn()) switchShowingOfGridlines();
+        if (dataVisualizer instanceof PlottingView) {
+            //Determine if axes and gridlines should be shown
+            if (!topPanel.showAxesButtonIsOn()) switchShowingOfAxes();
+            if (!topPanel.showGridlinesButtonIsOn()) switchShowingOfGridlines();
+            topPanel.makeOnOffButtonsVisible(true);
+        } else {
+            topPanel.makeOnOffButtonsVisible(false);
+        }
 
         ((JPanel)dataVisualizer).repaint();
     }

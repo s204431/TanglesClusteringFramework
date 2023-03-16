@@ -356,6 +356,11 @@ public class TopPanel extends JPanel {
         return showGridLinesButton.getText().equals(gridlinesOnText);
     }
 
+    protected void makeOnOffButtonsVisible(boolean visible) {
+        showAxesButton.setVisible(visible);
+        showGridLinesButton.setVisible(visible);
+    }
+
     protected void setBounds() {
         setBounds(0, 0, view.windowWidth, view.topPanelHeight);
         toolBar.setBounds(0, 0, view.windowWidth, view.topPanelHeight);

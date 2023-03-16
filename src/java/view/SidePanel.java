@@ -26,10 +26,11 @@ public class SidePanel extends JPanel {
         setPreferredSize(new Dimension(view.getWindowWidth(), view.getWindowHeight()));
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 
-        add(Box.createRigidArea(new Dimension(0, 20)));
+        font = new Font("TimesRoman", Font.BOLD, view.sidePanelWidth / 13);
+
+        add(Box.createRigidArea(new Dimension(0, font.getSize())));
 
         JLabel[] allLabels = { pointsText, pointsLabel, showingLabel, new JLabel(), NMIText, NMILabel, timeText, timeLabel };
-        font = new Font("TimesRoman", Font.BOLD, view.getWindowHeight() / 50);
 
         int c = 0;
         for (JLabel label : allLabels) {

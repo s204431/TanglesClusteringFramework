@@ -20,6 +20,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Objects;
 
 import static view.TopPanel.BUTTON_HEIGHT;
 import static view.TopPanel.BUTTON_WIDTH;
@@ -274,6 +275,13 @@ public class StatisticsTopPanel extends JPanel {
                 runButton.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
+                        //If data set is a graph, prevent running test set.
+                        if (Objects.equals(comboBox.getSelectedItem(), Dataset.supportedDatasetTypes[2]) && (kMeansCheckBox.isSelected() || spectralCheckBox.isSelected() || linkageCheckBox.isSelected())) {
+                            algorithmsErrorLabel.setText("Graph only supports Tangle");
+                            algorithmsErrorLabel.setVisible(true);
+                            return;
+                        }
+
                         //Prevent running of test set if table has 0 values or if no checkboxes are selected.
                         for (int i = 0; i < tableModel.getRowCount(); i++) {
                             for (int j = 0; j < tableModel.getColumnCount(); j++) {
@@ -288,7 +296,7 @@ public class StatisticsTopPanel extends JPanel {
                         testSetErrorLabel.setVisible(false);
 
                         if (!(tangleCheckBox.isSelected() || kMeansCheckBox.isSelected() || spectralCheckBox.isSelected() || linkageCheckBox.isSelected())) {
-                            System.out.println("Please select a checkbox");
+                            algorithmsErrorLabel.setText("Please select an algorithm");
                             algorithmsErrorLabel.setVisible(true);
                             return;
                         }
