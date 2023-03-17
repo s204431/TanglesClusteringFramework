@@ -1,4 +1,4 @@
-package test;
+package testsets;
 
 import datasets.*;
 import util.BitSet;

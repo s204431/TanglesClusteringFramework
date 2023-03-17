@@ -172,7 +172,6 @@ public class BinaryQuestionnaire extends Dataset {
                 cost /= cutSize*(getNumberOfParticipants()-cutSize);
             }
             result[i] = cost;
-            initialCuts[i].cutCost = result[i];
         }
         return result;
     }

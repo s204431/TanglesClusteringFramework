@@ -1,4 +1,4 @@
-package test;
+package testsets;
 
 public class TestCase {
 

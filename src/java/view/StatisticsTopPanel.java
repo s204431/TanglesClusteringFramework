@@ -1,14 +1,11 @@
 package view;
 
 import datasets.Dataset;
-import datasets.GraphDataset;
 import model.Model;
-import smile.data.type.DataType;
-import smile.swing.Table;
 import smile.swing.table.ButtonCellRenderer;
-import test.ClusteringTester;
-import test.TestCase;
-import test.TestSet;
+import testsets.ClusteringTester;
+import testsets.TestCase;
+import testsets.TestSet;
 
 import java.awt.event.*;
 import javax.swing.*;
@@ -16,10 +13,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import java.awt.*;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Objects;
 
 import static view.TopPanel.BUTTON_HEIGHT;
@@ -176,7 +170,7 @@ public class StatisticsTopPanel extends JPanel {
                         JButton fileButton = new JButton("Select File");
                         fileButton.addActionListener((l) -> {
                             final JFileChooser fc = new JFileChooser();
-                            String extension = "test";
+                            String extension = "testsets";
                             FileNameExtensionFilter filter = new FileNameExtensionFilter("."+extension, extension);
                             fc.setFileFilter(filter);
                             int returnVal = fc.showDialog(view, "Choose");
@@ -215,7 +209,7 @@ public class StatisticsTopPanel extends JPanel {
                         JButton fileButton = new JButton("Select File");
                         fileButton.addActionListener((l) -> {
                             final JFileChooser fc = new JFileChooser();
-                            String extension = "test";
+                            String extension = "testsets";
                             FileNameExtensionFilter filter = new FileNameExtensionFilter("."+extension, extension);
                             fc.setFileFilter(filter);
                             int returnVal = fc.showDialog(view, "Choose");

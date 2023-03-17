@@ -2,15 +2,12 @@ package view;
 
 import smile.plot.swing.*;
 import smile.plot.swing.Canvas;
-import smile.regression.Regression;
-import test.ClusteringTester;
-import test.TestSet;
+import testsets.ClusteringTester;
+import testsets.TestSet;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.Graphics;
-import java.awt.image.BufferedImage;
-import java.lang.reflect.InvocationTargetException;
 
 public class StatisticsPanel extends JPanel {
     private View view;

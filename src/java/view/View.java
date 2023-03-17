@@ -6,20 +6,15 @@ import datasets.FeatureBasedDataset;
 import datasets.GraphDataset;
 import controller.Controller;
 import model.Model;
-import test.TestSet;
 import util.BitSet;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.xml.crypto.Data;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class View extends JFrame {

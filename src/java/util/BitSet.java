@@ -5,8 +5,7 @@ public class BitSet {
     //This class contains a custom BitSet implementation with fast operations.
 
     protected long[] set;
-    private int size = 0;
-    public double cutCost;
+    private final int size;
 
     //Creates BitSet with specified maximum size.
     public BitSet(int maxSize) {
@@ -14,10 +13,24 @@ public class BitSet {
         size = maxSize;
     }
 
+    //Creates BitSet from a string of bits.
+    public BitSet(String bitString) {
+        this(bitString.length());
+        for (int i = 0; i < bitString.length(); i++) {
+            if (bitString.charAt(i) == '1') {
+                add(i);
+            }
+            else if (bitString.charAt(i) != '0') {
+                throw new IllegalArgumentException("Illegal bit string provided.");
+            }
+        }
+    }
+
     //Adds participant with specific index to set (constant time complexity).
     public void add(int index) {
         int longIndex = index >> 6; //index / 64
         index = index & 63; //index % 64
+        index = 63-index;
         set[longIndex] = set[longIndex] | (1L << index);
     }
 
@@ -27,7 +40,7 @@ public class BitSet {
             set[i] = -1;
             if (i == set.length-1) {
                 int bitsInLastLong = size() % 64;
-                set[i] = set[i] >>> (64-bitsInLastLong);
+                set[i] = set[i] << (64-bitsInLastLong);
             }
         }
     }
@@ -36,6 +49,7 @@ public class BitSet {
     public void remove(int index) {
         int longIndex = index >> 6; //index / 64
         index = index & 63; //index % 64
+        index = 63-index;
         set[longIndex] = set[longIndex] & ~(1L << index);
     }
 
@@ -63,6 +77,7 @@ public class BitSet {
     public boolean get(int index) {
         int longIndex = index >> 6; //index / 64
         index = index & 63; //index % 64
+        index = 63-index;
         return (set[longIndex] & (1L << index)) != 0;
     }
 
@@ -184,16 +199,23 @@ public class BitSet {
         return count;
     }
 
-    //Prints the bit set as a string of bits. Used for debugging.
+    //Converts the bit set to a string of bits. Used for debugging.
+    @Override
+    public String toString() {
+        StringBuilder result = new StringBuilder();
+        for (long l : set) {
+            result.append("0".repeat(Long.numberOfLeadingZeros(l)));
+            if (l != 0) {
+                result.append(Long.toBinaryString(l));
+            }
+        }
+        return result.toString();
+    }
+
+    //Prints the bit set as a string of bits and prints the size of the set and the number of longs used for the bit set. Used for debugging.
     public void print() {
         System.out.println(size + " " + set.length);
-        for (long l : set) {
-            for (int i = 0; i < Long.numberOfLeadingZeros(l); i++) {
-                System.out.print("0");
-            }
-            System.out.print(Long.toBinaryString(l));
-        }
-        System.out.println();
+        System.out.println(this);
     }
 
 }
