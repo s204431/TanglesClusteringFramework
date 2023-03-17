@@ -200,7 +200,7 @@ public class StatisticsTopPanel extends JPanel {
                             //Save test set
                             String datatype = comboBox.getSelectedItem().toString();
                             testSet = convertToTestSet(datatype, table);
-                            TestSet.saveTestSet(testSet, file[0]);
+                            testSet.saveTestSet(file[0]);
                         }
                     }
                 });

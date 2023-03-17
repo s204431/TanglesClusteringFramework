@@ -1,7 +1,9 @@
 package util;
 
-//Custom BitSet implementation with fast intersection.
 public class BitSet {
+
+    //This class contains a custom BitSet implementation with fast operations.
+
     protected long[] set;
     private int size = 0;
     public double cutCost;
@@ -37,6 +39,7 @@ public class BitSet {
         set[longIndex] = set[longIndex] & ~(1L << index);
     }
 
+    //Flips the bit at the specified index.
     public void flip(int index) {
         if (get(index)) {
             remove(index);
@@ -46,6 +49,7 @@ public class BitSet {
         }
     }
 
+    //Sets the bit at the specified index to the specified value.
     public void setValue(int index, boolean value) {
         if (value) {
             add(index);
@@ -55,18 +59,19 @@ public class BitSet {
         }
     }
 
-    //Returns true if given index is part of the set.
+    //Returns the value of the bit at the specified index.
     public boolean get(int index) {
         int longIndex = index >> 6; //index / 64
         index = index & 63; //index % 64
         return (set[longIndex] & (1L << index)) != 0;
     }
 
+    //Returns the size of the set.
     public int size() {
         return size;
     }
 
-    //Returns the amount of participants that are part of the cut.
+    //Returns the number of 1's in the bit set.
     public int count() {
         int count = 0;
         for (long l : set) {
@@ -75,11 +80,12 @@ public class BitSet {
         return count;
     }
 
+    //Returns the number of 0's in the bit set if flip is true. Returns the number of 1's otherwise.
     public int countFlipped(boolean flip) {
         return flip ? size() - count() : count();
     }
 
-    //Calculates the similarity of two BitSets using XNor.
+    //Calculates the similarity of two BitSets using bitwise XNor.
     public static int XNor(BitSet set1, BitSet set2) {
         int count = 0;
         for (int i = 0; i < set1.set.length; i++) {
@@ -102,17 +108,19 @@ public class BitSet {
     }
 
     //Returns the size of the intersection between two bitsets.
-    //Requires same maximum size. partOfSet specifies if false or true means part of the set.
+    //Requires same maximum size. flip specifies if the corresponding bit set should have all bits flipped before calculating the intersection.
     public static int intersection(BitSet set1, BitSet set2, boolean flip1, boolean flip2) {
         return intersectionEarlyStop(set1, set2, flip1, flip2, Integer.MAX_VALUE);
     }
 
     //Returns the size of the intersection between three bitsets.
+    //Requires same maximum size. flip specifies if the corresponding bit set should have all bits flipped before calculating the intersection.
     public static int intersection(BitSet set1, BitSet set2, BitSet set3, boolean flip1, boolean flip2, boolean flip3) {
         return intersectionEarlyStop(set1, set2, set3, flip1, flip2, flip3, Integer.MAX_VALUE);
     }
 
-    //Intersection that stops when greater than a.
+    //Intersection between two sets that stops when the intersection is known to be greater than a.
+    //Requires same maximum size. flip specifies if the corresponding bit set should have all bits flipped before calculating the intersection.
     public static int intersectionEarlyStop(BitSet set1, BitSet set2, boolean flip1, boolean flip2, int a) {
         int count = 0;
         for (int i = 0; i < set1.set.length; i++) {
@@ -141,7 +149,8 @@ public class BitSet {
         return count;
     }
 
-
+    //Intersection between three sets that stops when the intersection is known to be greater than a.
+    //Requires same maximum size. flip specifies if the corresponding bit set should have all bits flipped before calculating the intersection.
     public static int intersectionEarlyStop(BitSet set1, BitSet set2, BitSet set3, boolean flip1, boolean flip2, boolean flip3, int a) {
         int count = 0;
         for (int i = 0; i < set1.set.length; i++) {
@@ -175,6 +184,7 @@ public class BitSet {
         return count;
     }
 
+    //Prints the bit set as a string of bits. Used for debugging.
     public void print() {
         System.out.println(size + " " + set.length);
         for (long l : set) {

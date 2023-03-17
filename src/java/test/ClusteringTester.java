@@ -1,16 +1,10 @@
 package test;
 
 import datasets.*;
-import model.TangleClusterer;
 import util.BitSet;
 import util.Tuple;
 
-import java.awt.*;
-import java.io.*;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
-import java.util.Scanner;
 
 import model.Model;
 import smile.validation.metric.NormalizedMutualInformation;
@@ -19,10 +13,13 @@ import javax.swing.*;
 
 public class ClusteringTester {
 
-    public static double testProgress = 0.0;
+    //This class is used to run different tests on clustering algorithms.
 
-    private static Model model = new Model();
+    public static double testProgress = 0.0; //How far the current test run is (between 0 and 1).
 
+    private static final Model model = new Model();
+
+    //Used to test clustering with tangles on feature based data, binary questionnaires and graph data. Prints results to the console.
     public static void testTangleClusterer() {
 
         /*TestSet testSet = new TestSet(FeatureBasedDataset.name);
@@ -48,13 +45,13 @@ public class ClusteringTester {
         System.out.println("Tests finished. Total time: " + (time2 - time1) + " ms. Average NMI score: " + (result1[0]+result2[0]+result3[0])/(result1[1]+result2[1]+result3[1]));
     }
 
+    //Used to test clustering with tangles on feature based data. Prints results to the console.
+    //Returns sum of NMI scores and total datasets tested with NMI score.
     public static double[] testTangleClustererFeatureBased() {
         long totalTime1 = new Date().getTime();
-        int totalCount = 0;
         int totalCountWithoutNaN = 0;
         double NMISum = 0;
         for (int i = 1000; i <= 1000000; i *= 10) {
-            totalCount++;
             long sizeTime1 = new Date().getTime();
             int sizeCount = 0;
             for (int j = 1; j <= 10; j++) {
@@ -84,14 +81,13 @@ public class ClusteringTester {
         return new double[] {NMISum, totalCountWithoutNaN};
     }
 
+    //Used to test clustering with tangles on binary questionnaires. Prints results to the console.
     //Returns sum of NMI scores and total datasets tested with NMI score.
     public static double[] testTangleClustererBinaryQuestionnaire() {
         long totalTime1 = new Date().getTime();
-        int totalCount = 0;
         int totalCountWithoutNaN = 0;
         double NMISum = 0;
         for (int i = 1000; i <= 1000000; i *= 10) {
-            totalCount++;
             long sizeTime1 = new Date().getTime();
             int sizeCount = 0;
             for (int j = 10; j < 41; j+=5) {
@@ -123,13 +119,13 @@ public class ClusteringTester {
         return new double[] {NMISum, totalCountWithoutNaN};
     }
 
+    //Used to test clustering with tangles on graph data. Prints results to the console.
+    //Returns sum of NMI scores and total datasets tested with NMI score.
     public static double[] testTangleClustererGraph() {
         long totalTime1 = new Date().getTime();
-        int totalCount = 0;
         int totalCountWithoutNaN = 0;
         double NMISum = 0;
         for (int i = 20; i <= 500; i *= 2) {
-            totalCount++;
             long sizeTime1 = new Date().getTime();
             int sizeCount = 0;
             for (int j = 2; j <= 6; j++) {
@@ -159,8 +155,8 @@ public class ClusteringTester {
         return new double[] {NMISum, totalCountWithoutNaN};
     }
 
-    //Runs a test set on a specific algorithm. Returns {Time, NMI score} for each test case.
-    //Optionally takes a JPanel to be repainted when progress is made.
+    //Runs a test set on specific algorithms. Returns {Time, NMI score} for each test case.
+    //Optionally takes a JPanel to be repainted when progress is made (simply use null if there is no panel to be repainted).
     public static double[][][] runTest(TestSet testSet, String[] algorithmNames, JPanel repaintPanel) {
         double[][][] result = new double[algorithmNames.length][testSet.size()][2];
         System.out.print("Running tests for ");
@@ -185,32 +181,24 @@ public class ClusteringTester {
             long[] testCaseTimes = new long[algorithmNames.length];
             double[] testCaseNMIScores = new double[algorithmNames.length];
             for (int j = 0; j < testCase.nRuns; j++) {
-                Dataset dataset = null;
-                if (testSet.dataTypeName.equals(FeatureBasedDataset.name)) {
-                    dataset = new FeatureBasedDataset(DatasetGenerator.generateFeatureBasedDataPoints(testCase.nPoints, testCase.nClusters, testCase.nDimensions));
-                }
-                else if (testSet.dataTypeName.equals(BinaryQuestionnaire.name)) {
-                    dataset = new BinaryQuestionnaire(DatasetGenerator.generateBiasedBinaryQuestionnaireAnswers(testCase.nPoints, testCase.nDimensions, testCase.nClusters));
-                }
-                else if (testSet.dataTypeName.equals(GraphDataset.name)) {
-                    dataset = new GraphDataset(DatasetGenerator.generateRandomGraph(testCase.nPoints, testCase.nClusters));
-                }
+                Dataset dataset = switch (testSet.dataTypeName) {
+                    case FeatureBasedDataset.name -> new FeatureBasedDataset(DatasetGenerator.generateFeatureBasedDataPoints(testCase.nPoints, testCase.nClusters, testCase.nDimensions));
+                    case BinaryQuestionnaire.name -> new BinaryQuestionnaire(DatasetGenerator.generateBiasedBinaryQuestionnaireAnswers(testCase.nPoints, testCase.nDimensions, testCase.nClusters));
+                    case GraphDataset.name -> new GraphDataset(DatasetGenerator.generateRandomGraph(testCase.nPoints, testCase.nClusters));
+                    default -> null;
+                };
                 int[] hardClustering = null;
                 for (int algorithm = 0; algorithm < algorithmNames.length; algorithm++) {
                     String algorithmName = algorithmNames[algorithm];
                     long time1 = new Date().getTime();
-                    if (algorithmName.equals(Model.tangleName)) {
-                        int a = (int)((testCase.nPoints/testCase.nClusters)*(1.0/2.0));
-                        hardClustering = model.generateClusters(dataset, a, -1, null, null);
-                    }
-                    else if (algorithmName.equals(Model.kMeansName)) {
-                        hardClustering = dataset.kMeans(testCase.nClusters);
-                    }
-                    else if (algorithmName.equals(Model.spectralClusteringName)) {
-                        hardClustering = dataset.spectralClustering(testCase.nClusters, testCase.nPoints/10.0);
-                    }
-                    else if (algorithmName.equals(Model.linkageName)) {
-                        hardClustering = dataset.hierarchicalClustering(testCase.nClusters);
+                    switch (algorithmName) {
+                        case Model.tangleName -> {
+                            int a = (int) ((testCase.nPoints / testCase.nClusters) * (1.0 / 2.0));
+                            hardClustering = model.generateClusters(dataset, a, -1, null, null);
+                        }
+                        case Model.kMeansName -> hardClustering = dataset.kMeans(testCase.nClusters);
+                        case Model.spectralClusteringName -> hardClustering = dataset.spectralClustering(testCase.nClusters, testCase.nPoints / 10.0);
+                        case Model.linkageName -> hardClustering = dataset.hierarchicalClustering(testCase.nClusters);
                     }
                     testCaseTimes[algorithm] += new Date().getTime() - time1;
                     testCaseNMIScores[algorithm] += NormalizedMutualInformation.joint(hardClustering, dataset.getGroundTruth());
