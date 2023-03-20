@@ -86,7 +86,7 @@ public class BinaryQuestionnaire extends Dataset {
                         result.remove(result.size()-1);
                         break;
                     }
-                    result.get(result.size()-1).add(nextInt != 1);
+                    result.get(result.size()-1).add(nextInt == 1);
                     column++;
                 }
                 line++;
@@ -103,6 +103,7 @@ public class BinaryQuestionnaire extends Dataset {
                     }
                 }
             }
+            fileScanner.close();
             loadGroundTruth(file, startRow, endRow == -1 ? answers.length-1 : endRow);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -254,6 +255,12 @@ public class BinaryQuestionnaire extends Dataset {
     @Override
     public String getName() {
         return name;
+    }
+
+    //Checks if this object is equal to the given object.
+    @Override
+    public boolean equals(Object o) {
+        return o instanceof BinaryQuestionnaire && Arrays.equals(((BinaryQuestionnaire) o).answers, answers);
     }
 
 }

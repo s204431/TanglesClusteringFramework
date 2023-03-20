@@ -98,6 +98,7 @@ public class GraphDataset extends Dataset {
             for (int i = 0; i < edgesResult.size(); i++) {
                 edges[i] = edgesResult.get(i);
             }
+            fileScanner.close();
             loadGroundTruth(file, 0, dataPoints.length-1);
         } catch (Exception e) {
             throw new RuntimeException(e);

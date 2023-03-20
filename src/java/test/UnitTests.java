@@ -1,7 +1,20 @@
 package test;
 
+import datasets.BinaryQuestionnaire;
+import datasets.DatasetGenerator;
+import datasets.FeatureBasedDataset;
+import datasets.GraphDataset;
 import org.junit.jupiter.api.Test;
+import smile.stat.Hypothesis;
+import testsets.TestCase;
+import testsets.TestSet;
 import util.BitSet;
+
+import java.awt.*;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -113,5 +126,53 @@ public class UnitTests {
         StringBuilder stringBuilder = new StringBuilder(string);
         stringBuilder.setCharAt(index, ch);
         return stringBuilder.toString();
+    }
+
+    //Tests that saving/loading test sets works properly.
+    @Test
+    public void testTestSet() {
+        TestSet testSet = new TestSet("Test");
+        testSet.add(new TestCase(1, 2, 3, 4));
+        testSet.add(new TestCase(3, 2, 1));
+        File file = new File("testTestSet");
+        testSet.saveTestSet(file);
+        TestSet testSet2 = TestSet.loadTestSet(file);
+        assertEquals(testSet, testSet2);
+        file.delete();
+        assertFalse(file.exists());
+    }
+
+    //Tests saving and loading of feature based data set.
+    @Test
+    public void testFeatureBasedDataset() {
+        FeatureBasedDataset featureBasedDataset = new FeatureBasedDataset(DatasetGenerator.generateFeatureBasedDataPoints(1000, 4, 2));
+        File file = new File("testFeatureBasedDataset.csv");
+        featureBasedDataset.saveToFile(file);
+        FeatureBasedDataset featureBasedDataset2 = new FeatureBasedDataset();
+        featureBasedDataset2.loadDataFromFile(file.getName(), 0, -1, 0, -1);
+        assertEquals(featureBasedDataset, featureBasedDataset2);
+        assertTrue(Arrays.equals(featureBasedDataset.getGroundTruth(), featureBasedDataset2.getGroundTruth()));
+        file.delete();
+        assertFalse(file.exists());
+        File groundTruthFile = new File("testFeatureBasedDataset.gt");
+        groundTruthFile.delete();
+        assertFalse(groundTruthFile.exists());
+    }
+
+    //Tests saving and loading of binary questionnaire.
+    @Test
+    public void testBinaryQuestionnaire() {
+        BinaryQuestionnaire binaryQuestionnaire = new BinaryQuestionnaire(DatasetGenerator.generateBiasedBinaryQuestionnaireAnswers(1000, 10, 4));
+        File file = new File("testBinaryQuestionnaire.csv");
+        binaryQuestionnaire.saveToFile(file);
+        BinaryQuestionnaire binaryQuestionnaire2 = new BinaryQuestionnaire();
+        binaryQuestionnaire2.loadAnswersFromFile(file.getName(), 0, -1, 0, -1);
+        assertEquals(binaryQuestionnaire, binaryQuestionnaire2);
+        assertTrue(Arrays.equals(binaryQuestionnaire.getGroundTruth(), binaryQuestionnaire2.getGroundTruth()));
+        file.delete();
+        assertFalse(file.exists());
+        File groundTruthFile = new File("testBinaryQuestionnaire.gt");
+        groundTruthFile.delete();
+        assertFalse(groundTruthFile.exists());
     }
 }

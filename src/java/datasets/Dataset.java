@@ -67,8 +67,8 @@ public abstract class Dataset {
     //Loads the ground truth corresponding to a file that the dataset is stored in (if such a ground truth is stored).
     public void loadGroundTruth(File originalFile, int startRow, int endRow) {
         try {
-            String newName = originalFile.getName().substring(0, originalFile.getName().length()-4)+".gt";
-            File newFile = new File(originalFile.getParent()+"\\"+newName);
+            String newName = originalFile.getAbsolutePath().substring(0, originalFile.getAbsolutePath().length()-4)+".gt";
+            File newFile = new File(newName);
             if (newFile.exists()) {
                 Scanner scanner = new Scanner(newFile);
                 int numberOfLines = endRow - startRow + 1;
@@ -79,6 +79,7 @@ public abstract class Dataset {
                 for (int i = 0; i < numberOfLines; i++) {
                     groundTruth[i] = scanner.nextInt();
                 }
+                scanner.close();
             }
         } catch(IOException ignored) {}
     }
@@ -86,8 +87,8 @@ public abstract class Dataset {
     //Saves the ground truth of this dataset (if it has a ground truth).
     public void saveGroundTruth(File originalFile) {
         try {
-            String newName = originalFile.getName().substring(0, originalFile.getName().length()-4)+".gt";
-            File newFile = new File(originalFile.getParent()+"\\"+newName);
+            String newName = originalFile.getAbsolutePath().substring(0, originalFile.getAbsolutePath().length()-4)+".gt";
+            File newFile = new File(newName);
             BufferedWriter writer = new BufferedWriter(new FileWriter(newFile));
             for (int i = 0; i < groundTruth.length; i++) {
                 writer.write(""+groundTruth[i]);

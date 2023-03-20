@@ -6,6 +6,7 @@ import smile.clustering.KMeans;
 import smile.clustering.PartitionClustering;
 import smile.clustering.SpectralClustering;
 import smile.clustering.linkage.CompleteLinkage;
+import smile.stat.Hypothesis;
 import util.BitSet;
 import util.Tuple;
 
@@ -426,6 +427,7 @@ public class FeatureBasedDataset extends Dataset {
                     dataPoints[i][j] = result.get(i).get(j);
                 }
             }
+            fileScanner.close();
             loadGroundTruth(file, startRow, endRow == -1 ? dataPoints.length-1 : endRow);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -779,5 +781,11 @@ public class FeatureBasedDataset extends Dataset {
         }
         cutsAreAxisParallel = false;
         return result;
+    }
+
+    //Checks if this object is equal to the given object.
+    @Override
+    public boolean equals(Object o) {
+        return o instanceof FeatureBasedDataset && Arrays.deepEquals(((FeatureBasedDataset) o).dataPoints, dataPoints);
     }
 }

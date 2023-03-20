@@ -62,9 +62,16 @@ public class TestSet {
             while (scanner.hasNextInt()) {
                 testSet.add(new TestCase(scanner.nextInt(), scanner.nextInt(), scanner.nextInt(), scanner.nextInt()));
             }
+            scanner.close();
             return testSet;
         } catch (Exception ignored) {}
         return null; //Return null if loading failed.
+    }
+
+    //Checks if this object is equal to the given object.
+    @Override
+    public boolean equals(Object o) {
+        return o instanceof TestSet && ((TestSet) o).testCases.equals(testCases) && ((TestSet) o).dataTypeName.equals(dataTypeName);
     }
 
 }

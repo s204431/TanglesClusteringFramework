@@ -1,5 +1,7 @@
 package util;
 
+import java.util.Arrays;
+
 public class BitSet {
 
     //This class contains a custom BitSet implementation with fast operations.
@@ -217,6 +219,12 @@ public class BitSet {
     public void print() {
         System.out.println(size + " " + set.length);
         System.out.println(this);
+    }
+
+    //Checks if this object is equal to the given object.
+    @Override
+    public boolean equals(Object o) {
+        return o instanceof BitSet && Arrays.equals(((BitSet) o).set, set);
     }
 
 }

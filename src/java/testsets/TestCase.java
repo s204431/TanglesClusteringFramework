@@ -22,4 +22,14 @@ public class TestCase {
         nRuns = numberOfRuns;
     }
 
+    //Checks if this object is equal to the given object.
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof TestCase) {
+            TestCase t = (TestCase) o;
+            return t.nClusters == nClusters && t.nDimensions == nDimensions && t.nPoints == nPoints && t.nRuns == nRuns;
+        }
+        return false;
+    }
+
 }
