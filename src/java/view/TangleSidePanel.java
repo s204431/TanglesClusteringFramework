@@ -10,12 +10,18 @@ import java.awt.*;
 
 public class TangleSidePanel extends SidePanel {
 
+    //This class is the side panel associated with the tangle clustering algorithm.
+
     private ValueAdjuster aValueAdjuster; //Slider for the "a" parameter.
     private JCheckBox showHorizontalCutsCheckBox;
     private JCheckBox showVerticalCutsCheckBox;
     private JComboBox<String> cutGeneratorDropdown;
     private JComboBox<String> costFunctionDropdown;
 
+    private String removedCostFunction = null;
+    private boolean valueChangedDone = true;
+
+    //Constructor receiving view.
     public TangleSidePanel(View view) {
         super(view);
 
@@ -36,6 +42,7 @@ public class TangleSidePanel extends SidePanel {
         });
         add(aValueAdjuster);
 
+        //Add checkboxes for visualizing the generated cuts if data set is feature based and has two dimensions.
         if (view.getDataset() instanceof FeatureBasedDataset && ((FeatureBasedDataset) view.getDataset()).dataPoints[0].length <= 2) {
             showHorizontalCutsCheckBox = new JCheckBox("Show Horizontal Cuts");
             showHorizontalCutsCheckBox.setAlignmentX(CENTER_ALIGNMENT);
@@ -46,6 +53,8 @@ public class TangleSidePanel extends SidePanel {
             add(showHorizontalCutsCheckBox);
             add(showVerticalCutsCheckBox);
         }
+
+        //Add dropdown menus for generation algorithm and cost function.
         cutGeneratorDropdown = new JComboBox<>(view.getDataset().getInitialCutGenerators());
         cutGeneratorDropdown.addActionListener(e -> valueChanged());
         costFunctionDropdown = new JComboBox<>(view.getDataset().getCostFunctions());
@@ -67,12 +76,7 @@ public class TangleSidePanel extends SidePanel {
         valueChanged();
     }
 
-    protected void updateAValue(int a) {
-        aValueAdjuster.setValue(a);
-    }
-
-    private String removedCostFunction = null;
-    private boolean valueChangedDone = true;
+    //Updates values and generates cluster when a value has been changed in tangle side panel.
     protected void valueChanged() {
         if (!valueChangedDone) {
             return;
@@ -98,23 +102,19 @@ public class TangleSidePanel extends SidePanel {
         valueChangedDone = true;
     }
 
+    //Updates aValueAdjuster based on n and determines if the user should be able to interact with it.
     protected void update(int n) {
         aValueAdjuster.setMaximumValue(n);
         aValueAdjuster.setEnabled(view.dataVisualizer.getNumberOfPoints() > 0);
         repaint();
     }
 
-    /*protected void setBounds() {
-        super.setBounds();
-        aValueAdjuster.setBounds(30, 300, 100, 130);
-        if (showCutsCheckBox != null) {
-            showCutsCheckBox.setBounds(30, 400, 100, 50);
-        }
-    }*/
-
+    //Returns true if the horizontal cuts should be shown.
     protected boolean showHorizontalCuts() {
         return showHorizontalCutsCheckBox == null ? false : showHorizontalCutsCheckBox.isSelected();
     }
+
+    //Returns true if the vertical cuts should be shown.
     protected boolean showVerticalCuts() {
         return showVerticalCutsCheckBox == null ? false : showVerticalCutsCheckBox.isSelected();
     }

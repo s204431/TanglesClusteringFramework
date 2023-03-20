@@ -4,12 +4,16 @@ import javax.swing.*;
 import java.awt.*;
 
 public class SidePanel extends JPanel {
+
+    //This class represents a panel on the side of view.
+
     protected View view;
     protected double[][] softClustering;
     protected int[] hardClustering;
     private double NMIScore = -1;
     private long clusteringTime = -1;
 
+    //Labels shown on every side panel.
     private JLabel pointsText = new JLabel("Total points: ");
     private JLabel pointsLabel = new JLabel();
     private JLabel showingLabel = new JLabel();
@@ -18,8 +22,9 @@ public class SidePanel extends JPanel {
     private JLabel timeText = new JLabel("Clustering time: ");
     private JLabel timeLabel = new JLabel();
 
-    protected Font font;
+    protected Font font;    //Font also used by child classes.
 
+    //Constructor receiving a view.
     public SidePanel(View view) {
         this.view = view;
 
@@ -32,6 +37,7 @@ public class SidePanel extends JPanel {
 
         JLabel[] allLabels = { pointsText, pointsLabel, showingLabel, new JLabel(), NMIText, NMILabel, timeText, timeLabel };
 
+        //Add labels to side panel with spaces between.
         int c = 0;
         for (JLabel label : allLabels) {
             label.setFont(font);
@@ -43,6 +49,7 @@ public class SidePanel extends JPanel {
         }
     }
 
+    //Draws the side panel on the screen.
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -87,6 +94,7 @@ public class SidePanel extends JPanel {
 
     }
 
+    //States the size and placement of SidePanel.
     protected void setBounds() {
         setBounds(view.windowWidth - view.sidePanelWidth, view.topPanelHeight, view.sidePanelWidth, view.windowHeight - view.topPanelHeight);
     }
@@ -97,6 +105,7 @@ public class SidePanel extends JPanel {
         this.clusteringTime = clusteringTime;
     }
 
+    //Saves the received hard and soft clustering.
     protected void setClustering(int[] hardClustering, double[][] softClustering) {
         this.hardClustering = hardClustering;
         this.softClustering = softClustering;

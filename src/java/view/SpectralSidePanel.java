@@ -9,9 +9,11 @@ import java.awt.*;
 
 public class SpectralSidePanel extends SidePanel {
 
-    private ValueAdjuster kValueAdjuster; //Slider for the "k" parameter.
+    //Sliders for the "k" and "sigma" parameter in spectral clustering.
+    private ValueAdjuster kValueAdjuster;
     private ValueAdjuster sigmaValueAdjuster;
 
+    //Constructor receiving view.
     public SpectralSidePanel(View view) {
         super(view);
 
@@ -52,16 +54,14 @@ public class SpectralSidePanel extends SidePanel {
         add(sigmaValueAdjuster);
     }
 
-    protected void updateKValue(int k) {
-        kValueAdjuster.setValue(k);
-    }
-
+    //Clusters the data set when the sliders in spectral side panel has been changed.
     protected void valueChanged() {
         if (kValueAdjuster.hasValue() && sigmaValueAdjuster.hasValue()) {
             view.controller.generateClusteringSpectral(kValueAdjuster.getValue(), sigmaValueAdjuster.getValue());
         }
     }
 
+    //Updates kValueAdjuster and sigmaValueAdjuster based on n and determines if the user should be able to interact with them.
     protected void update(int n) {
         kValueAdjuster.setMaximumValue(100);
         kValueAdjuster.setEnabled(view.dataVisualizer.getNumberOfPoints() > 0);
@@ -70,6 +70,7 @@ public class SpectralSidePanel extends SidePanel {
         repaint();
     }
 
+    //Sets bounds of spectral side panel.
     protected void setBounds() {
         super.setBounds();
         kValueAdjuster.setBounds(30, 240, 100, 130);

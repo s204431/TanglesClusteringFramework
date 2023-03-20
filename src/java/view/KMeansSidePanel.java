@@ -9,8 +9,11 @@ import java.awt.*;
 
 public class KMeansSidePanel extends SidePanel {
 
+    //This class is the side panel associated with the k-means clustering algorithm.
+
     private ValueAdjuster kValueAdjuster; //Slider for the "k" parameter.
 
+    //Constructor receiving view.
     public KMeansSidePanel(View view) {
         super(view);
 
@@ -35,22 +38,21 @@ public class KMeansSidePanel extends SidePanel {
 
     }
 
-    protected void updateKValue(int k) {
-        kValueAdjuster.setValue(k);
-    }
-
+    //Clusters the data set when the slider in k-means side panel has been changed.
     protected void valueChanged() {
         if (kValueAdjuster.hasValue()) {
             view.controller.generateClusteringKMeans(kValueAdjuster.getValue());
         }
     }
 
+    //Updates kValueAdjuster based on n and determines if the user should be able to interact with it.
     protected void update(int n) {
         kValueAdjuster.setMaximumValue(100);
         kValueAdjuster.setEnabled(view.dataVisualizer.getNumberOfPoints() > 0);
         repaint();
     }
 
+    //Sets the bounds of the k-means side panel.
     protected void setBounds() {
         super.setBounds();
     }
