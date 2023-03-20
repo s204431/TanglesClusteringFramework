@@ -144,7 +144,12 @@ public class TopPanel extends JPanel {
                 if (loadResult == JOptionPane.OK_OPTION && file[0] != null) {
                     String fileName = file[0].getAbsolutePath();
                     if (datasetType.equals(GraphDataset.name)) {
-                        view.loadDatasetFromFile(datasetType, fileName, 0, 0, 0, 0);
+                        try {
+                            view.loadDatasetFromFile(datasetType, fileName, 0, 0, 0, 0);
+                        }
+                        catch (RuntimeException e1) {
+                            JOptionPane.showMessageDialog(view, "Failed to load data set");
+                        }
                         return;
                     }
                     ExtendedNumberFormatter formatter = createNumberFormatter();
@@ -200,7 +205,12 @@ public class TopPanel extends JPanel {
                         int endRow = Integer.parseInt(getTextFieldValue(endRowTextField, -1));
                         int startCol = Integer.parseInt(getTextFieldValue(startColTextField, 0));
                         int endCol = Integer.parseInt(getTextFieldValue(endColTextField ,-1));
-                        view.loadDatasetFromFile(datasetType, fileName, startRow, endRow, startCol, endCol);
+                        try {
+                            view.loadDatasetFromFile(datasetType, fileName, startRow, endRow, startCol, endCol);
+                        }
+                        catch (RuntimeException e1) {
+                            JOptionPane.showMessageDialog(view, "Failed to load data set");
+                        }
                     }
                 }
             }
@@ -384,7 +394,7 @@ public class TopPanel extends JPanel {
         NumberFormat format = NumberFormat.getIntegerInstance();
         format.setGroupingUsed(false);
         ExtendedNumberFormatter formatter = new ExtendedNumberFormatter(format);
-        formatter.setMinimum(0);
+        formatter.setMinimum(1);
         formatter.setMaximum(Integer.MAX_VALUE);
         formatter.setAllowsInvalid(false);
         return formatter;

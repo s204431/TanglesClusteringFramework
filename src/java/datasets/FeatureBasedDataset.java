@@ -1,6 +1,7 @@
 package datasets;
 
 import model.Model;
+import org.junit.jupiter.params.shadow.com.univocity.parsers.annotations.EnumOptions;
 import smile.clustering.HierarchicalClustering;
 import smile.clustering.KMeans;
 import smile.clustering.PartitionClustering;
@@ -429,6 +430,9 @@ public class FeatureBasedDataset extends Dataset {
             }
             fileScanner.close();
             loadGroundTruth(file, startRow, endRow == -1 ? dataPoints.length-1 : endRow);
+            if (dataPoints.length == 0 || dataPoints[0].length == 0) {
+                throw new RuntimeException("Failed to load dataset.");
+            }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

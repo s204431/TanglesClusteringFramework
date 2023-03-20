@@ -101,7 +101,7 @@ public class GraphDataset extends Dataset {
             fileScanner.close();
             loadGroundTruth(file, 0, dataPoints.length-1);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException();
         }
     }
 

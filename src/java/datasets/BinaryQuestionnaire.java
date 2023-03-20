@@ -105,6 +105,9 @@ public class BinaryQuestionnaire extends Dataset {
             }
             fileScanner.close();
             loadGroundTruth(file, startRow, endRow == -1 ? answers.length-1 : endRow);
+            if (answers.length == 0 || answers[0].size() == 0) {
+                throw new RuntimeException("Failed to load dataset.");
+            }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
