@@ -3,18 +3,13 @@ package test;
 import datasets.BinaryQuestionnaire;
 import datasets.DatasetGenerator;
 import datasets.FeatureBasedDataset;
-import datasets.GraphDataset;
 import org.junit.jupiter.api.Test;
-import smile.stat.Hypothesis;
 import testsets.TestCase;
 import testsets.TestSet;
 import util.BitSet;
 
-import java.awt.*;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -25,8 +20,10 @@ public class UnitTests {
     public void testBitSet() {
         String testBitString = "01010010110101111000111010001"+"1".repeat(60);
 
-        //Tests of Constructors, toString, size, count, countFlipped.
+        //Tests of Constructors, toString, equals, size, count, countFlipped.
         assertEquals(testBitString, new BitSet(testBitString).toString());
+
+        assertEquals(new BitSet(testBitString), new BitSet(testBitString));
 
         assertEquals("0".repeat(50), new BitSet(50).toString());
 
