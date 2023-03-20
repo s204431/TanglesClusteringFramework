@@ -11,13 +11,11 @@ public class UnitTests {
     @Test
     public void testBitSet() {
         String testBitString = "01010010110101111000111010001"+"1".repeat(60);
-        String fullTestBitString = testBitString+"0".repeat(64-testBitString.length()%64);
-        String trailingZeros = "0".repeat(fullTestBitString.length() - testBitString.length());
 
         //Tests of Constructors, toString, size, count, countFlipped.
-        assertEquals(fullTestBitString, new BitSet(testBitString).toString());
+        assertEquals(testBitString, new BitSet(testBitString).toString());
 
-        assertEquals("0".repeat(64), new BitSet(50).toString());
+        assertEquals("0".repeat(50), new BitSet(50).toString());
 
         assertEquals(testBitString.length(), new BitSet(testBitString).size());
 
@@ -29,50 +27,50 @@ public class UnitTests {
         //Tests of add.
         BitSet bitSet = new BitSet(testBitString);
         bitSet.add(4);
-        assertEquals(bitSet.toString(), setCharAt(4, '1', fullTestBitString));
+        assertEquals(setCharAt(4, '1', testBitString), bitSet.toString());
 
         bitSet = new BitSet(testBitString);
         bitSet.add(3);
-        assertEquals(bitSet.toString(), fullTestBitString);
+        assertEquals(testBitString, bitSet.toString());
 
         //Tests of remove.
         bitSet = new BitSet(testBitString);
         bitSet.remove(3);
-        assertEquals(bitSet.toString(), setCharAt(3, '0', fullTestBitString));
+        assertEquals(setCharAt(3, '0', testBitString), bitSet.toString());
 
         bitSet = new BitSet(testBitString);
         bitSet.remove(4);
-        assertEquals(bitSet.toString(), fullTestBitString);
+        assertEquals(testBitString, bitSet.toString());
 
         //Test of setAll.
         bitSet = new BitSet(testBitString);
         bitSet.setAll();
-        assertEquals(bitSet.toString(), "1".repeat(testBitString.length())+trailingZeros);
+        assertEquals("1".repeat(testBitString.length()), bitSet.toString());
 
         //Tests of flip.
         bitSet = new BitSet(testBitString);
         bitSet.flip(0);
-        assertEquals(bitSet.toString(), setCharAt(0, '1', fullTestBitString));
+        assertEquals(setCharAt(0, '1', testBitString), bitSet.toString());
 
         bitSet = new BitSet(testBitString);
         bitSet.flip(1);
-        assertEquals(bitSet.toString(), setCharAt(1, '0', fullTestBitString));
+        assertEquals(setCharAt(1, '0', testBitString), bitSet.toString());
 
         //Tests of setValue.
         for (int i = 0; i < 2; i++) {
             bitSet = new BitSet(testBitString);
             bitSet.setValue(7, i != 0);
-            assertEquals(bitSet.toString(), setCharAt(7, Character.forDigit(i, 10), fullTestBitString));
+            assertEquals(setCharAt(7, Character.forDigit(i, 10), testBitString), bitSet.toString());
 
             bitSet = new BitSet(testBitString);
             bitSet.setValue(6,i != 0);
-            assertEquals(bitSet.toString(), setCharAt(6, Character.forDigit(i, 10), fullTestBitString));
+            assertEquals(setCharAt(6, Character.forDigit(i, 10), testBitString), bitSet.toString());
         }
 
         //Tests of get.
         bitSet = new BitSet(testBitString);
-        assertEquals(bitSet.get(2), testBitString.charAt(2) != '0');
-        assertEquals(bitSet.get(3), testBitString.charAt(3) != '0');
+        assertEquals(testBitString.charAt(2) != '0', bitSet.get(2));
+        assertEquals(testBitString.charAt(3) != '0', bitSet.get(3));
 
         String otherTestBitString = "11001001110011000010101110000"+"0".repeat(60);
 
@@ -82,7 +80,7 @@ public class UnitTests {
         //Test of unionWith.
         bitSet = new BitSet(testBitString);
         bitSet.unionWith(new BitSet(otherTestBitString));
-        assertEquals("11011011110111111010111110001"+"1".repeat(60)+trailingZeros, bitSet.toString());
+        assertEquals("11011011110111111010111110001"+"1".repeat(60), bitSet.toString());
 
         //Tests of intersection.
         assertEquals(7, BitSet.intersection(new BitSet(testBitString), new BitSet(otherTestBitString), false, false));

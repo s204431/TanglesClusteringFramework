@@ -209,6 +209,7 @@ public class BitSet {
                 result.append(Long.toBinaryString(l));
             }
         }
+        result.delete(result.length() - (64-size()%64), result.length());
         return result.toString();
     }
 
