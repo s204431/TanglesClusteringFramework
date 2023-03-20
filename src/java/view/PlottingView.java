@@ -22,38 +22,40 @@ import java.util.Random;
 import java.util.List;
 
 public class PlottingView extends JPanel implements DataVisualizer, MouseListener, MouseMotionListener, MouseWheelListener {
+
+    //This class visualizes a point-based data set in a two-dimensional coordinate system.
+
     private static final int POINT_SIZE = 8;
     private static final int MAX_POINTS_TO_DRAW = 10000;
     private static final int MAX_POINTS_TO_DRAW_WHEN_MOVING = 2000;
 
     private View view;
 
-    private int windowMax;
-
-    private boolean close = false;
-
     private double[][] points;
     private int[] clusters;
     private double[][] softClustering;
     private Color[] colors;
 
+    private int windowMax;
+
+    private boolean close = false;  //Determines if threads in this class needs to be stopped.
+
+    //Constants used when dragging or zooming.
     private int[] mouseOrigVector;
     private boolean dragging = false;
-
     private int xOrig;
     private int yOrig;
-    private double factor = 1; //Used to expand x- or y-axis to capture largest datapoint
+    private double factor = 1; //Used to expand x- or y-axis to capture largest datapoint.
     private int zoomFactor = 1;
     private int lineGap;
     private int lines;
 
     protected JLabel coordinates = new JLabel();
 
-    //Often used strokes
+    //Often used strokes.
     private final BasicStroke stroke1 = new BasicStroke(1);
     private final BasicStroke stroke2 = new BasicStroke(2);
     private final BasicStroke stroke3 = new BasicStroke(3);
-    private final BasicStroke stroke4 = new BasicStroke(4);
 
     private int[] indicesToDraw; //Indices of points to draw when there are too many points.
     protected int originalNumberOfPoints; //Number of points before reducing the number of points.
@@ -61,6 +63,7 @@ public class PlottingView extends JPanel implements DataVisualizer, MouseListene
     protected boolean showAxes = true;
     protected boolean showGridLines = true;
 
+    //Constructor receiving view.
     public PlottingView(View view) {
         super();
         this.view = view;
@@ -88,6 +91,7 @@ public class PlottingView extends JPanel implements DataVisualizer, MouseListene
 
         Graphics2D g2d = (Graphics2D) g;
 
+        //Return if no data set has been loaded.
         if (!view.hasDataset()) {
             g2d.setFont(getFont().deriveFont(20f));
             g2d.drawString("Please load or generate a dataset", getWidth()/4, getHeight()/3);
@@ -139,7 +143,6 @@ public class PlottingView extends JPanel implements DataVisualizer, MouseListene
                 drawNumber = false;
             }
 
-            //Define useful values.
             int posX = xOrig + lineGap * i;
             int posY = yOrig + lineGap * i;
             int negX = xOrig - lineGap * i;
@@ -339,18 +342,22 @@ public class PlottingView extends JPanel implements DataVisualizer, MouseListene
         }
     }
 
+    //Returns an identical color to the received one but with a translucency based on percentage.
     private Color changeTranslucencyOfColor(Color color, double percentage) {
         return new Color(color.getRed(), color.getGreen(), color.getBlue(), (int)(percentage * 255));
     }
 
+    //Computes where a point should be placed on the screen given it's coordinates.
     private int[] convertPointToCoordinateOnScreen(double[] coor) {
         return new int[] { (int)(xOrig + (coor[0] * (lineGap) / factor) - POINT_SIZE / 2),  (int)(yOrig - (coor[1] * (lineGap) / factor) - POINT_SIZE / 2)};
     }
 
+    //Computes the coordinates for a point based on it's position on the screen.
     private double[] convertScreenPositionToCoordinate(int x, int y) {
         return new double[] { (x - xOrig) * factor / (double)lineGap, (yOrig - y) * factor / (double)lineGap };
     }
 
+    //Loads the points of a feature based data set in a variable and finds the min/max values necessary to configure the axes.
     protected void loadPoints(double[][] points) {
         if (runningTSNE) {
             return;
@@ -371,6 +378,7 @@ public class PlottingView extends JPanel implements DataVisualizer, MouseListene
         repaint();
     }
 
+    //Load the points of a binary data set and saves them in a variable.
     protected void loadPoints(BitSet[] questionnaireAnswers) {
         if (runningTSNE) {
             return;
@@ -387,6 +395,7 @@ public class PlottingView extends JPanel implements DataVisualizer, MouseListene
         repaint();
     }
 
+    //Converts a one-dimensional data set to a two-dimensional data set.
     private double[][] convert1DTo2D(double[][] points) {
         double[][] copy = new double[points.length][2];
         for (int i = 0; i < points.length; i++) {
@@ -396,6 +405,7 @@ public class PlottingView extends JPanel implements DataVisualizer, MouseListene
         return copy;
     }
 
+    //Converts a higher-dimensional data set to a two-dimensional data set using t-SNE. Runs in a different thread.
     private void TSne(double[][] dataPoints) {
         runningTSNE = true;
         points = null;
@@ -426,6 +436,7 @@ public class PlottingView extends JPanel implements DataVisualizer, MouseListene
         }).start();
     }
 
+    //Colors the data points in a data set based on the received hard clustering.
     public void loadClusters(int[] clusters) {
         if (clusters == null) {
             this.clusters = null;
@@ -455,6 +466,8 @@ public class PlottingView extends JPanel implements DataVisualizer, MouseListene
         repaint();
     }
 
+    //Colors the data points in a data set based on the received hard and soft clustering.
+    //Soft clustering is illustrated by the translucency of the color.
     public void loadClusters(int[] clusters, double[][] softClustering) {
         if (softClustering != null) {
             softClustering = convertSoftClustering(softClustering);
@@ -482,6 +495,7 @@ public class PlottingView extends JPanel implements DataVisualizer, MouseListene
         return newClusters;
     }
 
+    //Convert the soft clustering of the whole data set to a soft clustering only for the drawn points.
     private double[][] convertSoftClustering(double[][] softClustering) {
         double[][] newSoftClustering = new double[indicesToDraw.length][];
         for (int i = 0; i < indicesToDraw.length; i++) {
@@ -490,6 +504,7 @@ public class PlottingView extends JPanel implements DataVisualizer, MouseListene
         return newSoftClustering;
     }
 
+    //Finds the min and max values of the x and y values of the data points.
     private double[] findBounds(double[][] points) {
         double[] bounds = new double[4];  //Max x, max y, min x, min y
         for (double[] point : points) {
@@ -511,6 +526,7 @@ public class PlottingView extends JPanel implements DataVisualizer, MouseListene
         return bounds;
     }
 
+    //Configures the axes based of the received min and max values of the data points.
     private void configureAxes(double[] bounds) {
         double max = 0;
         for (double bound : bounds) {
@@ -521,10 +537,12 @@ public class PlottingView extends JPanel implements DataVisualizer, MouseListene
         yOrig = (view.windowHeight - view.topPanelHeight) / 2 - (int)((bounds[1] + bounds[3]) / factor);
     }
 
+    //Rounds a double d to decimalPlaces decimal places.
     private double round(double d, int decimalPlaces) {
         return new BigDecimal(d).setScale(decimalPlaces, RoundingMode.HALF_UP).doubleValue();
     }
 
+    //Updates the coordinate text and converts it to scientific notation if necessary.
     private void updateCoordinateText() {
         Point mousePos = getMousePosition();
         if (mousePos != null) {
@@ -546,15 +564,18 @@ public class PlottingView extends JPanel implements DataVisualizer, MouseListene
         }
     }
 
+    //Converts a double n to scientific notation.
     private String convertNumberToScientificNotation(double n) {
         NumberFormat numberFormat = new DecimalFormat("0.00E0");
         return numberFormat.format(n);
     }
 
+    //Changes the boolean value determining if axes should be shown.
     protected void switchShowingOfAxes() {
         showAxes = !showAxes;
     }
 
+    //Changes the boolean value determining if grid lines should be shown.
     protected void switchShowingOfGridlines() {
         showGridLines = !showGridLines;
     }
@@ -573,6 +594,7 @@ public class PlottingView extends JPanel implements DataVisualizer, MouseListene
         return result;
     }
 
+    //Returns the number of points in the currently loaded data set.
     public int getNumberOfPoints() {
         if (points == null) {
             return 0;
@@ -580,10 +602,12 @@ public class PlottingView extends JPanel implements DataVisualizer, MouseListene
         return points.length;
     }
 
+    //Return the original number of points of the data set.
     public int getOriginalNumberOfPoints() {
         return originalNumberOfPoints;
     }
 
+    //Inherited method from DataVisualizer determining returning true if t-SNE is not running.
     public boolean isReady() {
         return !runningTSNE;
     }
@@ -593,6 +617,7 @@ public class PlottingView extends JPanel implements DataVisualizer, MouseListene
 
     }
 
+    //Updates the coordinate text when the mouse moves.
     @Override
     public void mouseMoved(MouseEvent e) {
         if (view.hasDataset()) {
@@ -605,6 +630,7 @@ public class PlottingView extends JPanel implements DataVisualizer, MouseListene
 
     }
 
+    //Saves the mouse position and starts dragging when the mouse is pressed.
     @Override
     public void mousePressed(MouseEvent e) {
         Point mousePos = getMousePosition();
@@ -614,6 +640,7 @@ public class PlottingView extends JPanel implements DataVisualizer, MouseListene
         }
     }
 
+    //Stops dragging when the mouse is released.
     @Override
     public void mouseReleased(MouseEvent e) {
         dragging = false;

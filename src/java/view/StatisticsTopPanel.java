@@ -367,7 +367,7 @@ public class StatisticsTopPanel extends JPanel {
     }
 
     private void addPlottingButton() {
-        plottingButton = new JButton("Scatter plot");
+        plottingButton = new JButton("Data visualizer");
         plottingButton.addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent e) {
                 view.switchToPlotting();
