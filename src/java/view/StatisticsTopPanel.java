@@ -170,7 +170,7 @@ public class StatisticsTopPanel extends JPanel {
                         JButton fileButton = new JButton("Select File");
                         fileButton.addActionListener((l) -> {
                             final JFileChooser fc = new JFileChooser();
-                            String extension = "testsets";
+                            String extension = "testset";
                             FileNameExtensionFilter filter = new FileNameExtensionFilter("."+extension, extension);
                             fc.setFileFilter(filter);
                             int returnVal = fc.showDialog(view, "Choose");
@@ -209,7 +209,7 @@ public class StatisticsTopPanel extends JPanel {
                         JButton fileButton = new JButton("Select File");
                         fileButton.addActionListener((l) -> {
                             final JFileChooser fc = new JFileChooser();
-                            String extension = "testsets";
+                            String extension = "testset";
                             FileNameExtensionFilter filter = new FileNameExtensionFilter("."+extension, extension);
                             fc.setFileFilter(filter);
                             int returnVal = fc.showDialog(view, "Choose");
@@ -229,7 +229,12 @@ public class StatisticsTopPanel extends JPanel {
                         if (loadResult == JOptionPane.OK_OPTION && file[0] != null) {
                             //Load test set
                             testSet = TestSet.loadTestSet(file[0]);
-                            generateTable(testSet);
+                            if (testSet == null || testSet.size() == 0) {
+                                JOptionPane.showMessageDialog(view, "Failed to load test set");
+                            }
+                            else {
+                                generateTable(testSet);
+                            }
                         }
                     }
                 });
