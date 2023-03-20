@@ -23,6 +23,9 @@ import java.util.Random;
 import static guru.nidi.graphviz.model.Factory.*;
 
 public class GraphView extends JPanel implements DataVisualizer, MouseListener, MouseWheelListener {
+
+    //This class visualizes a graph data set in GraphViz format.
+
     private View view;
     private Image image;
     private MutableGraph graph;
@@ -41,6 +44,7 @@ public class GraphView extends JPanel implements DataVisualizer, MouseListener, 
 
     private boolean close = false;
 
+    //Constructor receiving view.
     public GraphView(View view) {
         this.view = view;
         setPreferredSize(new Dimension(view.getWindowWidth(), view.getWindowHeight()));
@@ -50,7 +54,7 @@ public class GraphView extends JPanel implements DataVisualizer, MouseListener, 
         (new Thread(new BoardDragger())).start();
     }
 
-    //Draws graphView on screen
+    //Draws graphView on screen.
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -60,6 +64,7 @@ public class GraphView extends JPanel implements DataVisualizer, MouseListener, 
         }
     }
 
+    //Converts a mutable graph to and image in GraphViz format.
     protected Image convertGraphToImage() {
         Image image = Graphviz.fromGraph(graph).render(Format.PNG).toImage();
         if (imageWidth == 0.0 || imageHeight == 0.0) {
@@ -86,6 +91,7 @@ public class GraphView extends JPanel implements DataVisualizer, MouseListener, 
         return Graphviz.fromGraph(graph).width((int)imageWidth).height((int)imageHeight).render(Format.PNG).toImage();
     }
 
+    //Constructs a mutable graph from a dot string.
     protected void loadGraphFromDotString(final String dot) {
         try {
             InputStream stream = new ByteArrayInputStream(dot.getBytes(StandardCharsets.UTF_8));
@@ -105,6 +111,7 @@ public class GraphView extends JPanel implements DataVisualizer, MouseListener, 
         } catch (Exception e) {}
     }
 
+    //Colors the nodes in a mutable graph based on the received hard clustering.
     public void loadClusters(final int[] hardClustering) {
         if (hardClustering == null) {
             return;
@@ -120,6 +127,8 @@ public class GraphView extends JPanel implements DataVisualizer, MouseListener, 
         repaint();
     }
 
+    //Colors the nodes in a mutable graph based on the received hard and soft clustering.
+    //Soft clustering is illustrated by the translucency of the color.
     public void loadClusters(final int[] hardClustering, final double[][] softClustering) {
         if (hardClustering == null || softClustering == null) {
             return;
@@ -138,6 +147,7 @@ public class GraphView extends JPanel implements DataVisualizer, MouseListener, 
         repaint();
     }
 
+    //Adds the necessary amount of colors to represent every cluster in the received hard clustering.
     private void addColors(final int[] hardClustering) {
         colors = new java.awt.Color[] { java.awt.Color.RED, java.awt.Color.BLUE, java.awt.Color.YELLOW, java.awt.Color.GREEN, java.awt.Color.ORANGE, java.awt.Color.PINK, java.awt.Color.GRAY };
 
@@ -161,23 +171,28 @@ public class GraphView extends JPanel implements DataVisualizer, MouseListener, 
         }
     }
 
+    //Returns number of points in the mutable graph.
     public int getNumberOfPoints() {
         return numberOfPoints;
     }
 
+    //Returns the original number of points in the mutable graph.
     public int getOriginalNumberOfPoints() {
         return getNumberOfPoints();
     }
 
+    //Inherited method from DataVisualizer (only relevant when t-SNE is running).
     public boolean isReady() {
         return true;
     }
+
 
     @Override
     public void mouseClicked(MouseEvent e) {
 
     }
 
+    //Saves the mouse position and starts dragging when the mouse is pressed.
     @Override
     public void mousePressed(MouseEvent e) {
         Point mousePos = getMousePosition();
@@ -187,6 +202,7 @@ public class GraphView extends JPanel implements DataVisualizer, MouseListener, 
         }
     }
 
+    //Stops dragging when the mouse is released.
     @Override
     public void mouseReleased(MouseEvent e) {
         dragging = false;
@@ -203,6 +219,7 @@ public class GraphView extends JPanel implements DataVisualizer, MouseListener, 
 
     }
 
+    //Zooms in and out when the mouse wheel is moved.
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
         if (e.getPreciseWheelRotation() < 0.0 || (imageWidth > 100 && imageHeight > 100)) {
