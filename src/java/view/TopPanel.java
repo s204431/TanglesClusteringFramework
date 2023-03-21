@@ -289,14 +289,18 @@ public class TopPanel extends JPanel {
                         JOptionPane.PLAIN_MESSAGE);
                 if (saveResult == JOptionPane.OK_OPTION && file[0] != null) {
                     try {
-                        ((PlottingView)view.dataVisualizer).coordinates.setVisible(false);
+                        if (view.dataVisualizer instanceof PlottingView) {
+                            ((PlottingView)view.dataVisualizer).coordinates.setVisible(false);
+                        }
                         JPanel panel = ((JPanel)view.dataVisualizer);
                         BufferedImage image = new BufferedImage(panel.getWidth(), panel.getHeight(), BufferedImage.TYPE_INT_RGB);
                         Graphics2D g = image.createGraphics();
                         panel.paint(g);
                         g.dispose();
                         ImageIO.write(image, "png", file[0]);
-                        ((PlottingView)view.dataVisualizer).coordinates.setVisible(true);
+                        if (view.dataVisualizer instanceof PlottingView) {
+                            ((PlottingView)view.dataVisualizer).coordinates.setVisible(true);
+                        }
                     } catch (IOException e1) {}
                 }
             }
