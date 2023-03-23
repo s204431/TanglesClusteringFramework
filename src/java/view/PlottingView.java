@@ -63,6 +63,8 @@ public class PlottingView extends JPanel implements DataVisualizer, MouseListene
     protected boolean showAxes = true;
     protected boolean showGridLines = true;
 
+    private boolean brushing = false;
+
     //Constructor receiving view.
     public PlottingView(View view) {
         super();
@@ -82,6 +84,7 @@ public class PlottingView extends JPanel implements DataVisualizer, MouseListene
         addMouseMotionListener(this);
         addMouseWheelListener(this);
         (new Thread(new BoardDragger())).start();
+        (new Thread(new Brusher())).start();
     }
 
     //Draws plottingView on screen.
@@ -381,8 +384,10 @@ public class PlottingView extends JPanel implements DataVisualizer, MouseListene
         else {
             this.points = points;
         }
-        double[] bounds = findBounds(points);
-        configureAxes(bounds);
+        if (!brushing) {
+            double[] bounds = findBounds(points);
+            configureAxes(bounds);
+        }
         repaint();
     }
 
@@ -642,9 +647,12 @@ public class PlottingView extends JPanel implements DataVisualizer, MouseListene
     @Override
     public void mousePressed(MouseEvent e) {
         Point mousePos = getMousePosition();
-        if (mousePos != null) {
+        if (mousePos != null && SwingUtilities.isLeftMouseButton(e)) {
             mouseOrigVector = new int[]{xOrig - mousePos.x, yOrig - mousePos.y};
             dragging = true;
+        }
+        else if (mousePos != null && SwingUtilities.isRightMouseButton(e)) {
+            brushing = true;
         }
     }
 
@@ -652,6 +660,7 @@ public class PlottingView extends JPanel implements DataVisualizer, MouseListene
     @Override
     public void mouseReleased(MouseEvent e) {
         dragging = false;
+        brushing = false;
         repaint();
     }
 
@@ -704,6 +713,50 @@ public class PlottingView extends JPanel implements DataVisualizer, MouseListene
             yOrig += (origHeightDist) * 4 * (tempLineGap + 0.5);
         }
         repaint();
+    }
+
+
+    private class Brusher implements Runnable {
+        @Override
+        public void run() {
+            double brushSize = 5;
+            int brushStrength = 20;
+            Random r = new Random();
+            while (!close) {
+                if (brushing && getMousePosition() != null) {
+                    //Generate points.
+                    Point mousePos = getMousePosition();
+                    double[] mousePositionOnScreen = convertScreenPositionToCoordinate(mousePos.x, mousePos.y);
+                    double[][] newPoints = new double[brushStrength][2];
+                    for (int i = 0; i < brushStrength; i++) {
+                        newPoints[i] = new double[] {r.nextGaussian(mousePositionOnScreen[0], brushSize), r.nextGaussian(mousePositionOnScreen[1], brushSize)};
+                    }
+                    double[][] updatedPoints = new double[points.length+newPoints.length][2];
+                    for (int i = 0; i < points.length; i++) {
+                        updatedPoints[i] = points[i];
+                    }
+                    for (int i = 0; i < newPoints.length; i++) {
+                        updatedPoints[i+points.length] = newPoints[i];
+                    }
+                    double[][] copy = new double[updatedPoints.length][2];
+                    for (int i = 0; i < updatedPoints.length; i++) {
+                        for (int j = 0; j < 2; j++) {
+                            copy[i][j] = updatedPoints[i][j];
+                        }
+                    }
+                    clusters = null;
+                    loadPoints(updatedPoints);
+                    view.setDataset(new FeatureBasedDataset(copy));
+                    view.selectedSidePanel.update(points.length);
+                    repaint();
+                }
+                try {
+                    Thread.sleep(20);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
     //Concurrent thread that moves the graph when dragging.

@@ -179,6 +179,10 @@ public class View extends JFrame {
         selectedSidePanel.setValues(NMIScore, clusteringTime);
     }
 
+    protected void setDataset(Dataset dataset) {
+        model.setDataset(dataset);
+    }
+
     public void resetView() {
         Dataset dataset = model.getDataset();
         dataVisualizer = dataset instanceof GraphDataset ? new GraphView(this) : new PlottingView(this);
