@@ -241,6 +241,7 @@ public class PlottingView extends JPanel implements DataVisualizer, MouseListene
                 int costIndex = 0;
                 for (int i = 0; i < dataset.axisParallelCuts.length; i++) {
                     if ((i == 0 && !((TangleSidePanel) view.selectedSidePanel).showVerticalCuts()) || (i == 1 && !((TangleSidePanel) view.selectedSidePanel).showHorizontalCuts())) {
+                        costIndex += dataset.axisParallelCuts[i].length;
                         continue;
                     }
                     int otherDimension = i == 0 ? 1 : 0;

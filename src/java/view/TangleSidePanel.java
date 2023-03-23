@@ -86,7 +86,6 @@ public class TangleSidePanel extends SidePanel {
         valueChangedDone = false;
         for (String costFunction : removedCostFunctions) {
             costFunctionDropdown.addItem(costFunction);
-            System.out.println("Add: "+costFunction);
         }
         removedCostFunctions = new ArrayList<>();
         for (int i = 0; i < cutGeneratorDropdown.getItemCount(); i++) {
@@ -94,7 +93,6 @@ public class TangleSidePanel extends SidePanel {
                 if (cutGeneratorDropdown.getSelectedIndex() != i && cutGeneratorDropdown.getItemAt(i).equals(costFunctionDropdown.getItemAt(j))) {
                     String removedCostFunction = costFunctionDropdown.getItemAt(j);
                     removedCostFunctions.add(removedCostFunction);
-                    System.out.println("Remove: "+removedCostFunction);
                 }
             }
         }
