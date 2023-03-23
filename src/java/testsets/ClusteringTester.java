@@ -193,7 +193,7 @@ public class ClusteringTester {
                     long time1 = new Date().getTime();
                     switch (algorithmName) {
                         case Model.tangleName -> {
-                            int a = (int) ((testCase.nPoints / testCase.nClusters) * (1.0 / 2.0));
+                            int a = (int) ((testCase.nPoints / testCase.nClusters) * (2.0 / 3.0));
                             hardClustering = model.generateClusters(dataset, a, -1, null, null);
                         }
                         case Model.kMeansName -> hardClustering = dataset.kMeans(testCase.nClusters);

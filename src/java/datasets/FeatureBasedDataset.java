@@ -768,7 +768,7 @@ public class FeatureBasedDataset extends Dataset {
                     }
                     String initialCutFunction = localCopy.length <= localK*8 ? initialCutsRange : initialCutsTanglesAdjust;
                     int localA = (int)(localCopy.length/localK*(2.0/3.0)) <= 0 ? 1 : (int)(localCopy.length/localK*(2.0/3.0));
-                    localClustering = new Model().generateClusters(new FeatureBasedDataset(localCopy), localA, -1, initialCutFunction, null);
+                    localClustering = new Model().generateClusters(new FeatureBasedDataset(localCopy), localA, -1, initialCutFunction, costFunctionDistanceToMean);
                     int max = Arrays.stream(localClustering).max().getAsInt();
                     centroids = new double[max+1][localCopy[0].length];
                     int[] count = new int[max+1];

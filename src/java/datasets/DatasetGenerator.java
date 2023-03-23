@@ -154,7 +154,7 @@ public class DatasetGenerator {
                     centroids[i][j] = r.nextDouble(-maxDist, maxDist);
                     centroidStds[i][j] = r.nextDouble(minStd, maxStd);
                     for (int k = 0; k < i; k++) {
-                        if (Math.abs(centroids[k][j] - centroids[i][j]) < 1.75*(centroidStds[k][j] + centroidStds[i][j])) {
+                        if (Math.abs(centroids[k][j] - centroids[i][j]) < 1.6*(centroidStds[k][j] + centroidStds[i][j])) {
                             good = false;
                             break;
                         }
