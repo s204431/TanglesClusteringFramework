@@ -57,7 +57,7 @@ public class ClusteringTester {
             for (int j = 1; j <= 10; j++) {
                 sizeCount++;
                 long time1 = new Date().getTime();
-                int a = (int)((i/j)*(1.0/2.0));
+                int a = (int)((i/j)*(2.0/3.0));
                 Tuple<double[][], int[]> generated = DatasetGenerator.generateFeatureBasedDataPoints(i, j, 2);
                 Dataset dataset = new FeatureBasedDataset(generated.x);
                 int[] groundTruth = generated.y;

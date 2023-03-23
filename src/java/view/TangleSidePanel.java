@@ -7,6 +7,8 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TangleSidePanel extends SidePanel {
 
@@ -18,7 +20,7 @@ public class TangleSidePanel extends SidePanel {
     private JComboBox<String> cutGeneratorDropdown;
     private JComboBox<String> costFunctionDropdown;
 
-    private String removedCostFunction = null;
+    private List<String> removedCostFunctions = new ArrayList<>();
     private boolean valueChangedDone = true;
 
     //Constructor receiving view.
@@ -82,18 +84,22 @@ public class TangleSidePanel extends SidePanel {
             return;
         }
         valueChangedDone = false;
-        if (removedCostFunction != null) {
-            costFunctionDropdown.addItem(removedCostFunction);
+        for (String costFunction : removedCostFunctions) {
+            costFunctionDropdown.addItem(costFunction);
+            System.out.println("Add: "+costFunction);
         }
-        removedCostFunction = null;
+        removedCostFunctions = new ArrayList<>();
         for (int i = 0; i < cutGeneratorDropdown.getItemCount(); i++) {
             for (int j = 0; j < costFunctionDropdown.getItemCount(); j++) {
                 if (cutGeneratorDropdown.getSelectedIndex() != i && cutGeneratorDropdown.getItemAt(i).equals(costFunctionDropdown.getItemAt(j))) {
-                    removedCostFunction = costFunctionDropdown.getItemAt(j);
-                    costFunctionDropdown.removeItem(removedCostFunction);
-                    break;
+                    String removedCostFunction = costFunctionDropdown.getItemAt(j);
+                    removedCostFunctions.add(removedCostFunction);
+                    System.out.println("Remove: "+removedCostFunction);
                 }
             }
+        }
+        for (String costFunction : removedCostFunctions) {
+            costFunctionDropdown.removeItem(costFunction);
         }
         if (aValueAdjuster.hasValue()) {
             view.controller.generateClusteringTangles(aValueAdjuster.getValue(), -1, (String) cutGeneratorDropdown.getSelectedItem(), (String) costFunctionDropdown.getSelectedItem());

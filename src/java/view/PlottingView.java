@@ -258,7 +258,14 @@ public class PlottingView extends JPanel implements DataVisualizer, MouseListene
                     }
                     for (int j = 0; j < dataset.axisParallelCuts[i].length; j++) {
                         g2d.setStroke(stroke2);
-                        double p = (highestCost - lowestCost) == 0 ? 0.5 : (dataset.cutCosts[costIndex] - lowestCost)/(highestCost - lowestCost);
+                        int rank = 0;
+                        for (int k = 0; k < dataset.cutCosts.length; k++) {
+                            if (costIndex != k && dataset.cutCosts[costIndex] > dataset.cutCosts[k]) {
+                                rank++;
+                            }
+                        }
+                        double p = (double)rank/(dataset.cutCosts.length-1);
+                        //double p = (highestCost - lowestCost) == 0 ? 0.5 : (dataset.cutCosts[costIndex] - lowestCost)/(highestCost - lowestCost);
                         g2d.setColor(p <= 0.5 ? new Color((int)(p*2.0*255), 0, 0) : new Color(255, (int)((p-0.5)*2.0*200), (int)((p-0.5)*2.0*200)));
                         if (((FeatureBasedDataset) view.getDataset()).cutsAreAxisParallel) {
                             if (i == 0) {

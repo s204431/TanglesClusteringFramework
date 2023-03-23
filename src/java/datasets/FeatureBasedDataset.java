@@ -39,6 +39,7 @@ public class FeatureBasedDataset extends Dataset {
     public static final String costFunctionPairwiseSquaredDistance = "Squared distances";
     public static final String costFunctionDistanceToMean = "Distance to mean";
     public static final String costFunctionLocalMeans = "Local means";
+    public static final String costFunctionKMeansAdjust = "K-Means adjust";
 
     //Empty constructor.
     public FeatureBasedDataset() {
@@ -226,7 +227,7 @@ public class FeatureBasedDataset extends Dataset {
     //Returns the names of the supported cost functions.
     @Override
     public String[] getCostFunctions() {
-        return new String[] {costFunctionDistanceToMean, costFunctionPairwiseDistance, costFunctionPairwiseSquaredDistance, costFunctionLocalMeans};
+        return new String[] {initialCutsKMeansAdjust, costFunctionDistanceToMean, costFunctionPairwiseDistance, costFunctionPairwiseSquaredDistance, costFunctionLocalMeans};
     }
 
     //Generates initial cuts for this dataset using the giving initial cut generator name and returns it as a BitSet array.
@@ -253,7 +254,10 @@ public class FeatureBasedDataset extends Dataset {
     //Generates costs for the initial cuts for this dataset using the giving cost function name and returns it as a double array.
     @Override
     public double[] getCutCosts(String costFunctionName) {
-        if (costFunctionName == null || costFunctionName.equals(costFunctionDistanceToMean)) {
+        if (costFunctionName == null || costFunctionName.equals(costFunctionKMeansAdjust)) {
+            //Do nothing
+        }
+        else if (costFunctionName.equals(costFunctionDistanceToMean)) {
             cutCosts = distanceToMeanCostFunction();
         }
         else if (costFunctionName.equals(costFunctionPairwiseDistance)) {
@@ -632,10 +636,16 @@ public class FeatureBasedDataset extends Dataset {
             KMeans kMeans = null;
             double cost = 0.0;
             int index = 0;
+            int side1Count = 0;
+            int side2Count = 0;
             for (int j = 0; j < dataPoints.length; j++) {
                 accumulated.remove(originalIndices[j]);
                 if (kMeans == null || kMeans.centroids[kMeans.y[index]][i] <= dataPoints[originalIndices[cutIndex]][i]) {
                     currentBitSet.remove(originalIndices[j]);
+                    side1Count++;
+                }
+                else {
+                    side2Count++;
                 }
                 double pointCost = 0.0;
                 if (kMeans != null) {
@@ -645,6 +655,9 @@ public class FeatureBasedDataset extends Dataset {
                             pointCost += getDistance(dataPoints[originalIndices[j]], kMeans.centroids[k]);
                             count++;
                         }
+                    }
+                    if (count == 0) {
+                        count = 1;
                     }
                     cost += Math.exp(-((1.0/range)*(pointCost/count)));
                 }
@@ -657,7 +670,14 @@ public class FeatureBasedDataset extends Dataset {
                     currentBitSet = new BitSet(dataPoints.length);
                     currentBitSet.unionWith(accumulated);
                     cuts.add(currentBitSet);
-                    costs.add(cost);
+                    if (side1Count == 0 || side2Count == 0) {
+                        cost = range*localK*a;
+                    }
+                    side1Count = side1Count == 0 ? 1 : side1Count;
+                    side2Count = side2Count == 0 ? 1 : side2Count;
+                    costs.add(cost/(side1Count*side2Count));
+                    side1Count = 0;
+                    side2Count = 0;
                     cost = 0.0;
                     //Find where to put the cut.
                     double[][] localCopy = new double[(j+a/precision+1)-(j+1)][];
