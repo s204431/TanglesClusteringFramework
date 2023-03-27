@@ -20,6 +20,7 @@ public class TangleClusterer {
         BitSet[] initialCuts = dataset.getInitialCuts(initialCutGenerator);
         double[] costs = dataset.getCutCosts(costFunctionName);
         Tuple<BitSet[], double[]> redundancyRemoved = removeRedundantCuts(initialCuts, costs, 1.0); //Set factor to 1 to turn it off.
+        System.out.println(redundancyRemoved.x.length);
         initialCuts = redundancyRemoved.x;
         costs = redundancyRemoved.y;
         TangleSearchTree tree = generateTangleSearchTree(initialCuts, costs, a, psi);
@@ -76,7 +77,7 @@ public class TangleClusterer {
         boolean[] toBeRemoved = new boolean[initialCuts.length]; //true indicates that the corresponding cut should be removed.
         for (int i = 0; i < initialCuts.length; i++) {
             for (int j = 0; j < initialCuts.length; j++) {
-                if (i != j && !toBeRemoved[i] && !toBeRemoved[j] && BitSet.XNor(initialCuts[i], initialCuts[j]) > initialCuts[i].size()*factor) {
+                if (i != j && !toBeRemoved[i] && !toBeRemoved[j] && (BitSet.XNor(initialCuts[i], initialCuts[j]) > initialCuts[i].size()*factor || BitSet.XOR(initialCuts[i], initialCuts[j]) > initialCuts[i].size()*factor)) {
                     //Remove cut with the largest cost.
                     int largest = costs[i] > costs[j] ? i : j;
                     toBeRemoved[largest] = true;

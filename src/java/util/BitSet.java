@@ -117,6 +117,15 @@ public class BitSet {
         return count;
     }
 
+    //Calculates the similarity of two BitSets using bitwise XOR.
+    public static int XOR(BitSet set1, BitSet set2) {
+        int count = 0;
+        for (int i = 0; i < set1.set.length; i++) {
+            count += Long.bitCount(set1.set[i] ^ set2.set[i]);
+        }
+        return count;
+    }
+
     //Unions this bitset with otherSet.
     public void unionWith(BitSet otherSet) {
         for (int i = 0; i < set.length; i++) {

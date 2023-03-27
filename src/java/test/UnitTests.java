@@ -84,8 +84,10 @@ public class UnitTests {
 
         String otherTestBitString = "11001001110011000010101110000"+"0".repeat(60);
 
-        //Test of XNor.
+        //Test of XNor and XOR.
         assertEquals(15, BitSet.XNor(new BitSet(testBitString), new BitSet(otherTestBitString)));
+
+        assertEquals(74, BitSet.XOR(new BitSet(testBitString), new BitSet(otherTestBitString)));
 
         //Test of unionWith.
         bitSet = new BitSet(testBitString);
