@@ -20,7 +20,6 @@ public class TangleClusterer {
         BitSet[] initialCuts = dataset.getInitialCuts(initialCutGenerator);
         double[] costs = dataset.getCutCosts(costFunctionName);
         Tuple<BitSet[], double[]> redundancyRemoved = removeRedundantCuts(initialCuts, costs, 1.0); //Set factor to 1 to turn it off.
-        System.out.println(redundancyRemoved.x.length);
         initialCuts = redundancyRemoved.x;
         costs = redundancyRemoved.y;
         TangleSearchTree tree = generateTangleSearchTree(initialCuts, costs, a, psi);

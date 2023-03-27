@@ -9,6 +9,7 @@ import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
@@ -79,13 +80,19 @@ public class TopPanel extends JPanel {
                 createPopupPanel.add(new JLabel("Number of points"));
                 createPopupPanel.add(pointsTextField);
                 createPopupPanel.add(Box.createRigidArea(new Dimension(0, 10)));
-                createPopupPanel.add(new JLabel("Number of dimensions"));
+                JLabel dimensionLabel = new JLabel("Number of dimensions");
+                createPopupPanel.add(dimensionLabel);
                 createPopupPanel.add(dimensionTextField);
                 createPopupPanel.add(Box.createRigidArea(new Dimension(0, 10)));
                 createPopupPanel.add(new JLabel("Number of clusters"));
                 createPopupPanel.add(clusterTextField);
                 createPopupPanel.add(Box.createRigidArea(new Dimension(0, 15)));
                 createPopupPanel.add(comboBox);
+
+                comboBox.addActionListener(e1 -> {
+                    dimensionLabel.setEnabled(!comboBox.getSelectedItem().equals(GraphDataset.name));
+                    dimensionTextField.setEnabled(!comboBox.getSelectedItem().equals(GraphDataset.name));
+                });
 
                 int createResult = JOptionPane.showConfirmDialog(view, createPopupPanel,
                         "Choose parameters", JOptionPane.OK_CANCEL_OPTION,
