@@ -18,6 +18,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class View extends JFrame {
+
+    //This class represents the GUI of the program.
+
     private Model model;
     protected Controller controller;
     protected int windowWidth, windowHeight;
@@ -34,6 +37,7 @@ public class View extends JFrame {
     protected int topPanelHeight;
     protected int sidePanelWidth;
 
+    //Constructor receiving a Model.
     public View(Model model) {
         this.model = model;
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -41,13 +45,7 @@ public class View extends JFrame {
         windowWidth = screenSize.width - screenSize.width / 10;
         windowHeight = screenSize.height - screenSize.height / 10;
 
-        //Create frame
-        setTitle("View");
-        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        setPreferredSize(new Dimension(windowWidth, windowHeight));
-        setLayout(null);
-
-        //Create components
+        //Create components.
         mainComponent = new JPanel();
         mainComponent.setLayout(null);
 
@@ -72,24 +70,30 @@ public class View extends JFrame {
         selectedSidePanel = sidePanel;
         pane.addTab("", new JPanel(null));
         ((JComponent)pane.getSelectedComponent()).add((JPanel)dataVisualizer);
-        mainComponent.add(sidePanel);
 
         setBounds();
 
+        //Add components to mainComponent.
+        mainComponent.add(sidePanel);
         mainComponent.add(pane);
         mainComponent.add(topPanel);
         mainComponent.add(statisticsPanel);
         mainComponent.add(statisticsTopPanel);
 
-        add(mainComponent);
-
         switchToPlotting();
 
+        //Create frame
+        setTitle("View");
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        setPreferredSize(new Dimension(windowWidth, windowHeight));
+        setLayout(null);
+        add(mainComponent);
         pack();
         setLocationByPlatform(true);
         setLocationRelativeTo(null);
         setVisible(true);
 
+        //ComponentListener that resizes View and the components in View.
         addComponentListener(new ComponentAdapter()
         {
             public void componentResized(ComponentEvent evt) {
@@ -121,6 +125,7 @@ public class View extends JFrame {
         loadClusters(selectedSidePanel.hardClustering, selectedSidePanel.softClustering);
     }
 
+    //Sets the bounds of all the components in View.
     private void setBounds() {
         topPanelHeight = windowHeight / 20;
         sidePanelWidth = windowWidth / 8;
@@ -155,39 +160,48 @@ public class View extends JFrame {
         }
     }
 
+    //Calls the loadPoints method of PlottingView for a feature based data set.
     public void loadPoints(double[][] points) {
         ((PlottingView)dataVisualizer).loadPoints(points);
         selectedSidePanel.update(points.length);
     }
 
+    //Calls the loadPoints method of PlottingView for a binary data set.
     public void loadPoints(BitSet[] points) {
         ((PlottingView)dataVisualizer).loadPoints(points);
         selectedSidePanel.update(points.length);
     }
 
+    //Calls the loadGraphFromDotString method of GraphView.
     public void loadPoints(String graphDotString) {
         ((GraphView)dataVisualizer).loadGraphFromDotString(graphDotString);
         selectedSidePanel.update(dataVisualizer.getOriginalNumberOfPoints());
     }
 
+    //Calls the loadClusters method of the currently displayed dataVisualizer and updates necessary values in
+    // the currently selected side panel.
     public void loadClusters(int[] clusters, double[][] softClustering) {
         selectedSidePanel.setClustering(clusters, softClustering);
         dataVisualizer.loadClusters(clusters, softClustering);
     }
 
+    //Updates values in the currently selected side panel.
     public void updateSelectedSidePanel(double NMIScore, long clusteringTime) {
         selectedSidePanel.setValues(NMIScore, clusteringTime);
     }
 
+    //Sets the data set in Model.
     protected void setDataset(Dataset dataset) {
         model.setDataset(dataset);
     }
 
+    //Resets View and all of its components.
     public void resetView() {
         Dataset dataset = model.getDataset();
         dataVisualizer = dataset instanceof GraphDataset ? new GraphView(this) : new PlottingView(this);
         ((JPanel)dataVisualizer).setBounds(0, 0, windowWidth - sidePanelWidth, windowHeight);
 
+        //Remove components from pane and mainComponent.
         pane.removeAll();
         for (SidePanel sidePanel : sidePanels) {
             mainComponent.remove(sidePanel);
@@ -202,11 +216,11 @@ public class View extends JFrame {
         ((JComponent)pane.getSelectedComponent()).add((JPanel) dataVisualizer);
         mainComponent.add(sidePanel);
 
+        //Add additional side tabs if the data set is not null.
         if (dataset == null) {
             selectedSidePanel.setVisible(false);
         }
         else {
-            //Add additional side tabs.
             if (dataset.supportsAlgorithm(Model.kMeansName)) {
                 addSidePanel(new KMeansSidePanel(this), Model.kMeansName);
             }
@@ -218,8 +232,8 @@ public class View extends JFrame {
             }
         }
 
+        //Determine if axes and gridlines should be shown
         if (dataVisualizer instanceof PlottingView) {
-            //Determine if axes and gridlines should be shown
             if (!topPanel.showAxesButtonIsOn()) switchShowingOfAxes();
             if (!topPanel.showGridlinesButtonIsOn()) switchShowingOfGridlines();
             topPanel.makeOnOffButtonsVisible(true);
@@ -230,6 +244,7 @@ public class View extends JFrame {
         ((JPanel)dataVisualizer).repaint();
     }
 
+    //Switches from displaying the data visualiser to displaying the statistics panel.
     protected void switchToStatistics() {
         pane.setVisible(false);
         selectedSidePanel.setVisible(false);
@@ -240,6 +255,7 @@ public class View extends JFrame {
         repaint();
     }
 
+    //Switches from displaying the statistics panel to displaying the data visualizer.
     protected void switchToPlotting() {
         pane.setVisible(true);
         selectedSidePanel.setVisible(true);
@@ -250,14 +266,17 @@ public class View extends JFrame {
         repaint();
     }
 
+    //Creates a data set of type datasetTypeName with input parameters describing number of points, dimensions and clusters.
     protected void createDataset(String datasetTypeName, int nPoints, int nDimensions, int nClusters) {
         controller.createNewDataset(datasetTypeName, nPoints, nDimensions, nClusters);
     }
 
+    //Loads a data set from a file.
     protected void loadDatasetFromFile(String datasetTypeName, String fileName, int startRow, int endRow, int startColumn, int endColumn) {
         controller.loadDatasetFromFile(datasetTypeName, fileName, startRow, endRow, startColumn, endColumn);
     }
 
+    //Turns axes ON or OFF in the plotting view.
     protected void switchShowingOfAxes() {
         if (dataVisualizer instanceof PlottingView) {
             ((PlottingView) dataVisualizer).switchShowingOfAxes();
@@ -265,6 +284,7 @@ public class View extends JFrame {
         repaint();
     }
 
+    //Turns grid lines ON or OFF in the plotting view.
     protected void switchShowingOfGridlines() {
         if (dataVisualizer instanceof PlottingView) {
             ((PlottingView) dataVisualizer).switchShowingOfGridlines();
@@ -272,34 +292,42 @@ public class View extends JFrame {
         repaint();
     }
 
+    //Returns the height of View.
     protected int getWindowHeight() {
         return windowHeight;
     }
 
+    //Returns the width of View.
     protected int getWindowWidth() {
         return windowWidth;
     }
 
+    //Sets the controller.
     public void setController(Controller controller) {
         this.controller = controller;
     }
 
+    //Returns the NMI score computed in Model.
     protected double getNMIScore() {
         return model.getNMIScore();
     }
 
+    //Returns the clustering time computed in Model.
     protected long getClusteringTime() {
         return model.getClusteringTime();
     }
 
+    //Returns the truth value describing if the data set in Model is null.
     protected boolean hasDataset() {
         return model.getDataset() != null;
     }
 
+    //Returns the data set in Model.
     protected Dataset getDataset() {
         return model.getDataset();
     }
 
+    //Returns true if t-SNE is not running; otherwise false.
     public boolean isReady() {
         return dataVisualizer.isReady();
     }
