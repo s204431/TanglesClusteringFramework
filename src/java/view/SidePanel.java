@@ -5,7 +5,7 @@ import java.awt.*;
 
 public class SidePanel extends JPanel {
 
-    //This class represents a panel on the side of view.
+    //This class represents a panel on the side of a View.
 
     protected View view;
     protected double[][] softClustering;
@@ -24,7 +24,7 @@ public class SidePanel extends JPanel {
 
     protected Font font;    //Font also used by child classes.
 
-    //Constructor receiving a view.
+    //Constructor receiving a View.
     public SidePanel(View view) {
         this.view = view;
 
@@ -89,7 +89,7 @@ public class SidePanel extends JPanel {
 
     }
 
-    //Updates the total number of data points.
+    //Updates components in the side panel based on the total number of data points.
     protected void update(int n) {
 
     }

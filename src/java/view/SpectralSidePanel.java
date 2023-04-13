@@ -17,8 +17,6 @@ public class SpectralSidePanel extends SidePanel {
     public SpectralSidePanel(View view) {
         super(view);
 
-        add(Box.createRigidArea(new Dimension(0, 20)));
-
         JLabel kLabel = new JLabel("k");
         kLabel.setFont(super.font);
         kLabel.setAlignmentX(CENTER_ALIGNMENT);

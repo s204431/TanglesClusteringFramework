@@ -21,6 +21,8 @@ import static view.TopPanel.BUTTON_WIDTH;
 
 public class StatisticsTopPanel extends JPanel {
 
+    //This class represents a panel in the top part of View when the statistics panel is being shown.
+
     private View view;
 
     JToolBar toolBar;
@@ -34,6 +36,7 @@ public class StatisticsTopPanel extends JPanel {
 
     private StatisticsPanel statisticsPanel;
 
+    //Constructor receiving a view and StatisticsPanel.
     protected StatisticsTopPanel(View view, StatisticsPanel statisticsPanel) {
         this.view = view;
         this.statisticsPanel = statisticsPanel;
@@ -50,11 +53,7 @@ public class StatisticsTopPanel extends JPanel {
         add(toolBar);
     }
 
-    @Override
-    protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
-    }
-
+    //Adds button to generate and run a test set.
     private void addRunButton() {
         runButton = new JButton("Run");
         runButton.addMouseListener(new MouseAdapter() {
@@ -163,6 +162,7 @@ public class StatisticsTopPanel extends JPanel {
                 saveButton.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
+                        //File chooser for .testset files.
                         final File[] file = new File[1];
                         JPanel savePopupPanel = new JPanel();
                         savePopupPanel.setLayout(new BoxLayout(savePopupPanel, BoxLayout.LINE_AXIS));
@@ -182,6 +182,8 @@ public class StatisticsTopPanel extends JPanel {
                                 label.setText(file[0].getName());
                             }
                         });
+
+                        //Panel that is shown to the user.
                         savePopupPanel.add(label);
                         savePopupPanel.add(Box.createRigidArea(new Dimension(10, 0)));
                         savePopupPanel.add(fileButton);
@@ -190,8 +192,8 @@ public class StatisticsTopPanel extends JPanel {
                                 "Save test set", JOptionPane.OK_CANCEL_OPTION,
                                 JOptionPane.PLAIN_MESSAGE);
 
+                        //Save test set if the user presses OK.
                         if (saveResult == JOptionPane.OK_OPTION && file[0] != null) {
-                            //Save test set
                             String datatype = comboBox.getSelectedItem().toString();
                             testSet = convertToTestSet(datatype, table);
                             testSet.saveTestSet(file[0]);
@@ -202,6 +204,7 @@ public class StatisticsTopPanel extends JPanel {
                 loadButton.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
+                        //File chooser for .testset files.
                         final File[] file = new File[1];
                         JPanel loadPopupPanel = new JPanel();
                         loadPopupPanel.setLayout(new BoxLayout(loadPopupPanel, BoxLayout.LINE_AXIS));
@@ -218,6 +221,8 @@ public class StatisticsTopPanel extends JPanel {
                                 label.setText(file[0].getName());
                             }
                         });
+
+                        //Panel that is shown to the user.
                         loadPopupPanel.add(label);
                         loadPopupPanel.add(Box.createRigidArea(new Dimension(10, 0)));
                         loadPopupPanel.add(fileButton);
@@ -226,6 +231,7 @@ public class StatisticsTopPanel extends JPanel {
                                 "Load test set", JOptionPane.OK_CANCEL_OPTION,
                                 JOptionPane.PLAIN_MESSAGE);
 
+                        //Load file and generate table if the user presses OK.
                         if (loadResult == JOptionPane.OK_OPTION && file[0] != null) {
                             //Load test set
                             testSet = TestSet.loadTestSet(file[0]);
@@ -238,6 +244,7 @@ public class StatisticsTopPanel extends JPanel {
                         }
                     }
                 });
+                //Panels that holds buttons.
                 JPanel resetPane = new JPanel();
                 resetPane.add(resetButton);
                 checkBoxPane.add(Box.createRigidArea(new Dimension(0, 10)));
@@ -350,6 +357,7 @@ public class StatisticsTopPanel extends JPanel {
         toolBar.add(runButton);
     }
 
+    //Returns a String array of the names of the algorithms that are checked in the run test set panel.
     private String[] getAlgorithmNames(boolean[] algorithmsToRun) {
         String[] algorithms = { Model.tangleName, Model.kMeansName, Model.spectralClusteringName, Model.linkageName };
 
@@ -371,6 +379,7 @@ public class StatisticsTopPanel extends JPanel {
         return result;
     }
 
+    //Adds button for changing back to the dataVisualizer.
     private void addPlottingButton() {
         plottingButton = new JButton("Data visualizer");
         plottingButton.addMouseListener(new MouseAdapter() {
@@ -381,6 +390,7 @@ public class StatisticsTopPanel extends JPanel {
         toolBar.add(plottingButton);
     }
 
+    //Creates a panel containing a checkbox with a label beside it.
     private JPanel createCheckBoxPanel(JCheckBox checkBox, String text) {
         JPanel checkBoxPanel = new JPanel();
         checkBoxPanel.setLayout(new BorderLayout());
@@ -396,6 +406,7 @@ public class StatisticsTopPanel extends JPanel {
         return checkBoxPanel;
     }
 
+    //Generates the table model used for generating test sets.
     private void generateTable(TestSet testSet) {
         CustomTableModel model = (CustomTableModel) table.getModel();
         for (int i = table.getRowCount() - 1; i >= 0; i--) {
@@ -415,10 +426,12 @@ public class StatisticsTopPanel extends JPanel {
         }
     }
 
+    //Returns an empty string if the integer parameter is zero; otherwise return the integer.
     private Object convertInteger(int integer) {
         return integer == 0 ? "" : integer;
     }
 
+    //Sets the bounds of StatisticsTopPanel.
     protected void setBounds() {
         setBounds(0, 0, view.windowWidth, view.topPanelHeight);
         toolBar.setBounds(0, 0, view.windowWidth, view.topPanelHeight);
@@ -426,6 +439,7 @@ public class StatisticsTopPanel extends JPanel {
         plottingButton.setBounds(view.windowWidth - view.sidePanelWidth - BUTTON_WIDTH, view.topPanelHeight / 2 - BUTTON_HEIGHT / 2, BUTTON_WIDTH, BUTTON_HEIGHT);
     }
 
+    //Converts the table values to a TestSet.
     public TestSet convertToTestSet(String dataTypeName, JTable table) {
         TestSet testSet = new TestSet(dataTypeName);
         int[] values = new int[4];  //nPoints, nDimensions, nClusters, nRuns
@@ -439,10 +453,12 @@ public class StatisticsTopPanel extends JPanel {
         return testSet;
     }
 
+    //Parses a String to an integer and the empty string to 0.
     private int parseInt(String string) {
         return string.equals("") ? 0 : Integer.parseInt(string);
     }
 
+    //Custom table model that can hold buttons in the fourth column.
     private static class CustomTableModel extends DefaultTableModel {
         @Override
         public Class<?> getColumnClass(int column) {

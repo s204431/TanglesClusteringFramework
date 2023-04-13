@@ -10,6 +10,9 @@ import java.awt.*;
 import java.awt.Graphics;
 
 public class StatisticsPanel extends JPanel {
+
+    //This class visualizes the results from running a test set.
+
     private View view;
 
     protected JLabel label;
@@ -19,6 +22,7 @@ public class StatisticsPanel extends JPanel {
 
     private JLabel preRunLabel, runLabel;
 
+    //Constructor receiving a View.
     public StatisticsPanel(View view) {
         this.view = view;
 
@@ -51,11 +55,14 @@ public class StatisticsPanel extends JPanel {
         add(labelPane);
     }
 
+    //Creates graphs displaying the results from running a test set and adds them to the left and right picture panels.
     protected void plotTestResults(double[][][] testResults, TestSet testSet, String[] algorithmNames) {
         Color[] colors = new Color[] {Color.RED, Color.BLUE, Color.GREEN, Color.ORANGE};
         Line[][] linesTime = new Line[3][algorithmNames.length];
         Line[][] linesNMI = new Line[3][algorithmNames.length];
         Legend[] legends = new Legend[algorithmNames.length];
+
+        //Organize the test results.
         for (int algorithm = 0; algorithm < algorithmNames.length; algorithm++) {
             double[][] timePoints = new double[testResults[algorithm].length][2];
             double[][] timeDimensions = new double[testResults[algorithm].length][2];
@@ -91,6 +98,7 @@ public class StatisticsPanel extends JPanel {
             legends[algorithm] = new Legend(algorithmNames[algorithm], colors[algorithm]);
         }
 
+        //Create the line plots.
         LinePlot[] timePlots = new LinePlot[3];
         LinePlot[] nmiPlots = new LinePlot[3];
 
@@ -99,6 +107,7 @@ public class StatisticsPanel extends JPanel {
             nmiPlots[i] = new LinePlot(linesNMI[i], legends);
         }
 
+        //Add axes labels, rescale the images and add the images to left and right picture panels.
         String[] xLabels = { "Points", "Dimensions", "Clusters" };
         String[] yLabels = { "Time (ms)", "NMI score" };
         int imageWidth = view.windowWidth * 16 / 33;
@@ -129,6 +138,7 @@ public class StatisticsPanel extends JPanel {
         setVisible(true);
     }
 
+    //Shows text indicating that a test set is running.
     protected void startRunPhase() {
         leftPicturePanel.removeAll();
         rightPicturePanel.removeAll();
@@ -137,6 +147,7 @@ public class StatisticsPanel extends JPanel {
         runLabel.setText("Running test set... 0%");
     }
 
+    //Paint method used to update text displaying the progress of the running test set.
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -145,10 +156,12 @@ public class StatisticsPanel extends JPanel {
         }
     }
 
+    //Removes the text indicating that a test set is running.
     protected void endRunPhase() {
         runLabel.setVisible(false);
     }
 
+    //Sets the bounds of the StatisticsPanel.
     protected void setBounds() {
         setBounds(0, view.topPanelHeight, view.windowWidth, view.windowHeight - view.topPanelHeight);
     }

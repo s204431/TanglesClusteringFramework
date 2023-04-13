@@ -18,15 +18,17 @@ import java.io.IOException;
 import java.text.NumberFormat;
 
 public class TopPanel extends JPanel {
+
+    //This class represents a panel in the top part of a View.
+
     public static final int BUTTON_WIDTH = 100;
     public static final int BUTTON_HEIGHT = 30;
 
     private View view;
 
+    //Toolbar and all the buttons that are added to the toolbar.
     private JToolBar toolBar;
-
     private JButton newButton;
-    private JPopupMenu newPopup;
     private JButton exportButton;
     private JButton showAxesButton;
     private JButton showGridLinesButton;
@@ -35,6 +37,7 @@ public class TopPanel extends JPanel {
     private String axesOnText = "Axes ON";
     private String gridlinesOnText = "Grid lines ON";
 
+    //Constructor receiving a View.
     protected TopPanel(View view) {
         this.view = view;
 
@@ -53,28 +56,27 @@ public class TopPanel extends JPanel {
         add(toolBar);
     }
 
-    @Override
-    protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
-    }
-
+    //Adds button to generate and load data sets to the toolbar.
     private void addNewButton() {
-        newPopup = new JPopupMenu();
+        final JPopupMenu newPopup = new JPopupMenu();
 
-        //Create new dataset
+        //Create new dataset functionality.
         newPopup.add(new JMenuItem(new AbstractAction("Create new dataset") {
             public void actionPerformed(ActionEvent e) {
+                //Formatter restricting user input to numbers.
                 ExtendedNumberFormatter formatter = createNumberFormatter();
                 JFormattedTextField pointsTextField = new JFormattedTextField(formatter);
                 JFormattedTextField dimensionTextField = new JFormattedTextField(formatter);
                 JFormattedTextField clusterTextField = new JFormattedTextField(formatter);
 
+                //Dropdown menu for supported data types.
                 JComboBox<String> comboBox = new JComboBox<>();
                 for (String type : Dataset.supportedDatasetTypes) {
                     comboBox.addItem(type);
                 }
                 comboBox.setAlignmentX(LEFT_ALIGNMENT);
 
+                //Labels describing which parameter is which.
                 JPanel createPopupPanel = new JPanel();
                 createPopupPanel.setLayout(new BoxLayout(createPopupPanel, BoxLayout.PAGE_AXIS));
                 createPopupPanel.add(new JLabel("Number of points"));
@@ -94,10 +96,12 @@ public class TopPanel extends JPanel {
                     dimensionTextField.setEnabled(!comboBox.getSelectedItem().equals(GraphDataset.name));
                 });
 
+
                 int createResult = JOptionPane.showConfirmDialog(view, createPopupPanel,
                         "Choose parameters", JOptionPane.OK_CANCEL_OPTION,
                         JOptionPane.PLAIN_MESSAGE);
 
+                //Create new dataset if user pressed OK in OptionPane.
                 if (createResult == JOptionPane.OK_OPTION) {
                     int points = Integer.parseInt(getTextFieldValue(pointsTextField, 1000));
                     int dimensions = Integer.parseInt(getTextFieldValue(dimensionTextField, 2));
@@ -108,9 +112,10 @@ public class TopPanel extends JPanel {
             }
         }));
 
-        //Load dataset
+        //Load dataset functionality.
         newPopup.add(new JMenuItem(new AbstractAction("Load new dataset") {
             public void actionPerformed(ActionEvent e) {
+                //File chooser for .csv and .dot files.
                 final File[] file = new File[1];
                 JPanel savePopupPanel = new JPanel();
                 savePopupPanel.setLayout(new BoxLayout(savePopupPanel, BoxLayout.LINE_AXIS));
@@ -127,14 +132,18 @@ public class TopPanel extends JPanel {
                     }
                 });
 
+                //Panel that holds file chooser.
                 savePopupPanel.add(label);
                 savePopupPanel.add(Box.createRigidArea(new Dimension(10, 0)));
                 savePopupPanel.add(fileButton);
 
+                //Dropdown menu for supported data types.
                 JComboBox<String> comboBox = new JComboBox<>();
                 for (String type : Dataset.supportedDatasetTypes) {
                     comboBox.addItem(type);
                 }
+
+                //Panel that is shown to the user.
                 JPanel loadPopupPanel = new JPanel();
                 loadPopupPanel.setLayout(new BoxLayout(loadPopupPanel, BoxLayout.PAGE_AXIS));
                 loadPopupPanel.add(savePopupPanel);
@@ -148,6 +157,7 @@ public class TopPanel extends JPanel {
                 Object selectedFile = file[0];
                 String datasetType = (String) comboBox.getSelectedItem();
 
+                //Load the chosen file if the user presses OK.
                 if (loadResult == JOptionPane.OK_OPTION && file[0] != null) {
                     String fileName = file[0].getAbsolutePath();
                     if (datasetType.equals(GraphDataset.name)) {
@@ -159,12 +169,15 @@ public class TopPanel extends JPanel {
                         }
                         return;
                     }
+
+                    //Formatter restricting user input to numbers.
                     ExtendedNumberFormatter formatter = createNumberFormatter();
                     JFormattedTextField startRowTextField = new JFormattedTextField(formatter);
                     JFormattedTextField endRowTextField = new JFormattedTextField(formatter);
                     JFormattedTextField startColTextField = new JFormattedTextField(formatter);
                     JFormattedTextField endColTextField = new JFormattedTextField(formatter);
 
+                    //Horizontal boxes to contain labels and text fields for loading parameters.
                     JPanel box1 = new JPanel();
                     box1.setLayout(new BoxLayout(box1, BoxLayout.LINE_AXIS));
                     JPanel box2 = new JPanel();
@@ -197,6 +210,7 @@ public class TopPanel extends JPanel {
                     box2.add(Box.createRigidArea(new Dimension(5, 0)));
                     box2.add(endColumnPane);
 
+                    // Panel that is shown to the user.
                     JPanel parameterPopupPanel = new JPanel();
                     parameterPopupPanel.setLayout(new BoxLayout(parameterPopupPanel, BoxLayout.PAGE_AXIS));
                     parameterPopupPanel.add(box1);
@@ -207,6 +221,7 @@ public class TopPanel extends JPanel {
                             ("Choose loading parameters for " + selectedFile), JOptionPane.OK_CANCEL_OPTION,
                             JOptionPane.PLAIN_MESSAGE);
 
+                    // Load data set with chosen parameters if the user presses OK.
                     if (parameterResult == JOptionPane.OK_OPTION) {
                         int startRow = Integer.parseInt(getTextFieldValue(startRowTextField, 0));
                         int endRow = Integer.parseInt(getTextFieldValue(endRowTextField, -1));
@@ -223,7 +238,7 @@ public class TopPanel extends JPanel {
             }
         }));
 
-        //Create button on toolbar
+        //Create button on toolbar.
         newButton = new JButton("New");
         newButton.addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent e) {
@@ -233,10 +248,12 @@ public class TopPanel extends JPanel {
         toolBar.add(newButton);
     }
 
+    //Adds button for exporting to the toolbar.
     private void addExportButton() {
         final JPopupMenu exportPopup = new JPopupMenu();
         exportPopup.add(new JMenuItem(new AbstractAction("Save dataset to file") {
             public void actionPerformed(ActionEvent e) {
+                //File chooser for .dot and .csv files.
                 final File[] file = new File[1];
                 JPanel savePopupPanel = new JPanel();
                 savePopupPanel.setLayout(new BoxLayout(savePopupPanel, BoxLayout.LINE_AXIS));
@@ -256,12 +273,17 @@ public class TopPanel extends JPanel {
                         label.setText(file[0].getName());
                     }
                 });
+
+                //Panel that holds file chooser.
                 savePopupPanel.add(label);
                 savePopupPanel.add(Box.createRigidArea(new Dimension(10, 0)));
                 savePopupPanel.add(button);
+
                 int saveResult = JOptionPane.showConfirmDialog(view, savePopupPanel,
                         "Save dataset to file", JOptionPane.OK_CANCEL_OPTION,
                         JOptionPane.PLAIN_MESSAGE);
+
+                //Save data set to the destination path if the user presses OK.
                 if (saveResult == JOptionPane.OK_OPTION && file[0] != null) {
                     view.getDataset().saveToFile(file[0]);
                 }
@@ -269,6 +291,7 @@ public class TopPanel extends JPanel {
         }));
         exportPopup.add(new JMenuItem(new AbstractAction("As PNG") {
             public void actionPerformed(ActionEvent e) {
+                //File chooser for .png files.
                 final File[] file = new File[1];
                 JPanel savePopupPanel = new JPanel();
                 savePopupPanel.setLayout(new BoxLayout(savePopupPanel, BoxLayout.LINE_AXIS));
@@ -288,12 +311,17 @@ public class TopPanel extends JPanel {
                         label.setText(file[0].getName());
                     }
                 });
+
+                //Panel that holds file chooser.
                 savePopupPanel.add(label);
                 savePopupPanel.add(Box.createRigidArea(new Dimension(10, 0)));
                 savePopupPanel.add(button);
+
                 int saveResult = JOptionPane.showConfirmDialog(view, savePopupPanel,
                         "Export as PNG", JOptionPane.OK_CANCEL_OPTION,
                         JOptionPane.PLAIN_MESSAGE);
+
+                //Save png of dataVisualizer to the destination path if the user presses OK.
                 if (saveResult == JOptionPane.OK_OPTION && file[0] != null) {
                     try {
                         if (view.dataVisualizer instanceof PlottingView) {
@@ -323,6 +351,7 @@ public class TopPanel extends JPanel {
         toolBar.add(exportButton);
     }
 
+    //Adds button to turn axes on and off to the toolbar.
     private void addAxesButton() {
         showAxesButton = new JButton(axesOnText);
         showAxesButton.setBackground(new JButton().getBackground());
@@ -341,6 +370,7 @@ public class TopPanel extends JPanel {
         toolBar.add(showAxesButton);
     }
 
+    //Adds button to turn grid lines on and off to the toolbar.
     private void addGridLinesButton() {
         showGridLinesButton = new JButton(gridlinesOnText);
         showGridLinesButton.setBackground(new JButton().getBackground());
@@ -359,6 +389,7 @@ public class TopPanel extends JPanel {
         toolBar.add(showGridLinesButton);
     }
 
+    //Adds button that switches to statistics view to the toolbar.
     private void addStatisticsButton() {
         statisticsButton = new JButton("Statistics");
         statisticsButton.addMouseListener(new MouseAdapter() {
@@ -369,19 +400,23 @@ public class TopPanel extends JPanel {
         toolBar.add(statisticsButton);
     }
 
+    //Returns the truth value stating if the axes button is on or off.
     protected boolean showAxesButtonIsOn() {
         return showAxesButton.getText().equals(axesOnText);
     }
 
+    //Returns the truth value stating if the grid lines button is on or off.
     protected boolean showGridlinesButtonIsOn() {
         return showGridLinesButton.getText().equals(gridlinesOnText);
     }
 
+    //Makes axes and grid lines buttons visible.
     protected void makeOnOffButtonsVisible(boolean visible) {
         showAxesButton.setVisible(visible);
         showGridLinesButton.setVisible(visible);
     }
 
+    //Sets bounds of the visible components in the top panel.
     protected void setBounds() {
         setBounds(0, 0, view.windowWidth, view.topPanelHeight);
         toolBar.setBounds(0, 0, view.windowWidth, view.topPanelHeight);
@@ -394,6 +429,7 @@ public class TopPanel extends JPanel {
         statisticsButton.setBounds(view.windowWidth - view.sidePanelWidth - BUTTON_WIDTH, view.topPanelHeight / 2 - BUTTON_HEIGHT / 2, BUTTON_WIDTH, BUTTON_HEIGHT);
     }
 
+    //Returns the value of a text field. If the text field is null it returns the default value.
     private String getTextFieldValue(JFormattedTextField textfield, int defaultValue) {
         if (textfield.getValue() == null) {
             return ""+defaultValue;
@@ -401,6 +437,7 @@ public class TopPanel extends JPanel {
         return textfield.getValue().toString();
     }
 
+    //Custom ExtendedNumberFormatter that only allows number between 1 and max integer value as input.
     private ExtendedNumberFormatter createNumberFormatter() {
         NumberFormat format = NumberFormat.getIntegerInstance();
         format.setGroupingUsed(false);

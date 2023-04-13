@@ -123,8 +123,8 @@ public class PlottingView extends JPanel implements DataVisualizer, MouseListene
         if (showAxes) {
             g2d.setStroke(stroke3);
             g2d.setColor(Color.BLACK);
-            g2d.drawLine(0, yOrig, view.getWindowWidth(), yOrig);
-            g2d.drawLine(xOrig, 0, xOrig, view.getWindowHeight());
+            g2d.drawLine(0, yOrig, view.windowWidth, yOrig);
+            g2d.drawLine(xOrig, 0, xOrig, view.windowHeight);
         }
 
         //Draw lines, grid lines and numbers on axes.
@@ -155,10 +155,10 @@ public class PlottingView extends JPanel implements DataVisualizer, MouseListene
             g2d.setStroke(stroke1);
             if (showGridLines) {
                 g2d.setColor(Color.LIGHT_GRAY);
-                g2d.drawLine(posX, 0, posX, view.getWindowHeight()); //Positive direction on x-axis
-                g2d.drawLine(0, posY, view.getWindowWidth(), posY); //Positive direction on y-axis
-                g2d.drawLine(negX, 0, negX, view.getWindowHeight()); //Negative direction on x-axis
-                g2d.drawLine(0, negY, view.getWindowWidth(), negY); //Negative direction on y-axis
+                g2d.drawLine(posX, 0, posX, view.windowHeight); //Positive direction on x-axis
+                g2d.drawLine(0, posY, view.windowWidth, posY); //Positive direction on y-axis
+                g2d.drawLine(negX, 0, negX, view.windowHeight); //Negative direction on x-axis
+                g2d.drawLine(0, negY, view.windowWidth, negY); //Negative direction on y-axis
             }
 
             //Draw lines on axes.
