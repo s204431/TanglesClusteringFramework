@@ -28,6 +28,7 @@ public class StatisticsTopPanel extends JPanel {
     JToolBar toolBar;
 
     JButton runButton;
+    JButton logarithmicScaleButton;
     JButton plottingButton;
 
     TestSet testSet = null;
@@ -48,6 +49,7 @@ public class StatisticsTopPanel extends JPanel {
         toolBar.setLayout(null);
 
         addRunButton();
+        addLogarithmicScaleButton();
         addPlottingButton();
 
         add(toolBar);
@@ -326,6 +328,7 @@ public class StatisticsTopPanel extends JPanel {
                                 statisticsPanel.plotTestResults(testResults,testSet,algorithmsNames);
                                 statisticsPanel.endRunPhase();
                                 setVisible(true);
+                                logarithmicScaleButton.setVisible(true);
                             }
                         }).start();
                     }
@@ -355,6 +358,18 @@ public class StatisticsTopPanel extends JPanel {
             }
         });
         toolBar.add(runButton);
+    }
+
+    //Adds button to change between logarithmic and non-logarithmic scale of graphs in StatisticsView.
+    private void addLogarithmicScaleButton() {
+        logarithmicScaleButton = new JButton("Change logarithmic scale");
+        logarithmicScaleButton.addMouseListener(new MouseAdapter() {
+            public void mousePressed(MouseEvent e) {
+                view.switchLogarithmicScale();
+            }
+        });
+        logarithmicScaleButton.setVisible(false);
+        toolBar.add(logarithmicScaleButton);
     }
 
     //Returns a String array of the names of the algorithms that are checked in the run test set panel.
@@ -436,6 +451,7 @@ public class StatisticsTopPanel extends JPanel {
         setBounds(0, 0, view.windowWidth, view.topPanelHeight);
         toolBar.setBounds(0, 0, view.windowWidth, view.topPanelHeight);
         runButton.setBounds(BUTTON_HEIGHT, view.topPanelHeight / 2 - BUTTON_HEIGHT / 2, BUTTON_WIDTH, BUTTON_HEIGHT);
+        logarithmicScaleButton.setBounds(BUTTON_HEIGHT + BUTTON_WIDTH, view.topPanelHeight / 2 - BUTTON_HEIGHT / 2, BUTTON_WIDTH * 2, BUTTON_HEIGHT);
         plottingButton.setBounds(view.windowWidth - view.sidePanelWidth - BUTTON_WIDTH, view.topPanelHeight / 2 - BUTTON_HEIGHT / 2, BUTTON_WIDTH, BUTTON_HEIGHT);
     }
 

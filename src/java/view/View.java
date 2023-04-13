@@ -292,6 +292,11 @@ public class View extends JFrame {
         repaint();
     }
 
+    //Switches between logarithmic and non-logarithmic scale of graphs in StatisticsView.
+    protected void switchLogarithmicScale() {
+        statisticsPanel.switchLogarithmicScale();
+    }
+
     //Returns the height of View.
     protected int getWindowHeight() {
         return windowHeight;

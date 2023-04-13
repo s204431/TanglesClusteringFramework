@@ -22,6 +22,12 @@ public class StatisticsPanel extends JPanel {
 
     private JLabel preRunLabel, runLabel;
 
+    private double[][][] testResults;
+    private TestSet testSet;
+    private String[] algorithmNames;
+
+    private boolean logarithmicScale = false;
+
     //Constructor receiving a View.
     public StatisticsPanel(View view) {
         this.view = view;
@@ -57,6 +63,10 @@ public class StatisticsPanel extends JPanel {
 
     //Creates graphs displaying the results from running a test set and adds them to the left and right picture panels.
     protected void plotTestResults(double[][][] testResults, TestSet testSet, String[] algorithmNames) {
+        this.testResults = testResults;
+        this.testSet = testSet;
+        this.algorithmNames = algorithmNames;
+
         Color[] colors = new Color[] {Color.RED, Color.BLUE, Color.GREEN, Color.ORANGE};
         Line[][] linesTime = new Line[3][algorithmNames.length];
         Line[][] linesNMI = new Line[3][algorithmNames.length];
@@ -67,28 +77,39 @@ public class StatisticsPanel extends JPanel {
             double[][] timePoints = new double[testResults[algorithm].length][2];
             double[][] timeDimensions = new double[testResults[algorithm].length][2];
             double[][] timeClusters = new double[testResults[algorithm].length][2];
+
             double[][] nmiPoints = new double[testResults[algorithm].length][2];
             double[][] nmiDimensions = new double[testResults[algorithm].length][2];
             double[][] nmiClusters = new double[testResults[algorithm].length][2];
+
             for (int test = 0; test < testResults[algorithm].length; test++) {
+                //Time values
                 timePoints[test][0] = testSet.get(test).nPoints;
                 timePoints[test][1] = testResults[algorithm][test][0];
-
                 timeDimensions[test][0] = testSet.get(test).nDimensions;
                 timeDimensions[test][1] = testResults[algorithm][test][0];
-
                 timeClusters[test][0] = testSet.get(test).nClusters;
                 timeClusters[test][1] = testResults[algorithm][test][0];
 
+                //NMI values
                 nmiPoints[test][0] = testSet.get(test).nPoints;
                 nmiPoints[test][1] = testResults[algorithm][test][1];
-
                 nmiDimensions[test][0] = testSet.get(test).nDimensions;
                 nmiDimensions[test][1] = testResults[algorithm][test][1];
-
                 nmiClusters[test][0] = testSet.get(test).nClusters;
                 nmiClusters[test][1] = testResults[algorithm][test][1];
             }
+
+            //Converts the test results into logarithmic scale if logarithmicScale is true.
+            if (logarithmicScale) {
+                for (int test = 0; test < testResults[algorithm].length; test++) {
+                    timePoints[test][0] = timePoints[test][0] == 0 ? 0 : Math.log10(timePoints[test][0]);
+                    timePoints[test][1] = timePoints[test][1] == 0 ? 0 : Math.log10(timePoints[test][1]);
+                    nmiPoints[test][0] = nmiPoints[test][0] == 0 ? 0 : Math.log10(nmiPoints[test][0]);
+                }
+            }
+
+            //Create lines
             linesTime[0][algorithm] = Line.of(timePoints, colors[algorithm]);
             linesTime[1][algorithm] = Line.of(timeDimensions, colors[algorithm]);
             linesTime[2][algorithm] = Line.of(timeClusters, colors[algorithm]);
@@ -107,7 +128,56 @@ public class StatisticsPanel extends JPanel {
             nmiPlots[i] = new LinePlot(linesNMI[i], legends);
         }
 
-        //Add axes labels, rescale the images and add the images to left and right picture panels.
+        //Find min and max value of test results.
+        double min = Integer.MAX_VALUE;
+        double max = Integer.MIN_VALUE;
+        for (int i = 0; i < algorithmNames.length; i++) {
+            for (int j = 0; j < testResults[i].length; j++) {
+                double temp = testResults[i][j][0] == 0 ? 0 : Math.log10(testResults[i][j][0]);
+                min = Math.min(temp, min);
+                max = Math.max(temp, max);
+            }
+        }
+
+        //Find rounded gap between the slices.
+        int slices = timePlots[0].canvas().getAxis(1).slices();
+        double gap = (max - min) / slices;
+        int digits;
+        if (gap >= 1) {
+            digits = String.valueOf((int)gap).length() - 1;
+        } else {
+            digits = -(int)Math.ceil(Math.abs(Math.log10(gap)));
+        }
+        double x = gap / (Math.pow(10, digits));
+        double roundedGap = Math.ceil(x) * (Math.pow(10, digits));
+        double startValue = (int)(min / roundedGap) * roundedGap;
+
+        //Prepare tick labels and their locations on the graph.
+        String[][] xTicks = new String[3][testSet.size()];
+        double[][] xLocations = new double[3][testSet.size()];
+        for (int i = 0; i < testSet.size(); i++) {
+            xTicks[0][i] = ""+testSet.get(i).nPoints;
+            xTicks[1][i] = ""+testSet.get(i).nDimensions;
+            xTicks[2][i] = ""+testSet.get(i).nClusters;
+            xLocations[0][i] = logarithmicScale ? Math.log10(testSet.get(i).nPoints) : testSet.get(i).nPoints;
+            xLocations[1][i] = testSet.get(i).nDimensions;
+            xLocations[2][i] = testSet.get(i).nClusters;
+        }
+
+        String[] yTicks = new String[slices];
+        double[] yLocations = new double[slices];
+        if (min == max) {
+            yTicks = new String[] { ""+Math.pow(10, min), ""+Math.pow(10, max) };
+            yLocations = new double[] { min, max };
+        } else {
+            for (int i = 0; i < slices; i++) {
+                double tempValue = startValue + i * roundedGap;
+                yTicks[i] = "" + (int)(Math.pow(10, tempValue));
+                yLocations[i] = tempValue;
+            }
+        }
+
+        //Add axes labels, tick labels, rescale the images and add the images to left and right picture panels.
         String[] xLabels = { "Points", "Dimensions", "Clusters" };
         String[] yLabels = { "Time (ms)", "NMI score" };
         int imageWidth = view.windowWidth * 16 / 33;
@@ -118,15 +188,26 @@ public class StatisticsPanel extends JPanel {
             canvases[i] = timePlots[i].canvas();
             canvases[i+3] = nmiPlots[i].canvas();
 
+            //Set axis labels
             canvases[i].setAxisLabels(xLabels[i], yLabels[0]);
             canvases[i+3].setAxisLabels(xLabels[i], yLabels[1]);
 
+            //Set tick labels
+            canvases[i].getAxis(0).setTicks(xTicks[i], xLocations[i]);
+            canvases[i + 3].getAxis(0).setTicks(xTicks[i], xLocations[i]);
+            if (logarithmicScale && i == 0) {
+                canvases[i].getAxis(1).setTicks(yTicks, yLocations);
+            }
+
+            //Convert to images
             images[i] = canvases[i].toBufferedImage(imageWidth * 8 / 7, imageHeight * 8 / 7);
             images[i+3] = canvases[i+3].toBufferedImage(imageWidth * 8 / 7, imageHeight * 8 / 7);
 
+            //Scale images
             images[i] = images[i].getScaledInstance(imageWidth, imageHeight, Image.SCALE_SMOOTH);
             images[i+3] = images[i+3].getScaledInstance(imageWidth, imageHeight, Image.SCALE_SMOOTH);
 
+            //Add images to left and right picture panel
             leftPicturePanel.add(new JLabel(new ImageIcon(images[i])));
             rightPicturePanel.add(new JLabel(new ImageIcon(images[i+3])));
 
@@ -136,6 +217,20 @@ public class StatisticsPanel extends JPanel {
 
         setVisible(false);
         setVisible(true);
+    }
+
+    //Switches between logarithmic scale and non-logarithmic scale in graphs.
+    protected void switchLogarithmicScale() {
+        logarithmicScale = !logarithmicScale;
+        startRunPhase();
+        plotTestResults(testResults, testSet, algorithmNames);
+        endRunPhase();
+    }
+
+    //Rounds double to precision decimal places.
+    private static double round (double value, int precision) {
+        int scale = (int) Math.pow(10, precision);
+        return (double) Math.round(value * scale) / scale;
     }
 
     //Shows text indicating that a test set is running.
