@@ -221,20 +221,20 @@ public class FeatureBasedDataset extends Dataset {
     //Returns the names of the supported initial cut generators.
     @Override
     public String[] getInitialCutGenerators() {
-        return new String[] {initialCutsKMeansAdjust, initialCutsRange, initialCutsLocalMeans, initialCutsSimple, initialCutsTanglesAdjust};
+        return new String[] {initialCutsLocalMeans, initialCutsKMeansAdjust, initialCutsRange, initialCutsSimple, initialCutsTanglesAdjust};
     }
 
     //Returns the names of the supported cost functions.
     @Override
     public String[] getCostFunctions() {
-        return new String[] {initialCutsKMeansAdjust, costFunctionDistanceToMean, costFunctionPairwiseDistance, costFunctionPairwiseSquaredDistance, costFunctionLocalMeans};
+        return new String[] {costFunctionLocalMeans, initialCutsKMeansAdjust, costFunctionDistanceToMean, costFunctionPairwiseDistance, costFunctionPairwiseSquaredDistance};
     }
 
     //Generates initial cuts for this dataset using the giving initial cut generator name and returns it as a BitSet array.
     @Override
     public BitSet[] getInitialCuts(String generatorName) {
-        if (generatorName == null || generatorName.equals(initialCutsKMeansAdjust)) {
-            return getInitialCutsKMeansAdjust();
+        if (generatorName == null || generatorName.equals(initialCutsLocalMeans)) {
+            return getInitialCutsLocalMeans();
         }
         else if (generatorName.equals(initialCutsRange)) {
             return getInitialCutsRange();
@@ -242,19 +242,19 @@ public class FeatureBasedDataset extends Dataset {
         else if (generatorName.equals(initialCutsSimple)) {
             return getInitialCutsSimple();
         }
-        else if (generatorName.equals(initialCutsLocalMeans)) {
-            return getInitialCutsLocalMeans();
+        else if (generatorName.equals(initialCutsKMeansAdjust)) {
+            return getInitialCutsKMeansAdjust();
         }
         else if (generatorName.equals(initialCutsTanglesAdjust)) {
             return getInitialCutsTanglesAdjust();
         }
-        return getInitialCutsKMeansAdjust();
+        return getInitialCutsLocalMeans();
     }
 
     //Generates costs for the initial cuts for this dataset using the giving cost function name and returns it as a double array.
     @Override
     public double[] getCutCosts(String costFunctionName) {
-        if (costFunctionName == null || costFunctionName.equals(costFunctionKMeansAdjust)) {
+        if (costFunctionName == null || costFunctionName.equals(costFunctionLocalMeans)) {
             //Do nothing
         }
         else if (costFunctionName.equals(costFunctionDistanceToMean)) {
@@ -266,7 +266,7 @@ public class FeatureBasedDataset extends Dataset {
         else if (costFunctionName.equals(costFunctionPairwiseSquaredDistance)) {
             cutCosts = pairwiseSquaredDistanceCostFunction();
         }
-        else if (costFunctionName.equals(costFunctionLocalMeans)) {
+        else if (costFunctionName.equals(costFunctionKMeansAdjust)) {
             //Do nothing
         }
         else {
