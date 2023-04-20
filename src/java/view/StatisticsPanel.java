@@ -67,7 +67,7 @@ public class StatisticsPanel extends JPanel {
         this.testSet = testSet;
         this.algorithmNames = algorithmNames;
 
-        Color[] colors = new Color[] {Color.RED, Color.BLUE, Color.GREEN, Color.ORANGE};
+        Color[] colors = new Color[] {Color.RED, Color.BLUE, new Color(1, 150, 30) /* Darker green */, new Color(255, 140, 0) /* Darker orange */};
         Line[][] linesTime = new Line[3][algorithmNames.length];
         Line[][] linesNMI = new Line[3][algorithmNames.length];
         Legend[] legends = new Legend[algorithmNames.length];
