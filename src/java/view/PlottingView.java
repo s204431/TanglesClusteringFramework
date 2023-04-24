@@ -5,7 +5,6 @@ import com.jujutsu.tsne.barneshut.BHTSne;
 import com.jujutsu.tsne.barneshut.BarnesHutTSne;
 import com.jujutsu.tsne.barneshut.ParallelBHTsne;
 import com.jujutsu.utils.TSneUtils;
-import datasets.Dataset;
 import datasets.FeatureBasedDataset;
 import util.BitSet;
 
@@ -43,6 +42,7 @@ public class PlottingView extends JPanel implements DataVisualizer, MouseListene
     //Constants used when dragging or zooming.
     private int[] mouseOrigVector;
     private boolean dragging = false;
+    private int zoomTimer = 0;
     private int xOrig;
     private int yOrig;
     private double factor = 1; //Used to expand x- or y-axis to capture largest datapoint.
@@ -85,6 +85,7 @@ public class PlottingView extends JPanel implements DataVisualizer, MouseListene
         addMouseWheelListener(this);
         (new Thread(new BoardDragger())).start();
         (new Thread(new Brusher())).start();
+        (new Thread(new ZoomTimer())).start();
     }
 
     //Draws plottingView on screen.
@@ -198,7 +199,8 @@ public class PlottingView extends JPanel implements DataVisualizer, MouseListene
 
         //Plot points.
         if (points != null) {
-            int bound = MAX_POINTS_TO_DRAW_WHEN_MOVING < points.length && dragging ? MAX_POINTS_TO_DRAW_WHEN_MOVING : points.length;
+            int bound = MAX_POINTS_TO_DRAW_WHEN_MOVING < points.length && (dragging || zoomTimer > 0) ? MAX_POINTS_TO_DRAW_WHEN_MOVING : points.length;
+            System.out.println(bound);
             for (int i = 0; i < bound; i++) {
                 int[] coor = convertPointToCoordinateOnScreen(points[i]);
                 if (clusters != null && clusters[i] < colors.length && colors[clusters[i]] != null) {
@@ -712,6 +714,7 @@ public class PlottingView extends JPanel implements DataVisualizer, MouseListene
             xOrig += (origWidthDist) * 4 * (tempLineGap + 0.5);
             yOrig += (origHeightDist) * 4 * (tempLineGap + 0.5);
         }
+        zoomTimer = 200;
         repaint();
     }
 
@@ -777,6 +780,25 @@ public class PlottingView extends JPanel implements DataVisualizer, MouseListene
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
+            }
+        }
+    }
+
+    //Reduces the zoom timer periodically.
+    private class ZoomTimer implements Runnable {
+        @Override
+        public void run() {
+            while(!close) {
+                if (zoomTimer > 0) {
+                    zoomTimer -= 100;
+                    if (zoomTimer <= 0) {
+                        repaint();
+                    }
+                }
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {}
+                System.out.println(zoomTimer);
             }
         }
     }
