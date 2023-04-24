@@ -200,7 +200,6 @@ public class PlottingView extends JPanel implements DataVisualizer, MouseListene
         //Plot points.
         if (points != null) {
             int bound = MAX_POINTS_TO_DRAW_WHEN_MOVING < points.length && (dragging || zoomTimer > 0) ? MAX_POINTS_TO_DRAW_WHEN_MOVING : points.length;
-            System.out.println(bound);
             for (int i = 0; i < bound; i++) {
                 int[] coor = convertPointToCoordinateOnScreen(points[i]);
                 if (clusters != null && clusters[i] < colors.length && colors[clusters[i]] != null) {
@@ -754,7 +753,7 @@ public class PlottingView extends JPanel implements DataVisualizer, MouseListene
                     repaint();
                 }
                 try {
-                    Thread.sleep(20);
+                    Thread.sleep(50);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -798,7 +797,6 @@ public class PlottingView extends JPanel implements DataVisualizer, MouseListene
                 try {
                     Thread.sleep(100);
                 } catch (InterruptedException e) {}
-                System.out.println(zoomTimer);
             }
         }
     }
