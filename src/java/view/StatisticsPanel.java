@@ -109,6 +109,19 @@ public class StatisticsPanel extends JPanel {
                 }
             }
 
+            /*
+            //Edge case with only one test case.
+            if (testResults[algorithm].length == 1) {
+                System.out.println("YES");
+                timePoints = new double[][] { timePoints[0], timePoints[0].clone() };
+                timeDimensions = new double[][] { timeDimensions[0], timeDimensions[0].clone() };
+                timeClusters = new double[][] { timeClusters[0], timeClusters[0].clone() };
+                nmiPoints = new double[][] { nmiPoints[0], nmiPoints[0].clone() };
+                nmiDimensions = new double[][] { nmiDimensions[0], nmiDimensions[0].clone() };
+                nmiClusters = new double[][] { nmiClusters[0], nmiClusters[0].clone() };
+            }
+             */
+
             //Create lines
             linesTime[0][algorithm] = Line.of(timePoints, colors[algorithm]);
             linesTime[1][algorithm] = Line.of(timeDimensions, colors[algorithm]);
@@ -122,7 +135,6 @@ public class StatisticsPanel extends JPanel {
         //Create the line plots.
         LinePlot[] timePlots = new LinePlot[3];
         LinePlot[] nmiPlots = new LinePlot[3];
-
         for (int i = 0; i < 3; i++) {
             timePlots[i] = new LinePlot(linesTime[i], legends);
             nmiPlots[i] = new LinePlot(linesNMI[i], legends);
@@ -175,6 +187,16 @@ public class StatisticsPanel extends JPanel {
                 yTicks[i] = "" + (int)(Math.pow(10, tempValue));
                 yLocations[i] = tempValue;
             }
+        }
+
+        //Edge case with only one test case.
+        if (testSet.size() == 1) {
+            for (int i = 0; i < 3; i++) {
+                xTicks[i] = new String[] { xTicks[i][0], xTicks[i][0] };
+                xLocations[i] = new double[] { xLocations[i][0], xLocations[i][0] };
+            }
+            yTicks = new String[] { yTicks[0], yTicks[0] };
+            yLocations = new double[] { yLocations[0], yLocations[0] };
         }
 
         //Add axes labels, tick labels, rescale the images and add the images to left and right picture panels.

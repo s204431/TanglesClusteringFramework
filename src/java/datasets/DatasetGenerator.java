@@ -303,4 +303,86 @@ public class DatasetGenerator {
         return new Tuple<>(result, groundTruth);
     }
 
+    //Generate four clusters with different number of points.
+    public static Tuple<double[][], int[]> generateDifferentSizeClusters(int numOfPoints, int range) {
+        int halfNumOfPoints = numOfPoints / 2 - 1;
+        if (range > halfNumOfPoints) {
+            range = halfNumOfPoints;
+        }
+
+        int numOfClusters = 4;
+        int numOfFeatures = 2;
+        double[][] result = new double[numOfPoints][numOfFeatures];
+        int[] groundTruth = new int[numOfPoints];
+        Random r = new Random();
+
+        //Compute number of points in each a, b, c and d cluster.
+        int c = numOfPoints / 4 + range / 6;
+        int a = -3 * c + numOfPoints;
+        int b = -c + numOfPoints / 2;
+        int d = 3 * c - numOfPoints / 2;
+
+        System.out.println(a + ", " + b + ", " + c + ", " + d);
+
+        double maxDist = numOfPoints * 0.12 * numOfClusters;
+        double maxStd = numOfPoints * 0.1;
+        double minStd = numOfPoints * 0.01;
+
+        //Generate means of clusters
+        double[][] centroids = new double[numOfClusters][numOfFeatures];
+        double[][] centroidStds = new double[numOfClusters][numOfFeatures];
+        for (int i = 0; i < numOfClusters; i++) {
+            for (int j = 0; j < numOfFeatures; j++) {
+                //Generate until not too close to another cluster.
+                boolean good = false;
+                while (!good) {
+                    good = true;
+                    centroids[i][j] = r.nextDouble(-maxDist, maxDist);
+                    centroidStds[i][j] = r.nextDouble(minStd, maxStd);
+                    for (int k = 0; k < i; k++) {
+                        if (Math.abs(centroids[k][j] - centroids[i][j]) < 1.6*(centroidStds[k][j] + centroidStds[i][j])) {
+                            good = false;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        //Generate points around means
+        for (int i = 0; i < a; i++) {
+            int centroid = 0;
+            for (int j = 0; j < numOfFeatures; j++) {
+                result[i][j] = r.nextGaussian(centroids[centroid][j], centroidStds[centroid][j]);
+            }
+            groundTruth[i] = centroid;
+        }
+
+        for (int i = a; i < a+b; i++) {
+            int centroid = 1;
+            for (int j = 0; j < numOfFeatures; j++) {
+                result[i][j] = r.nextGaussian(centroids[centroid][j], centroidStds[centroid][j]);
+            }
+            groundTruth[i] = centroid;
+        }
+
+        for (int i = a+b; i < a+b+c; i++) {
+            int centroid = 2;
+            for (int j = 0; j < numOfFeatures; j++) {
+                result[i][j] = r.nextGaussian(centroids[centroid][j], centroidStds[centroid][j]);
+            }
+            groundTruth[i] = centroid;
+        }
+
+        for (int i = a+b+c; i < a+b+c+d; i++) {
+            int centroid = 3;
+            for (int j = 0; j < numOfFeatures; j++) {
+                result[i][j] = r.nextGaussian(centroids[centroid][j], centroidStds[centroid][j]);
+            }
+            groundTruth[i] = centroid;
+        }
+
+        return new Tuple<>(result, groundTruth);
+    }
+
 }
