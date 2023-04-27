@@ -1,13 +1,11 @@
 package datasets;
 
 import model.Model;
-import org.junit.jupiter.params.shadow.com.univocity.parsers.annotations.EnumOptions;
 import smile.clustering.HierarchicalClustering;
 import smile.clustering.KMeans;
 import smile.clustering.PartitionClustering;
 import smile.clustering.SpectralClustering;
 import smile.clustering.linkage.CompleteLinkage;
-import smile.stat.Hypothesis;
 import util.BitSet;
 import util.Tuple;
 
@@ -718,8 +716,6 @@ public class FeatureBasedDataset extends Dataset {
     //Similar to the K-Means adjust initial cut generator, but recursively uses clustering with tangles instead.
     public BitSet[] getInitialCutsTanglesAdjust() {
         int localK = 4;
-        double range = getMaxRange();
-        List<Double> costs = new ArrayList<>();
         List<BitSet> cuts = new ArrayList<>();
         List<Double>[] axisParallelCuts = new ArrayList[dataPoints[0].length]; //For visualization.
         double[][] copy = new double[dataPoints.length][dataPoints[0].length];
@@ -729,7 +725,6 @@ public class FeatureBasedDataset extends Dataset {
             System.arraycopy(dataPoints[i], 0, copy[i], 0, dataPoints[0].length);
         }
         for (int i = 0; i < dataPoints[0].length; i++) {
-            costs.add(Double.MAX_VALUE);
             axisParallelCuts[i] = new ArrayList<>();
             mergeSort(copy, originalIndices, i, 0, dataPoints.length-1);
             BitSet currentBitSet = new BitSet(dataPoints.length);
@@ -798,10 +793,6 @@ public class FeatureBasedDataset extends Dataset {
             for (int j = 0; j < axisParallelCuts[i].size(); j++) {
                 this.axisParallelCuts[i][j] = axisParallelCuts[i].get(j);
             }
-        }
-        cutCosts = new double[costs.size()];
-        for (int i = 0; i < costs.size(); i++) {
-            cutCosts[i] = costs.get(i);
         }
         cutsAreAxisParallel = false;
         return result;

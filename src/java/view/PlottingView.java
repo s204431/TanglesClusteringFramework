@@ -275,11 +275,11 @@ public class PlottingView extends JPanel implements DataVisualizer, MouseListene
                         if (((FeatureBasedDataset) view.getDataset()).cutsAreAxisParallel) {
                             if (i == 0) {
                                 double pos = convertPointToCoordinateOnScreen(new double[] {dataset.axisParallelCuts[i][j], 0})[0];
-                                g2d.drawLine((int) pos, 0, (int) pos, view.getWindowHeight());
+                                g2d.drawLine((int) pos+POINT_SIZE/2, 0, (int) pos+POINT_SIZE/2, view.getWindowHeight());
                             }
                             else {
                                 double pos = convertPointToCoordinateOnScreen(new double[] {0, dataset.axisParallelCuts[i][j]})[1];
-                                g2d.drawLine(0, (int) pos, view.getWindowWidth(), (int) pos);
+                                g2d.drawLine(0, (int) pos+POINT_SIZE/2, view.getWindowWidth(), (int) pos+POINT_SIZE/2);
                             }
                         }
                         else {
@@ -332,20 +332,8 @@ public class PlottingView extends JPanel implements DataVisualizer, MouseListene
                             for (int k = 0; k < segmentPoints.size()-1; k++) {
                                 int[] pos1 = convertPointToCoordinateOnScreen(segmentPoints.get(k));
                                 int[] pos2 = convertPointToCoordinateOnScreen(segmentPoints.get(k+1));
-                                g2d.drawLine(pos1[0], pos1[1], pos2[0], pos2[1]);
+                                g2d.drawLine(pos1[0]+POINT_SIZE/2, pos1[1]+POINT_SIZE/2, pos2[0]+POINT_SIZE/2, pos2[1]+POINT_SIZE/2);
                             }
-                            /*int[] firstPos = convertPointToCoordinateOnScreen(segmentPoints.get(0));
-                            int[] lastPos = convertPointToCoordinateOnScreen(segmentPoints.get(segmentPoints.size()-1));
-                            if (i == 0) {
-                                double pos = convertPointToCoordinateOnScreen(new double[] {dataset.axisParallelCuts[i][j], 0})[0];
-                                g2d.drawLine((int) pos, 0, lastPos[0], lastPos[1]);
-                                g2d.drawLine(firstPos[0], firstPos[1], (int) pos, view.getWindowHeight());
-                            }
-                            else {
-                                double pos = convertPointToCoordinateOnScreen(new double[] {0, dataset.axisParallelCuts[i][j]})[1];
-                                g2d.drawLine(0, (int) pos, firstPos[0], firstPos[1]);
-                                g2d.drawLine(lastPos[0], lastPos[1], view.getWindowWidth(), (int) pos);
-                            }*/
                         }
                         costIndex++;
                     }
