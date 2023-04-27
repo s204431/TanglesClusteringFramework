@@ -362,7 +362,7 @@ public class StatisticsTopPanel extends JPanel {
 
     //Adds button to change between logarithmic and non-logarithmic scale of graphs in StatisticsView.
     private void addLogarithmicScaleButton() {
-        logarithmicScaleButton = new JButton("Change logarithmic scale");
+        logarithmicScaleButton = new JButton("Logarithmic scale");
         logarithmicScaleButton.addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent e) {
                 view.switchLogarithmicScale();

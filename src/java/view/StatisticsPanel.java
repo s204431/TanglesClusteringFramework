@@ -100,6 +100,14 @@ public class StatisticsPanel extends JPanel {
                 nmiClusters[test][1] = testResults[algorithm][test][1];
             }
 
+            //Sort test results
+            mergeSort(timePoints);
+            mergeSort(timeDimensions);
+            mergeSort(timeClusters);
+            mergeSort(nmiPoints);
+            mergeSort(nmiDimensions);
+            mergeSort(nmiClusters);
+
             //Converts the test results into logarithmic scale if logarithmicScale is true.
             if (logarithmicScale) {
                 for (int test = 0; test < testResults[algorithm].length; test++) {
@@ -108,19 +116,6 @@ public class StatisticsPanel extends JPanel {
                     nmiPoints[test][0] = nmiPoints[test][0] == 0 ? 0 : Math.log10(nmiPoints[test][0]);
                 }
             }
-
-            /*
-            //Edge case with only one test case.
-            if (testResults[algorithm].length == 1) {
-                System.out.println("YES");
-                timePoints = new double[][] { timePoints[0], timePoints[0].clone() };
-                timeDimensions = new double[][] { timeDimensions[0], timeDimensions[0].clone() };
-                timeClusters = new double[][] { timeClusters[0], timeClusters[0].clone() };
-                nmiPoints = new double[][] { nmiPoints[0], nmiPoints[0].clone() };
-                nmiDimensions = new double[][] { nmiDimensions[0], nmiDimensions[0].clone() };
-                nmiClusters = new double[][] { nmiClusters[0], nmiClusters[0].clone() };
-            }
-             */
 
             //Create lines
             linesTime[0][algorithm] = Line.of(timePoints, colors[algorithm]);
@@ -239,6 +234,45 @@ public class StatisticsPanel extends JPanel {
 
         setVisible(false);
         setVisible(true);
+    }
+
+    //Sorts a two-dimensional double array based on the first column.
+    public static void mergeSort(double[][] arr) {
+        if (arr == null || arr.length <= 1) {
+            return;
+        }
+
+        //Split array.
+        int mid = arr.length / 2;
+        double[][] left = new double[mid][];
+        double[][] right = new double[arr.length - mid][];
+        System.arraycopy(arr, 0, left, 0, mid);
+        System.arraycopy(arr, mid, right, 0, arr.length - mid);
+
+        //Recursively sort left and right array and merge them.
+        mergeSort(left);
+        mergeSort(right);
+        merge(left, right, arr);
+    }
+
+    //Merges left and right array and returns the result.
+    public static void merge(double[][] left, double[][] right, double[][] arr) {
+        int i = 0;
+        int j = 0;
+        int k = 0;
+        while (i < left.length && j < right.length) {
+            if (left[i][0] < right[j][0]) {
+                arr[k++] = left[i++];
+            } else {
+                arr[k++] = right[j++];
+            }
+        }
+        while (i < left.length) {
+            arr[k++] = left[i++];
+        }
+        while (j < right.length) {
+            arr[k++] = right[j++];
+        }
     }
 
     //Switches between logarithmic scale and non-logarithmic scale in graphs.
