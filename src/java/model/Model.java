@@ -1,8 +1,15 @@
 package model;
 
 import datasets.Dataset;
+import datasets.FeatureBasedDataset;
 import smile.validation.metric.NormalizedMutualInformation;
 
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.Date;
 
 public class Model {
@@ -106,6 +113,34 @@ public class Model {
     //Returns the last measured clustering time.
     public long getClusteringTime() {
         return clusteringTime;
+    }
+
+    public void clusterImage(String inputFilePath, String outputFilePath) {
+        try {
+            Color[] colors = new Color[] { Color.RED, Color.BLUE, Color.YELLOW, Color.GREEN, Color.ORANGE, Color.PINK, Color.GRAY };
+            BufferedImage image = ImageIO.read(new FileInputStream(new File(inputFilePath)));
+            double[][] dataPoints = new double[image.getHeight()*image.getWidth()][3];
+            int index = 0;
+            for (int i = 0; i < image.getWidth(); i++) {
+                for (int j = 0; j < image.getHeight(); j++) {
+                    Color color = new Color(image.getRGB(i, j));
+                    dataPoints[index++] = new double[] {color.getRed(), color.getGreen(), color.getBlue()};
+                }
+            }
+            FeatureBasedDataset imageDataset = new FeatureBasedDataset(dataPoints);
+            TangleClusterer clusterer = new TangleClusterer();
+            clusterer.generateClusters(imageDataset, (int)(dataPoints.length/5.0*(2.0/3.0)), -1, null, null);
+            int[] hardClustering = clusterer.getHardClustering();
+            BufferedImage newImage = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_RGB);
+            index = 0;
+            for (int i = 0; i < newImage.getWidth(); i++) {
+                for (int j = 0; j < newImage.getHeight(); j++) {
+                    newImage.setRGB(i, j, colors[hardClustering[index++]].getRGB());
+                }
+            }
+            File outputfile = new File(outputFilePath);
+            ImageIO.write(newImage, "jpg", outputfile);
+        } catch (IOException e) {}
     }
 
 }
