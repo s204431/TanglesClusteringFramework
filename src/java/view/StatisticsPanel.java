@@ -255,7 +255,7 @@ public class StatisticsPanel extends JPanel {
         merge(left, right, arr);
     }
 
-    //Merges left and right array and returns the result.
+    //Merges left and right array into arr.
     public static void merge(double[][] left, double[][] right, double[][] arr) {
         int i = 0;
         int j = 0;
