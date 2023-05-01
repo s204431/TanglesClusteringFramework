@@ -1,8 +1,11 @@
 package datasets;
 
+import controller.Controller;
+import main.Main;
 import model.Model;
 import util.BitSet;
 import util.Tuple;
+import view.View;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -17,6 +20,7 @@ public class GraphDataset extends Dataset {
     public static final String name = "Graph";
     private int[][][] dataPoints;
     private int[][] edges;
+    private int a;
 
     public static final String initialCutsKernighanLin = "Kernighan-Lin";
     public static final String costFunctionKernighanLin = "Kernighan-Lin";
@@ -45,6 +49,11 @@ public class GraphDataset extends Dataset {
     public GraphDataset(Tuple<int[][][], int[]> dataPointsWithGroundTruth) {
         this(dataPointsWithGroundTruth.x);
         groundTruth = dataPointsWithGroundTruth.y;
+    }
+
+    //Sets the value of a (agreement parameter).
+    public void setA(int a) {
+        this.a = a;
     }
 
     //Loads a graph from graphviz format.
@@ -108,8 +117,7 @@ public class GraphDataset extends Dataset {
     //Performs the Kernighan–Lin algorithm to generate initial cuts.
     @Override
     public BitSet[] getInitialCuts(String initialCutGenerator) {
-        int numberOfCuts = 20;
-        BitSet[] cuts = new BitSet[numberOfCuts];
+        BitSet[] cuts = getRandomCuts();
         int maxWeight = Integer.MIN_VALUE;
         int minWeight = Integer.MAX_VALUE;
         for (int i = 0; i < edges.length; i++) {
@@ -120,12 +128,11 @@ public class GraphDataset extends Dataset {
                 maxWeight = edges[i][2];
             }
         }
-        for (int i = 0; i < numberOfCuts; i++) {
-            BitSet cut = getRandomBitSet();
-            cuts[i] = cut;
+        for (int i = 0; i < cuts.length; i++) {
+            BitSet cut = cuts[i];
             int size1 = cut.count();
             int size2 = cut.size() - cut.count();
-            for (int j = 0; j < 2; j++) {
+            for (int j = 0; j < 5; j++) {
                 int[] dValues = new int[dataPoints.length];
                 for (int k = 0; k < dValues.length; k++) {
                     dValues[k] = getDValue(cut, k, minWeight, maxWeight);
@@ -134,7 +141,7 @@ public class GraphDataset extends Dataset {
                 List<Integer> av = new ArrayList<>();
                 List<Integer> bv = new ArrayList<>();
                 boolean[] inactiveNodes = new boolean[dataPoints.length];
-                for (int k = 0; k < (size1 > size2 ? size2 : size1); k++) {
+                for (int k = 0; k < Math.min(size1, size2); k++) {
                     int g = Integer.MIN_VALUE;
                     int bestA = -1;
                     int bestB = -1;
@@ -221,8 +228,36 @@ public class GraphDataset extends Dataset {
         return costs;
     }
 
+    //Generates random cuts of different sizes.
+    private BitSet[] getRandomCuts() {
+        int iterations = 5;
+        Random r = new Random();
+        BitSet[] result = new BitSet[(dataPoints.length/a-1)*iterations];
+        int index = 0;
+        for (int k = 0; k < iterations; k++) {
+            for (int i = a; i <= dataPoints.length-a; i += a) {
+                List<Integer> indices = new ArrayList<>();
+                for (int j = 0; j < dataPoints.length; j++) {
+                    indices.add(j);
+                }
+                List<Integer> chosenIndices = new ArrayList<>();
+                for (int j = 0; j < i; j++) {
+                    int chosen = r.nextInt(indices.size());
+                    chosenIndices.add(indices.get(chosen));
+                    indices.remove(chosen);
+                }
+                result[index] = new BitSet(dataPoints.length);
+                for (int j : chosenIndices) {
+                    result[index].add(j);
+                }
+                index++;
+            }
+        }
+        return result;
+    }
+
     //Generates a random cut as a BitSet.
-    private BitSet getRandomBitSet() {
+    /*private BitSet getRandomBitSet() {
         BitSet result = new BitSet(dataPoints.length);
         int n0 = 0;
         int n1 = 0;
@@ -246,7 +281,7 @@ public class GraphDataset extends Dataset {
             }
         }
         return result;
-    }
+    }*/
 
     //Calculates the cost of an edge (0 if there is no edge).
     private int getCost(int node1, int node2, int minWeight, int maxWeight) {
