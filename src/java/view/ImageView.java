@@ -60,18 +60,19 @@ public class ImageView extends JPanel implements DataVisualizer {
         originalImage = image;
         numberOfPoints = ((DataBufferByte) originalImage.getRaster().getDataBuffer()).getData().length;
 
-        //Adjust size of image
+        //Set position of images
         originalImageX = 0;
         originalImageY = 0;
         clusteredImageX = (double)(view.windowWidth - view.sidePanelWidth) / 2;
         clusteredImageY = 0;
 
+        //Adjust size of image
         if (imageWidth == 0.0 || imageHeight == 0.0) {
             imageWidth = originalImage.getWidth(null);
             imageHeight = originalImage.getHeight(null);
 
-            int maxWidth = (view.windowWidth - view.sidePanelWidth) / 2;
-            int maxHeight = (view.windowHeight - view.topPanelHeight*3) / 2;
+            double maxWidth = (double)(view.windowWidth - view.sidePanelWidth) / 2;
+            double maxHeight = (double)(view.windowHeight - view.topPanelHeight*3) / 2;
 
             if (imageWidth > maxWidth) {
                 double scale = maxWidth / imageWidth;
