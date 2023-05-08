@@ -62,7 +62,7 @@ public class ImageView extends JPanel implements DataVisualizer {
     //Loads original image and adjusts its size.
     public void loadImage(BufferedImage image) {
         originalImage = image;
-        numberOfPoints = ((DataBufferByte) originalImage.getRaster().getDataBuffer()).getData().length;
+        numberOfPoints = image.getWidth() * image.getHeight();
 
         //Adjust size of image
         imageWidth = (double)(view.windowWidth - view.sidePanelWidth) / 2;
