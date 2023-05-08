@@ -54,6 +54,10 @@ public class ImageView extends JPanel implements DataVisualizer {
         if (clusteredImage != null) {
             g.drawImage(clusteredImage, (int)clusteredImageX, (int)clusteredImageY, (int)imageWidth, (int)imageHeight, null);
         }
+
+        //Draw line separating images
+        ((Graphics2D)g).setStroke(new BasicStroke(3));
+        g.drawLine((view.windowWidth - view.sidePanelWidth) / 2, 0, (view.windowWidth - view.sidePanelWidth) / 2, view.windowHeight);
     }
 
     //Loads original image and adjusts its size.
