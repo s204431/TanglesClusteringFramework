@@ -61,6 +61,16 @@ public class StatisticsPanel extends JPanel {
         add(labelPane);
     }
 
+    //Creates graphs displaying the results from an already run test set and adds them to the left and right picture panels.
+    protected void plotTestResults() {
+        if (this.testResults == null || this.testSet == null || this.algorithmNames == null) {
+            return;
+        }
+        startRunPhase();
+        plotTestResults(testResults, testSet, algorithmNames);
+        endRunPhase();
+    }
+
     //Creates graphs displaying the results from running a test set and adds them to the left and right picture panels.
     protected void plotTestResults(double[][][] testResults, TestSet testSet, String[] algorithmNames) {
         this.testResults = testResults;

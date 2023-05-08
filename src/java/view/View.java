@@ -104,6 +104,11 @@ public class View extends JFrame {
                 windowWidth = getWidth();
                 windowHeight = getHeight();
                 setBounds();
+
+                if (statisticsPanel.isVisible()) {
+                    statisticsPanel.plotTestResults();
+                }
+
                 repaint();
             }
         });

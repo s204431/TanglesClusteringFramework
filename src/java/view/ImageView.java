@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Random;
 
 public class ImageView extends JPanel implements DataVisualizer {
 
@@ -100,7 +101,7 @@ public class ImageView extends JPanel implements DataVisualizer {
             clusteredImage = null;
             return;
         }
-        Color[] colors = new Color[] { Color.RED, Color.BLUE, Color.YELLOW, Color.GREEN, Color.ORANGE, Color.PINK, Color.GRAY};
+        addColors(hardClustering);
         clusteredImage = new BufferedImage(originalImage.getWidth(), originalImage.getHeight(), BufferedImage.TYPE_INT_RGB);
         int index = 0;
         for (int i = 0; i < clusteredImage.getWidth(); i++) {
@@ -129,6 +130,30 @@ public class ImageView extends JPanel implements DataVisualizer {
         */
 
         repaint();
+    }
+
+    //Adds the necessary amount of colors to represent every cluster in the received hard clustering.
+    private void addColors(final int[] hardClustering) {
+        colors = new java.awt.Color[] { Color.RED, Color.BLUE, Color.YELLOW, Color.GREEN, Color.ORANGE, Color.PINK, Color.GRAY };
+
+        int amountOfColors = 0;
+        for (int i = 0; i < hardClustering.length; i++) {
+            if (hardClustering[i] > amountOfColors) {
+                amountOfColors = hardClustering[i];
+            }
+        }
+        amountOfColors++;
+        if (amountOfColors > colors.length) {
+            Random random = new Random();
+            this.colors = new java.awt.Color[amountOfColors];
+            for (int i = 0; i < amountOfColors; i++) {
+                float r = random.nextFloat();
+                float g = random.nextFloat();
+                float b = random.nextFloat();
+                java.awt.Color randomColor = new java.awt.Color(r, g, b);
+                this.colors[i] = randomColor;
+            }
+        }
     }
 
     //Returns number of points in the mutable graph.
