@@ -27,7 +27,6 @@ public class ImageView extends JPanel implements DataVisualizer {
 
     private BufferedImage originalImage;
     private BufferedImage clusteredImage;
-    private double[][] dataPoints;
     private double originalImageX;
     private double originalImageY;
     private double clusteredImageX;
@@ -65,16 +64,31 @@ public class ImageView extends JPanel implements DataVisualizer {
         originalImage = image;
         numberOfPoints = ((DataBufferByte) originalImage.getRaster().getDataBuffer()).getData().length;
 
-        //Set position of images
-        originalImageX = 0;
-        originalImageY = 0;
-        clusteredImageX = (double)(view.windowWidth - view.sidePanelWidth) / 2;
-        clusteredImageY = 0;
-
         //Adjust size of image
         imageWidth = (double)(view.windowWidth - view.sidePanelWidth) / 2;
         double scale = imageWidth / originalImage.getWidth();
         imageHeight = originalImage.getHeight() * scale;
+
+        int maxWidth = view.windowWidth - view.sidePanelWidth;
+        int maxHeight = view.windowHeight - view.topPanelHeight*3;
+
+        if (imageWidth > maxWidth) {
+            scale = maxWidth / imageWidth;
+            imageWidth = maxWidth;
+            imageHeight *= scale;
+        }
+
+        if (imageHeight > maxHeight) {
+            scale = maxHeight / imageHeight;
+            imageHeight = maxHeight;
+            imageWidth *= scale;
+        }
+
+        //Set position of images
+        originalImageX = 0;
+        originalImageY = 0;
+        clusteredImageX = (double)(view.windowWidth - view.sidePanelWidth) - imageWidth;
+        clusteredImageY = 0;
     }
 
     //Colors the pixels based on the received hard clustering.
@@ -88,16 +102,8 @@ public class ImageView extends JPanel implements DataVisualizer {
             clusteredImage = null;
             return;
         }
-        addColors(hardClustering);
-        clusteredImage = new BufferedImage(originalImage.getWidth(), originalImage.getHeight(), BufferedImage.TYPE_INT_RGB);
-        int index = 0;
-        for (int i = 0; i < clusteredImage.getWidth(); i++) {
-            for (int j = 0; j < clusteredImage.getHeight(); j++) {
-                clusteredImage.setRGB(i, j, colors[hardClustering[index++]].getRGB());
-            }
-        }
 
-        /*
+        double[][] dataPoints = ((FeatureBasedDataset)view.getDataset()).dataPoints;
         colors = new Color[Arrays.stream(hardClustering).max().getAsInt()+1];
         for (int i = 0; i < colors.length; i++) {
             int r = 0;
@@ -114,33 +120,16 @@ public class ImageView extends JPanel implements DataVisualizer {
             }
             colors[i] = new Color(r/n, g/n, b/n);
         }
-        */
+
+        clusteredImage = new BufferedImage(originalImage.getWidth(), originalImage.getHeight(), BufferedImage.TYPE_INT_RGB);
+        int index = 0;
+        for (int i = 0; i < clusteredImage.getWidth(); i++) {
+            for (int j = 0; j < clusteredImage.getHeight(); j++) {
+                clusteredImage.setRGB(i, j, colors[hardClustering[index++]].getRGB());
+            }
+        }
 
         repaint();
-    }
-
-    //Adds the necessary amount of colors to represent every cluster in the received hard clustering.
-    private void addColors(final int[] hardClustering) {
-        colors = new java.awt.Color[] { Color.RED, Color.BLUE, Color.YELLOW, Color.GREEN, Color.ORANGE, Color.PINK, Color.GRAY };
-
-        int amountOfColors = 0;
-        for (int i = 0; i < hardClustering.length; i++) {
-            if (hardClustering[i] > amountOfColors) {
-                amountOfColors = hardClustering[i];
-            }
-        }
-        amountOfColors++;
-        if (amountOfColors > colors.length) {
-            Random random = new Random();
-            this.colors = new java.awt.Color[amountOfColors];
-            for (int i = 0; i < amountOfColors; i++) {
-                float r = random.nextFloat();
-                float g = random.nextFloat();
-                float b = random.nextFloat();
-                java.awt.Color randomColor = new java.awt.Color(r, g, b);
-                this.colors[i] = randomColor;
-            }
-        }
     }
 
     //Returns number of points in the mutable graph.
