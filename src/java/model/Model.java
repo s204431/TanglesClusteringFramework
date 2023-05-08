@@ -116,52 +116,19 @@ public class Model {
         return clusteringTime;
     }
 
-    public void clusterImage(String inputFilePath, String outputFilePath) {
-        try {
-            Color[] colors = new Color[] { Color.RED, Color.BLUE, Color.YELLOW, Color.GREEN, Color.ORANGE, Color.PINK, Color.GRAY};
-            BufferedImage image = ImageIO.read(new FileInputStream(new File(inputFilePath)));
-            double[][] dataPoints = new double[image.getHeight()*image.getWidth()][3];
-            int index = 0;
-            for (int i = 0; i < image.getWidth(); i++) {
-                for (int j = 0; j < image.getHeight(); j++) {
-                    Color color = new Color(image.getRGB(i, j));
-                    double x = (i/(double)image.getWidth())*255;
-                    double y = (j/(double)image.getHeight())*255;
-                    dataPoints[index++] = new double[] {color.getRed(), color.getGreen(), color.getBlue()};
-                }
+    //Loads image and computes pixels to feature based data points.
+    public void loadImage(BufferedImage image) {
+        double[][] dataPoints = new double[image.getHeight()*image.getWidth()][3];
+        int index = 0;
+        for (int i = 0; i < image.getWidth(); i++) {
+            for (int j = 0; j < image.getHeight(); j++) {
+                Color color = new Color(image.getRGB(i, j));
+                double x = (i/(double)image.getWidth())*255;
+                double y = (j/(double)image.getHeight())*255;
+                dataPoints[index++] = new double[] {color.getRed(), color.getGreen(), color.getBlue()};
             }
-            FeatureBasedDataset imageDataset = new FeatureBasedDataset(dataPoints);
-            TangleClusterer clusterer = new TangleClusterer();
-            clusterer.generateClusters(imageDataset, (int)(dataPoints.length/5.0*(2.0/3.0)), -1, null, null);
-            int[] hardClustering = clusterer.getHardClustering();
-
-            colors = new Color[Arrays.stream(hardClustering).max().getAsInt()+1];
-            for (int i = 0; i < colors.length; i++) {
-                int r = 0;
-                int g = 0;
-                int b = 0;
-                int n = 0;
-                for (int j = 0; j < hardClustering.length; j++) {
-                    if (hardClustering[j] == i) {
-                        r += dataPoints[j][0];
-                        g += dataPoints[j][1];
-                        b += dataPoints[j][2];
-                        n++;
-                    }
-                }
-                colors[i] = new Color(r/n, g/n, b/n);
-            }
-
-            BufferedImage newImage = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_RGB);
-            index = 0;
-            for (int i = 0; i < newImage.getWidth(); i++) {
-                for (int j = 0; j < newImage.getHeight(); j++) {
-                    newImage.setRGB(i, j, colors[hardClustering[index++]].getRGB());
-                }
-            }
-            File outputfile = new File(outputFilePath);
-            ImageIO.write(newImage, "jpg", outputfile);
-        } catch (IOException e) {}
+        }
+        dataset = new FeatureBasedDataset(dataPoints);
     }
 
 }

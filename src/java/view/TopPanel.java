@@ -238,6 +238,43 @@ public class TopPanel extends JPanel {
             }
         }));
 
+        //Create load new image functionality.
+        newPopup.add(new JMenuItem(new AbstractAction("Load new image") {
+            public void actionPerformed(ActionEvent e) {
+                //File chooser for .png and .jpg files.
+                final File[] file = new File[1];
+                JPanel loadPopupPanel = new JPanel();
+                loadPopupPanel.setLayout(new BoxLayout(loadPopupPanel, BoxLayout.LINE_AXIS));
+                JLabel label = new JLabel("No file selected");
+                JButton fileButton = new JButton("Select File");
+                fileButton.addActionListener((l) -> {
+                    final JFileChooser fc = new JFileChooser();
+                    FileNameExtensionFilter filter = new FileNameExtensionFilter(".png, .jpg", "png", "jpg");
+                    fc.setFileFilter(filter);
+                    int returnVal = fc.showDialog(view, "Choose");
+                    if (returnVal == JFileChooser.APPROVE_OPTION) {
+                        file[0] = fc.getSelectedFile();
+                        label.setText(file[0].getName());
+                    }
+                });
+
+                //Panel that holds file chooser.
+                loadPopupPanel.add(label);
+                loadPopupPanel.add(Box.createRigidArea(new Dimension(10, 0)));
+                loadPopupPanel.add(fileButton);
+
+                int loadResult = JOptionPane.showConfirmDialog(view, loadPopupPanel,
+                        "Load dataset", JOptionPane.OK_CANCEL_OPTION,
+                        JOptionPane.PLAIN_MESSAGE);
+
+                //Load the chosen image file if the user presses OK.
+                if (loadResult == JOptionPane.OK_OPTION && file[0] != null) {
+                    String fileName = file[0].getAbsolutePath();
+                    view.loadImageFromFile(fileName);
+                }
+            }
+        }));
+
         //Create button on toolbar.
         newButton = new JButton("New");
         newButton.addMouseListener(new MouseAdapter() {

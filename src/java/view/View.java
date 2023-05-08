@@ -6,6 +6,7 @@ import datasets.FeatureBasedDataset;
 import datasets.GraphDataset;
 import controller.Controller;
 import model.Model;
+import smile.plot.swing.Plot;
 import util.BitSet;
 
 import javax.swing.*;
@@ -14,6 +15,8 @@ import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferByte;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -178,6 +181,12 @@ public class View extends JFrame {
         selectedSidePanel.update(dataVisualizer.getOriginalNumberOfPoints());
     }
 
+    //Calls the loadImage method of ImageView.
+    public void loadImage(BufferedImage image) {
+        ((ImageView)dataVisualizer).loadImage(image);
+        selectedSidePanel.update(((DataBufferByte) image.getRaster().getDataBuffer()).getData().length);
+    }
+
     //Calls the loadClusters method of the currently displayed dataVisualizer and updates necessary values in
     // the currently selected side panel.
     public void loadClusters(int[] clusters, double[][] softClustering) {
@@ -196,9 +205,19 @@ public class View extends JFrame {
     }
 
     //Resets View and all of its components.
-    public void resetView() {
+    public void resetView(String dataVisualizerName) {
         Dataset dataset = model.getDataset();
-        dataVisualizer = dataset instanceof GraphDataset ? new GraphView(this) : new PlottingView(this);
+        switch (dataVisualizerName) {
+            case PlottingView.name -> {
+                dataVisualizer = new PlottingView(this);
+            }
+            case GraphView.name -> {
+                dataVisualizer = new GraphView(this);
+            }
+            case ImageView.name -> {
+                dataVisualizer = new ImageView(this);
+            }
+        }
         ((JPanel)dataVisualizer).setBounds(0, 0, windowWidth - sidePanelWidth, windowHeight);
 
         //Remove components from pane and mainComponent.
@@ -274,6 +293,11 @@ public class View extends JFrame {
     //Loads a data set from a file.
     protected void loadDatasetFromFile(String datasetTypeName, String fileName, int startRow, int endRow, int startColumn, int endColumn) {
         controller.loadDatasetFromFile(datasetTypeName, fileName, startRow, endRow, startColumn, endColumn);
+    }
+
+    //Loads an image from a file.
+    protected void loadImageFromFile(String fileName) {
+        controller.loadImageFromFile(fileName);
     }
 
     //Turns axes ON or OFF in the plotting view.

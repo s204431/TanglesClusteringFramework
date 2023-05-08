@@ -2,7 +2,16 @@ package controller;
 
 import datasets.*;
 import model.Model;
+import view.GraphView;
+import view.ImageView;
+import view.PlottingView;
 import view.View;
+
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 
 public class Controller {
 
@@ -38,8 +47,18 @@ public class Controller {
             }
         }
         model.setDataset(dataset);
-        view.resetView();
+        view.resetView(dataset instanceof GraphDataset ? GraphView.name : PlottingView.name);
         view.loadDataPoints();
+    }
+
+    //Loads an image from a file and updates the view and the model.
+    public void loadImageFromFile(String inputFilePath) {
+        try {
+            BufferedImage image = ImageIO.read(new FileInputStream(new File(inputFilePath)));
+            model.loadImage(image);
+            view.resetView(ImageView.name);
+            view.loadImage(image);
+        } catch (IOException e) {}
     }
 
     //Generates a new dataset with a specific data type and updates the view and the model.
@@ -54,7 +73,7 @@ public class Controller {
             default -> null;
         };
         model.setDataset(dataset);
-        view.resetView();
+        view.resetView(dataset instanceof GraphDataset ? GraphView.name : PlottingView.name);
         view.loadDataPoints();
     }
 

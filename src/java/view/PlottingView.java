@@ -24,6 +24,8 @@ public class PlottingView extends JPanel implements DataVisualizer, MouseListene
 
     //This class visualizes a point-based data set in a two-dimensional coordinate system.
 
+    public static final String name = "Plotting View";
+
     private static final int POINT_SIZE = 8;
     private static final int MAX_POINTS_TO_DRAW = 10000;
     private static final int MAX_POINTS_TO_DRAW_WHEN_MOVING = 2000;

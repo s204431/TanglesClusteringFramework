@@ -26,6 +26,8 @@ public class GraphView extends JPanel implements DataVisualizer, MouseListener, 
 
     //This class visualizes a graph data set in GraphViz format.
 
+    public static final String name = "Graph View";
+
     private View view;
     private Image image;
     private MutableGraph graph;
