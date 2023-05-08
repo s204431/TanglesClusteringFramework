@@ -118,6 +118,7 @@ public class ImageView extends JPanel implements DataVisualizer {
                     n++;
                 }
             }
+            n = n == 0 ? 1 : n;
             colors[i] = new Color(r/n, g/n, b/n);
         }
 
