@@ -68,26 +68,9 @@ public class ImageView extends JPanel implements DataVisualizer {
         clusteredImageY = 0;
 
         //Adjust size of image
-        if (imageWidth == 0.0 || imageHeight == 0.0) {
-            imageWidth = originalImage.getWidth(null);
-            imageHeight = originalImage.getHeight(null);
-
-            double maxWidth = (double)(view.windowWidth - view.sidePanelWidth) / 2;
-            double maxHeight = (double)(view.windowHeight - view.topPanelHeight*3) / 2;
-
-            if (imageWidth > maxWidth) {
-                double scale = maxWidth / imageWidth;
-                imageWidth = maxWidth;
-                imageHeight *= scale;
-            }
-
-            if (imageHeight > maxHeight) {
-                double scale = maxHeight / imageHeight;
-                imageHeight = maxHeight;
-                imageWidth *= scale;
-            }
-        }
-
+        imageWidth = (double)(view.windowWidth - view.sidePanelWidth) / 2;
+        double scale = imageWidth / originalImage.getWidth();
+        imageHeight = originalImage.getHeight() * scale;
     }
 
     //Colors the pixels based on the received hard clustering.
