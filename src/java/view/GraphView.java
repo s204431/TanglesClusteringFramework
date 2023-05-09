@@ -24,6 +24,8 @@ import static guru.nidi.graphviz.model.Factory.*;
 
 public class GraphView extends JPanel implements DataVisualizer, MouseListener, MouseWheelListener {
 
+    //Responsible: Michael
+
     //This class visualizes a graph data set in GraphViz format.
 
     public static final String name = "Graph View";

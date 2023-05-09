@@ -15,6 +15,8 @@ import java.io.IOException;
 
 public class Controller {
 
+    //Responsible: Jens
+
     //This is the controller for the Model-View-Controller design pattern.
 
     private final Model model;

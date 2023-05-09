@@ -12,6 +12,8 @@ import java.util.List;
 
 public class TangleSidePanel extends SidePanel {
 
+    //Responsible: Michael
+
     //This class is the side panel associated with the tangle clustering algorithm.
 
     private ValueAdjuster aValueAdjuster; //Slider for the "a" parameter.

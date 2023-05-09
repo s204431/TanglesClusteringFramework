@@ -10,6 +10,8 @@ import java.util.Scanner;
 
 public class TestSet {
 
+    //Responsible: Jens
+
     //This class represents a test set (a number of test cases and a data type).
 
     public final String dataTypeName; //Type of data for the test set.

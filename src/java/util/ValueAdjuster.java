@@ -9,6 +9,8 @@ import java.text.NumberFormat;
 
 public class ValueAdjuster extends JComponent {
 
+    //Responsible: Michael
+
     //This class represents a JSlider with a corresponding JTextField that follow each other.
 
     private final JSlider slider;

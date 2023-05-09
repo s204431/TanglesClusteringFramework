@@ -15,6 +15,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class UnitTests {
 
+    //Responsible: Jens
+
     //Unit test for the BitSet class.
     @Test
     public void testBitSet() {

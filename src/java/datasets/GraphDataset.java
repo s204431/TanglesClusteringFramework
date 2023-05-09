@@ -15,6 +15,8 @@ import java.util.*;
 
 public class GraphDataset extends Dataset {
 
+    //Responsible: Jens
+
     //This class represents a graph dataset.
 
     public static final String name = "Graph";

@@ -5,6 +5,8 @@ import java.awt.*;
 
 public class SidePanel extends JPanel {
 
+    //Responsible: Michael
+
     //This class represents a panel on the side of a View.
 
     protected View view;

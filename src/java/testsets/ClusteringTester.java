@@ -13,6 +13,8 @@ import javax.swing.*;
 
 public class ClusteringTester {
 
+    //Responsible: Jens
+
     //This class is used to run different tests on clustering algorithms.
 
     public static double testProgress = 0.0; //How far the current test run is (between 0 and 1).

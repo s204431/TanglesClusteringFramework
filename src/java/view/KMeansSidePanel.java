@@ -9,6 +9,8 @@ import java.awt.*;
 
 public class KMeansSidePanel extends SidePanel {
 
+    //Responsible: Michael
+
     //This class is the side panel associated with the k-means clustering algorithm.
 
     private ValueAdjuster kValueAdjuster; //Slider for the "k" parameter.

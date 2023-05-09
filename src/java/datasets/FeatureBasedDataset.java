@@ -17,6 +17,8 @@ import java.util.*;
 
 public class FeatureBasedDataset extends Dataset {
 
+    //Responsible: Jens
+
     //This class represents a feature based dataset.
 
     public static final String name = "Feature Based";

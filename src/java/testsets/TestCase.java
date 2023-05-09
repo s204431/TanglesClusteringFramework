@@ -2,6 +2,8 @@ package testsets;
 
 public class TestCase {
 
+    //Responsible: Jens
+
     //This class represents a specific test case.
 
     public int nPoints; //Number of points for the test case.

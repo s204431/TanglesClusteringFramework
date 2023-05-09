@@ -15,6 +15,8 @@ import java.util.Random;
 
 public class ImageView extends JPanel implements DataVisualizer {
 
+    //Responsible: Michael
+
     // This class visualizes an image and the clustering of that image.
 
     public static final String name = "Image View";

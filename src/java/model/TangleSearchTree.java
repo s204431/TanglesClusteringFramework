@@ -6,6 +6,8 @@ import java.util.*;
 
 public class TangleSearchTree {
 
+    //Responsible: Jens
+
     //This class represents a tangle search tree.
 
     private static final boolean USE_HASHING = false; //Determines if hashing of intersections is used.

@@ -19,6 +19,8 @@ import java.text.NumberFormat;
 
 public class TopPanel extends JPanel {
 
+    //Responsible: Michael
+
     //This class represents a panel in the top part of a View.
 
     public static final int BUTTON_WIDTH = 100;

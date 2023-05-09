@@ -6,6 +6,8 @@ import java.text.ParseException;
 
 public class ExtendedNumberFormatter extends NumberFormatter {
 
+    //Responsible: Michael
+
     //This class functions as a NumberFormatter where empty strings are allowed (in case the user wants to delete everything from a text field).
 
     public ExtendedNumberFormatter(NumberFormat f) {

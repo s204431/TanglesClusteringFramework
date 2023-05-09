@@ -9,6 +9,8 @@ import java.awt.*;
 
 public class SpectralSidePanel extends SidePanel {
 
+    //Responsible: Michael
+
     //Sliders for the "k" and "sigma" parameter in spectral clustering.
     private ValueAdjuster kValueAdjuster;
     private ValueAdjuster sigmaValueAdjuster;
