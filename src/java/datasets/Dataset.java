@@ -10,6 +10,8 @@ import java.util.Scanner;
 
 public abstract class Dataset {
 
+    //Responsible: Jens
+
     //This is an abstract superclass for datasets. Each type of dataset should extend this and override the relevant methods.
 
     //The names of all the dataset types that we support.

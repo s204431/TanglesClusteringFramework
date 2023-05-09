@@ -22,6 +22,8 @@ import java.util.List;
 
 public class PlottingView extends JPanel implements DataVisualizer, MouseListener, MouseMotionListener, MouseWheelListener {
 
+    //Responsible: Michael
+
     //This class visualizes a point-based data set in a two-dimensional coordinate system.
 
     public static final String name = "Plotting View";

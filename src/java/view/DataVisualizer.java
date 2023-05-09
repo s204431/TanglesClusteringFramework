@@ -1,8 +1,9 @@
 package view;
 
-import javax.swing.*;
-
 public interface DataVisualizer {
+
+    //Responsible: Jens
+
     public int getNumberOfPoints();
     public int getOriginalNumberOfPoints();
     public boolean isReady();

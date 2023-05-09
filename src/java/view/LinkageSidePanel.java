@@ -9,6 +9,8 @@ import java.awt.*;
 
 public class LinkageSidePanel extends SidePanel {
 
+    //Responsible: Michael
+
     private ValueAdjuster kValueAdjuster; //Slider for the "k" parameter.
 
     //Constructor receiving view.

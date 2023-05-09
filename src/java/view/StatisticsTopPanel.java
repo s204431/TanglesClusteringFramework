@@ -21,6 +21,8 @@ import static view.TopPanel.BUTTON_WIDTH;
 
 public class StatisticsTopPanel extends JPanel {
 
+    //Responsible: Michael
+
     //This class represents a panel in the top part of View when the statistics panel is being shown.
 
     private View view;

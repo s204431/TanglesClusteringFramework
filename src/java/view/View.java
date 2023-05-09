@@ -22,6 +22,8 @@ import java.util.List;
 
 public class View extends JFrame {
 
+    //Responsible: Michael
+
     //This class represents the GUI of the program.
 
     private Model model;

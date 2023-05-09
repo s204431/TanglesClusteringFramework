@@ -9,6 +9,8 @@ import util.Tuple;
 
 public class DatasetGenerator {
 
+    //Responsible: Michael
+
     //This class contains methods used to generate random datasets of different types.
 
     //Generates a random BitSet of answers to a binary questionnaire and returns the result.

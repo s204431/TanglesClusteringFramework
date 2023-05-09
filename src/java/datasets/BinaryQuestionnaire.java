@@ -17,6 +17,8 @@ import java.util.*;
 
 public class BinaryQuestionnaire extends Dataset {
 
+    //Responsible: Jens
+
     //This class represents a binary questionnaire dataset.
 
     public static final String name = "Binary Questionnaire";

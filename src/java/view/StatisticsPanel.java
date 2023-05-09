@@ -11,6 +11,8 @@ import java.awt.Graphics;
 
 public class StatisticsPanel extends JPanel {
 
+    //Responsible: Michael
+
     //This class visualizes the results from running a test set.
 
     private View view;

@@ -7,6 +7,8 @@ import model.TangleSearchTree.Node;
 
 public class TangleClusterer {
 
+    //Responsible: Jens
+
     //This class is used to generate a clustering with tangles.
 
     private TangleSearchTree tangleSearchTree;

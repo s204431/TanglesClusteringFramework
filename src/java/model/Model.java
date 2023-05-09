@@ -15,6 +15,8 @@ import java.util.Date;
 
 public class Model {
 
+    //Responsible: Jens
+
     //This is the model for the Model-View-Controller design pattern.
 
     //Names of supported clustering algorithms.

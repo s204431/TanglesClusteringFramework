@@ -2,6 +2,8 @@ package util;
 
 public class Tuple<T1, T2> {
 
+    //Responsible: Jens
+
     //This class represents a tuple with two objects.
 
     public T1 x;
