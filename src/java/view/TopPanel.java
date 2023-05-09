@@ -264,7 +264,7 @@ public class TopPanel extends JPanel {
                 loadPopupPanel.add(fileButton);
 
                 int loadResult = JOptionPane.showConfirmDialog(view, loadPopupPanel,
-                        "Load dataset", JOptionPane.OK_CANCEL_OPTION,
+                        "Load image", JOptionPane.OK_CANCEL_OPTION,
                         JOptionPane.PLAIN_MESSAGE);
 
                 //Load the chosen image file if the user presses OK.
