@@ -433,7 +433,7 @@ public class FeatureBasedDataset extends Dataset {
                 }
             }
             fileScanner.close();
-            loadGroundTruth(file, startRow, endRow == -1 ? dataPoints.length-1 : endRow);
+            loadGroundTruth(file, startRow, endRow == -1 ? startRow+dataPoints.length-1 : endRow);
             if (dataPoints.length == 0 || dataPoints[0].length == 0) {
                 throw new RuntimeException("Failed to load dataset.");
             }
