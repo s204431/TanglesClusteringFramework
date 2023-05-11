@@ -1,6 +1,7 @@
 package view;
 
 import datasets.Dataset;
+import datasets.FeatureBasedDataset;
 import datasets.GraphDataset;
 import util.ExtendedNumberFormatter;
 
@@ -139,17 +140,20 @@ public class TopPanel extends JPanel {
                 savePopupPanel.add(Box.createRigidArea(new Dimension(10, 0)));
                 savePopupPanel.add(fileButton);
 
+                //Checkbox for normalizing data set.
+                JCheckBox normalizeCheckBox = new JCheckBox("Normalize data set");
+                normalizeCheckBox.setAlignmentX(RIGHT_ALIGNMENT);
+                JPanel checkBoxPanel = new JPanel();
+                checkBoxPanel.add(normalizeCheckBox);
+
                 //Dropdown menu for supported data types.
                 JComboBox<String> comboBox = new JComboBox<>();
                 for (String type : Dataset.supportedDatasetTypes) {
                     comboBox.addItem(type);
                 }
-
-                //Checkbox for normalizing data set.
-                JCheckBox normalizeCheckBox = new JCheckBox("Normalize data set", true);
-                normalizeCheckBox.setAlignmentX(RIGHT_ALIGNMENT);
-                JPanel checkBoxPanel = new JPanel();
-                checkBoxPanel.add(normalizeCheckBox);
+                comboBox.addActionListener(e1 -> {
+                    normalizeCheckBox.setEnabled(comboBox.getSelectedItem().equals(FeatureBasedDataset.name));
+                });
 
                 //Panel that is shown to the user.
                 JPanel loadPopupPanel = new JPanel();
