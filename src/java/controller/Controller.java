@@ -29,7 +29,7 @@ public class Controller {
     }
 
     //Loads a dataset with a specific data type from a file and updates the view and the model.
-    public void loadDatasetFromFile(String datasetTypeName, String fileName, int startRow, int endRow, int startColumn, int endColumn) {
+    public void loadDatasetFromFile(String datasetTypeName, String fileName, int startRow, int endRow, int startColumn, int endColumn, boolean normalizeDataPoints) {
         if (!view.isReady()) {
             return;
         }
@@ -41,7 +41,7 @@ public class Controller {
             }
             case FeatureBasedDataset.name -> {
                 dataset = new FeatureBasedDataset();
-                ((FeatureBasedDataset) dataset).loadDataFromFile(fileName, startRow, endRow, startColumn, endColumn);
+                ((FeatureBasedDataset) dataset).loadDataFromFile(fileName, startRow, endRow, startColumn, endColumn, normalizeDataPoints);
             }
             case GraphDataset.name -> {
                 dataset = new GraphDataset();

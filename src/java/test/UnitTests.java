@@ -150,7 +150,7 @@ public class UnitTests {
         File file = new File("testFeatureBasedDataset.csv");
         featureBasedDataset.saveToFile(file);
         FeatureBasedDataset featureBasedDataset2 = new FeatureBasedDataset();
-        featureBasedDataset2.loadDataFromFile(file.getName(), 0, -1, 0, -1);
+        featureBasedDataset2.loadDataFromFile(file.getName(), 0, -1, 0, -1, false);
         assertEquals(featureBasedDataset, featureBasedDataset2);
         assertTrue(Arrays.equals(featureBasedDataset.getGroundTruth(), featureBasedDataset2.getGroundTruth()));
         file.delete();

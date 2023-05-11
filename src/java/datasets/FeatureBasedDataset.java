@@ -394,7 +394,7 @@ public class FeatureBasedDataset extends Dataset {
     }
 
     //Loads the dataset from a file.
-    public void loadDataFromFile(String fileName, int startRow, int endRow, int startColumn, int endColumn) {
+    public void loadDataFromFile(String fileName, int startRow, int endRow, int startColumn, int endColumn, boolean normalizeDataPoints) {
         try {
             List<List<Double>> result = new ArrayList<>();
             File file = new File(fileName);
@@ -430,6 +430,36 @@ public class FeatureBasedDataset extends Dataset {
                 }
                 for (int j = 0; j < dataPoints[i].length; j++) {
                     dataPoints[i][j] = result.get(i).get(j);
+                }
+            }
+            //Normalization of data points.
+            if (normalizeDataPoints) {
+                int cols = dataPoints[0].length;
+                double[] minValues = new double[cols];
+                double[] maxValues = new double[cols];
+
+                //Initialize min and max values.
+                for (int i = 0; i < cols; i++) {
+                    minValues[0] = dataPoints[0][i];
+                    maxValues[0] = dataPoints[0][i];
+                }
+
+                //Find min and max values.
+                for (int i = 0; i < dataPoints.length; i++) {
+                    for (int j = 0; j < dataPoints[i].length; j++) {
+                        double val = dataPoints[i][j];
+                        minValues[j] = Math.min(minValues[j], val);
+                        maxValues[j] = Math.max(maxValues[j], val);
+                    }
+                }
+
+                //Normalize data points to be between x and y using min-max scaling.
+                int x = 0;
+                int y = 100;
+                for (int i = 0; i < dataPoints.length; i++) {
+                    for (int j = 0; j < dataPoints[i].length; j++) {
+                        dataPoints[i][j] = y * (x + (dataPoints[i][j] - minValues[j]) / (maxValues[j] - minValues[j]));
+                    }
                 }
             }
             fileScanner.close();

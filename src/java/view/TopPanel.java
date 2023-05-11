@@ -145,12 +145,19 @@ public class TopPanel extends JPanel {
                     comboBox.addItem(type);
                 }
 
+                //Checkbox for normalizing data set.
+                JCheckBox normalizeCheckBox = new JCheckBox("Normalize data set", true);
+                normalizeCheckBox.setAlignmentX(RIGHT_ALIGNMENT);
+                JPanel checkBoxPanel = new JPanel();
+                checkBoxPanel.add(normalizeCheckBox);
+
                 //Panel that is shown to the user.
                 JPanel loadPopupPanel = new JPanel();
                 loadPopupPanel.setLayout(new BoxLayout(loadPopupPanel, BoxLayout.PAGE_AXIS));
                 loadPopupPanel.add(savePopupPanel);
                 loadPopupPanel.add(Box.createRigidArea(new Dimension(0, 10)));
                 loadPopupPanel.add(comboBox);
+                loadPopupPanel.add(checkBoxPanel);
 
                 int loadResult = JOptionPane.showConfirmDialog(view, loadPopupPanel,
                         "Load dataset", JOptionPane.OK_CANCEL_OPTION,
@@ -164,7 +171,7 @@ public class TopPanel extends JPanel {
                     String fileName = file[0].getAbsolutePath();
                     if (datasetType.equals(GraphDataset.name)) {
                         try {
-                            view.loadDatasetFromFile(datasetType, fileName, 0, 0, 0, 0);
+                            view.loadDatasetFromFile(datasetType, fileName, 0, 0, 0, 0, false);
                         }
                         catch (RuntimeException e1) {
                             JOptionPane.showMessageDialog(view, "Failed to load data set");
@@ -229,8 +236,9 @@ public class TopPanel extends JPanel {
                         int endRow = Integer.parseInt(getTextFieldValue(endRowTextField, -1));
                         int startCol = Integer.parseInt(getTextFieldValue(startColTextField, 0));
                         int endCol = Integer.parseInt(getTextFieldValue(endColTextField ,-1));
+                        boolean normalize = normalizeCheckBox.isSelected();
                         try {
-                            view.loadDatasetFromFile(datasetType, fileName, startRow, endRow, startCol, endCol);
+                            view.loadDatasetFromFile(datasetType, fileName, startRow, endRow, startCol, endCol, normalize);
                         }
                         catch (RuntimeException e1) {
                             JOptionPane.showMessageDialog(view, "Failed to load data set");

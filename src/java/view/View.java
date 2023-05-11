@@ -298,8 +298,8 @@ public class View extends JFrame {
     }
 
     //Loads a data set from a file.
-    protected void loadDatasetFromFile(String datasetTypeName, String fileName, int startRow, int endRow, int startColumn, int endColumn) {
-        controller.loadDatasetFromFile(datasetTypeName, fileName, startRow, endRow, startColumn, endColumn);
+    protected void loadDatasetFromFile(String datasetTypeName, String fileName, int startRow, int endRow, int startColumn, int endColumn, boolean normalizeDataPoints) {
+        controller.loadDatasetFromFile(datasetTypeName, fileName, startRow, endRow, startColumn, endColumn, normalizeDataPoints);
     }
 
     //Loads an image from a file.
