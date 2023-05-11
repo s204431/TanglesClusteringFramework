@@ -117,6 +117,20 @@ public class PlottingView extends JPanel implements DataVisualizer, MouseListene
             return;
         }
 
+        //Choose whether to show ground truth or generated clusters.
+        int[] clusters;// = view.selectedSidePanel.showGroundTruth() ? view.getDataset().getGroundTruth() : this.clusters;
+        double[][] softClustering;
+
+        if (view.selectedSidePanel.showGroundTruth()) {
+            clusters = view.getDataset().getGroundTruth();
+            clusters = convertClusters(clusters);
+            softClustering = null;
+        }
+        else {
+            clusters = this.clusters;
+            softClustering = this.softClustering;
+        }
+
         //Update necessary values.
         windowMax = Math.max(view.getWindowHeight(), view.getWindowWidth());
         if (lineGap == 0) {
@@ -442,15 +456,8 @@ public class PlottingView extends JPanel implements DataVisualizer, MouseListene
         }).start();
     }
 
-    //Colors the data points in a data set based on the received hard clustering.
-    public void loadClusters(int[] clusters) {
-        if (clusters == null) {
-            this.clusters = null;
-            return;
-        }
-        clusters = convertClusters(clusters);
+    private void setColors(int[] clusters) {
         colors = new Color[] { Color.RED, Color.BLUE, Color.YELLOW, Color.GREEN, Color.ORANGE, Color.PINK, Color.GRAY };
-        this.clusters = clusters;
         int amountOfColors = 0;
         for (int i = 0; i < clusters.length; i++) {
             if (clusters[i] > amountOfColors) {
@@ -468,6 +475,19 @@ public class PlottingView extends JPanel implements DataVisualizer, MouseListene
                 Color randomColor = new Color(r, g, b);
                 this.colors[i] = randomColor;
             }
+        }
+    }
+
+    //Colors the data points in a data set based on the received hard clustering.
+    public void loadClusters(int[] clusters) {
+        if (clusters == null) {
+            this.clusters = null;
+            return;
+        }
+        clusters = convertClusters(clusters);
+        this.clusters = clusters;
+        if (!view.selectedSidePanel.showGroundTruth()) {
+            setColors(clusters);
         }
         repaint();
     }
@@ -490,6 +510,18 @@ public class PlottingView extends JPanel implements DataVisualizer, MouseListene
             newPoints[i] = dataPoints[indicesToDraw[i]];
         }
         return newPoints;
+    }
+
+    //Switches between showing and not showing ground truth.
+    public void showGroundTruth(boolean show) {
+        if (show) {
+            int[] groundTruth = view.getDataset().getGroundTruth();
+            groundTruth = convertClusters(groundTruth);
+            setColors(groundTruth);
+        }
+        else if (clusters != null) {
+            setColors(clusters);
+        }
     }
 
     //Matches the clusters to the points if the number of points have been reduced.

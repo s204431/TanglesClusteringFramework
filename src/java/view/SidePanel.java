@@ -2,6 +2,8 @@ package view;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class SidePanel extends JPanel {
 
@@ -23,6 +25,7 @@ public class SidePanel extends JPanel {
     private JLabel NMILabel = new JLabel();
     private JLabel timeText = new JLabel("Clustering time: ");
     private JLabel timeLabel = new JLabel();
+    private JCheckBox groundTruthCheckBox = new JCheckBox("Show ground truth");
 
     protected Font font;    //Font also used by child classes.
 
@@ -48,6 +51,18 @@ public class SidePanel extends JPanel {
             if (c++ % 2 == 1) {
                 add(Box.createRigidArea(new Dimension(0, font.getSize())));
             }
+        }
+        groundTruthCheckBox.setAlignmentX(CENTER_ALIGNMENT);
+        if (view.hasDataset() && view.getDataset().getGroundTruth() != null) {
+            groundTruthCheckBox.addActionListener(e -> {
+                view.repaint();
+                view.dataVisualizer.showGroundTruth(groundTruthCheckBox.isSelected());
+            });
+            add(groundTruthCheckBox);
+
+        }
+        else {
+            groundTruthCheckBox = null;
         }
     }
 
@@ -111,6 +126,10 @@ public class SidePanel extends JPanel {
     protected void setClustering(int[] hardClustering, double[][] softClustering) {
         this.hardClustering = hardClustering;
         this.softClustering = softClustering;
+    }
+
+    protected boolean showGroundTruth() {
+        return groundTruthCheckBox != null && groundTruthCheckBox.isSelected();
     }
 
 }

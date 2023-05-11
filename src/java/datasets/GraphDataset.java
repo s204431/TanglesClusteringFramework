@@ -234,10 +234,16 @@ public class GraphDataset extends Dataset {
     private BitSet[] getRandomCuts() {
         int iterations = 5;
         Random r = new Random();
-        BitSet[] result = new BitSet[(dataPoints.length/a-1)*iterations];
+        boolean chooseMiddle = false;
+        int nCuts = dataPoints.length/a-1;
+        if (nCuts <= 0) {
+            nCuts = 1;
+            chooseMiddle = true;
+        }
+        BitSet[] result = new BitSet[nCuts*iterations];
         int index = 0;
         for (int k = 0; k < iterations; k++) {
-            for (int i = a; i <= dataPoints.length-a; i += a) {
+            for (int i = chooseMiddle ? dataPoints.length/2 : a; i <= (chooseMiddle ? dataPoints.length/2 : dataPoints.length-a); i += a) {
                 List<Integer> indices = new ArrayList<>();
                 for (int j = 0; j < dataPoints.length; j++) {
                     indices.add(j);

@@ -34,6 +34,8 @@ public class GraphView extends JPanel implements DataVisualizer, MouseListener, 
     private Image image;
     private MutableGraph graph;
     private java.awt.Color[] colors;
+    private int[] hardClustering;
+    private double[][] softClustering;
 
     private int numberOfPoints = 0;
 
@@ -120,10 +122,17 @@ public class GraphView extends JPanel implements DataVisualizer, MouseListener, 
         if (hardClustering == null) {
             return;
         }
+        if (!view.selectedSidePanel.showGroundTruth()) {
+            this.hardClustering = hardClustering;
+        }
+        if (hardClustering != view.getDataset().getGroundTruth() && view.selectedSidePanel.showGroundTruth()) {
+            return;
+        }
         addColors(hardClustering);
         loadGraphFromDotString(((GraphDataset)view.getDataset()).asDot());
         for (int i = 0; i < hardClustering.length; i++) {
-            graph.nodes().add(mutNode("" + i).add(
+            graph.nodes().remove(mutNode("" + i));
+            graph.add(mutNode("" + i).add(
                     Color.rgb(colors[hardClustering[i]].getRGB()).fill()
             ));
         }
@@ -131,10 +140,29 @@ public class GraphView extends JPanel implements DataVisualizer, MouseListener, 
         repaint();
     }
 
+    @Override
+    public void showGroundTruth(boolean show) {
+        if (show) {
+            loadClusters(view.getDataset().getGroundTruth());
+        } else if (hardClustering != null) {
+            loadClusters(hardClustering, softClustering);
+        }
+        else {
+            loadGraphFromDotString(((GraphDataset)view.getDataset()).asDot());
+        }
+    }
+
     //Colors the nodes in a mutable graph based on the received hard and soft clustering.
     //Soft clustering is illustrated by the translucency of the color.
     public void loadClusters(final int[] hardClustering, final double[][] softClustering) {
         if (hardClustering == null || softClustering == null) {
+            return;
+        }
+        if (!view.selectedSidePanel.showGroundTruth()) {
+            this.hardClustering = hardClustering;
+            this.softClustering = softClustering;
+        }
+        if (hardClustering != view.getDataset().getGroundTruth() && view.selectedSidePanel.showGroundTruth()) {
             return;
         }
         addColors(hardClustering);

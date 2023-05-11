@@ -135,6 +135,11 @@ public class ImageView extends JPanel implements DataVisualizer {
         repaint();
     }
 
+    @Override
+    public void showGroundTruth(boolean show) {
+        //Do nothing.
+    }
+
     //Returns number of points in the mutable graph.
     public int getNumberOfPoints() {
         return numberOfPoints;

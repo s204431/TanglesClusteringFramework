@@ -9,4 +9,5 @@ public interface DataVisualizer {
     public boolean isReady();
     public void loadClusters(int[] clusters, double[][] softClustering);
     public void loadClusters(int[] clusters);
+    public void showGroundTruth(boolean show);
 }
