@@ -140,6 +140,7 @@ public class GraphView extends JPanel implements DataVisualizer, MouseListener, 
         repaint();
     }
 
+    //Shows the ground truth.
     @Override
     public void showGroundTruth(boolean show) {
         if (show) {
