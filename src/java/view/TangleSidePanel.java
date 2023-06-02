@@ -35,7 +35,7 @@ public class TangleSidePanel extends SidePanel {
         add(aLabel);
 
         aValueAdjuster = new ValueAdjuster(1, 80);
-        aValueAdjuster.setMaximumSize(new Dimension(view.sidePanelWidth - view.sidePanelWidth / 2, view.windowHeight / 6));
+        aValueAdjuster.setMaximumSize(new Dimension(view.sidePanelWidth - view.sidePanelWidth / 2, view.windowHeight / 12));
         aValueAdjuster.setEnabled(false);
         aValueAdjuster.addChangeListener(new ChangeListener() {
             @Override
@@ -78,6 +78,7 @@ public class TangleSidePanel extends SidePanel {
         add(Box.createRigidArea(new Dimension(0, 5)));
         add(costFunctionDropdown);
         valueChanged();
+        addClusterButton(new ValueAdjuster[] { aValueAdjuster });
     }
 
     //Updates values and generates cluster when a value has been changed in tangle side panel.

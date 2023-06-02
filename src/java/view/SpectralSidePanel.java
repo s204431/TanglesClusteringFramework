@@ -25,7 +25,7 @@ public class SpectralSidePanel extends SidePanel {
         add(kLabel);
 
         kValueAdjuster = new ValueAdjuster(2, 20);
-        kValueAdjuster.setMaximumSize(new Dimension(view.sidePanelWidth - view.sidePanelWidth / 2, view.windowHeight / 6));
+        kValueAdjuster.setMaximumSize(new Dimension(view.sidePanelWidth - view.sidePanelWidth / 2, view.windowHeight / 12));
         kValueAdjuster.setEnabled(false);
         kValueAdjuster.addChangeListener(new ChangeListener() {
             @Override
@@ -42,7 +42,7 @@ public class SpectralSidePanel extends SidePanel {
         add(sigmaLabel);
 
         sigmaValueAdjuster = new ValueAdjuster(1, 100);
-        sigmaValueAdjuster.setMaximumSize(new Dimension(view.sidePanelWidth - view.sidePanelWidth / 2, view.windowHeight / 6));
+        sigmaValueAdjuster.setMaximumSize(new Dimension(view.sidePanelWidth - view.sidePanelWidth / 2, view.windowHeight / 12));
         sigmaValueAdjuster.setEnabled(false);
         sigmaValueAdjuster.addChangeListener(new ChangeListener() {
             @Override
@@ -52,6 +52,7 @@ public class SpectralSidePanel extends SidePanel {
             }
         });
         add(sigmaValueAdjuster);
+        addClusterButton(new ValueAdjuster[] { kValueAdjuster, sigmaValueAdjuster });
     }
 
     //Clusters the data set when the sliders in spectral side panel has been changed.

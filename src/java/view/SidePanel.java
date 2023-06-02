@@ -1,9 +1,12 @@
 package view;
 
+import util.ValueAdjuster;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 public class SidePanel extends JPanel {
 
@@ -17,7 +20,7 @@ public class SidePanel extends JPanel {
     private double NMIScore = -1;
     private long clusteringTime = -1;
 
-    //Labels shown on every side panel.
+    //Components shown on every side panel.
     private JLabel pointsText = new JLabel("Total points: ");
     private JLabel pointsLabel = new JLabel();
     private JLabel showingLabel = new JLabel();
@@ -64,6 +67,7 @@ public class SidePanel extends JPanel {
         else {
             groundTruthCheckBox = null;
         }
+        add(Box.createRigidArea(new Dimension(0, 20)));
     }
 
     //Draws the side panel on the screen.
@@ -109,6 +113,22 @@ public class SidePanel extends JPanel {
     //Updates components in the side panel based on the total number of data points.
     protected void update(int n) {
 
+    }
+
+    //Adds cluster button to side panel.
+    protected void addClusterButton(ValueAdjuster[] valueAdjusters) {
+        add(Box.createRigidArea(new Dimension(0, 20)));
+        JButton clusterButton = new JButton("Cluster");
+        clusterButton.setAlignmentX(CENTER_ALIGNMENT);
+        clusterButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                for (ValueAdjuster adjuster : valueAdjusters) {
+                    adjuster.updateValue();
+                }
+            }
+        });
+        add(clusterButton);
     }
 
     //States the size and placement of SidePanel.

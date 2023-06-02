@@ -23,7 +23,7 @@ public class LinkageSidePanel extends SidePanel {
         add(kLabel);
 
         kValueAdjuster = new ValueAdjuster(2, 20);
-        kValueAdjuster.setMaximumSize(new Dimension(view.sidePanelWidth - view.sidePanelWidth / 2, view.windowHeight / 6));
+        kValueAdjuster.setMaximumSize(new Dimension(view.sidePanelWidth - view.sidePanelWidth / 2, view.windowHeight / 12));
         kValueAdjuster.setEnabled(false);
         kValueAdjuster.addChangeListener(new ChangeListener() {
             @Override
@@ -33,6 +33,7 @@ public class LinkageSidePanel extends SidePanel {
             }
         });
         add(kValueAdjuster);
+        addClusterButton(new ValueAdjuster[] { kValueAdjuster });
     }
 
     //Clusters the data set when the slider in linkage side panel has been changed.
