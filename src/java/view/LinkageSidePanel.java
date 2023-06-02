@@ -23,7 +23,7 @@ public class LinkageSidePanel extends SidePanel {
         add(kLabel);
 
         kValueAdjuster = new ValueAdjuster(2, 20);
-        kValueAdjuster.setMaximumSize(new Dimension(view.sidePanelWidth - view.sidePanelWidth / 2, view.windowHeight / 12));
+        kValueAdjuster.setMaximumSize(new Dimension(view.sidePanelWidth - view.sidePanelWidth / 2, view.windowHeight / 10));
         kValueAdjuster.setEnabled(false);
         kValueAdjuster.addChangeListener(new ChangeListener() {
             @Override
