@@ -2,16 +2,10 @@ package view;
 
 import datasets.FeatureBasedDataset;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferByte;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.Arrays;
-import java.util.Random;
 
 public class ImageView extends JPanel implements DataVisualizer {
 

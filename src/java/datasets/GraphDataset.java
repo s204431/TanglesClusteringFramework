@@ -1,11 +1,8 @@
 package datasets;
 
-import controller.Controller;
-import main.Main;
 import model.Model;
 import util.BitSet;
 import util.Tuple;
-import view.View;
 
 import java.io.BufferedWriter;
 import java.io.File;

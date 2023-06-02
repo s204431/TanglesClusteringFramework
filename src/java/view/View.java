@@ -6,7 +6,6 @@ import datasets.FeatureBasedDataset;
 import datasets.GraphDataset;
 import controller.Controller;
 import model.Model;
-import smile.plot.swing.Plot;
 import util.BitSet;
 
 import javax.swing.*;
