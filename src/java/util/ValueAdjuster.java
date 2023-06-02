@@ -72,20 +72,7 @@ public class ValueAdjuster extends JComponent {
             @Override
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                    try {
-                        int value = Integer.parseInt(textField.getText());
-                        valueEntered = true;
-                        hasValue = true;
-                        slider.setValue((int)(value * 100.0 / maximumValue));
-                        slider.setFocusable(true);
-                        slider.setEnabled(true);
-                        if (changeListener != null) {
-                            changeListener.stateChanged(new ChangeEvent(thisObject));
-                        }
-                        textField.setFocusable(false);
-                        textField.setFocusable(true);
-                        repaint();
-                    } catch (Exception ignored) { }
+                    updateValue();
                 }
             }
 
@@ -121,13 +108,19 @@ public class ValueAdjuster extends JComponent {
     //Updates the current value of the ValueAdjuster to the value in the text field.
     public void updateValue() {
         try {
-            setValue(Integer.parseInt(textField.getText()));
+            int value = Integer.parseInt(textField.getText());
+            valueEntered = true;
+            hasValue = true;
+            slider.setValue((int)(value * 100.0 / maximumValue));
+            slider.setFocusable(true);
+            slider.setEnabled(true);
             if (changeListener != null) {
                 changeListener.stateChanged(new ChangeEvent(this));
             }
+            textField.setFocusable(false);
+            textField.setFocusable(true);
             repaint();
-        }
-        catch (Exception e) {}
+        } catch (Exception ignored) { }
     }
 
     //Returns the value of the value adjuster. Returns Integer.MIN_VALUE if there is no value.
