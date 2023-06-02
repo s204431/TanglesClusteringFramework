@@ -118,6 +118,18 @@ public class ValueAdjuster extends JComponent {
         return hasValue;
     }
 
+    //Updates the current value of the ValueAdjuster to the value in the text field.
+    public void updateValue() {
+        try {
+            setValue(Integer.parseInt(textField.getText()));
+            if (changeListener != null) {
+                changeListener.stateChanged(new ChangeEvent(this));
+            }
+            repaint();
+        }
+        catch (Exception e) {}
+    }
+
     //Returns the value of the value adjuster. Returns Integer.MIN_VALUE if there is no value.
     public int getValue() {
         if (!hasValue) {
