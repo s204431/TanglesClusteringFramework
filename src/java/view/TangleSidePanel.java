@@ -35,7 +35,7 @@ public class TangleSidePanel extends SidePanel {
         add(aLabel);
 
         aValueAdjuster = new ValueAdjuster(1, 80);
-        aValueAdjuster.setMaximumSize(new Dimension(view.sidePanelWidth - view.sidePanelWidth / 2, view.windowHeight / 12));
+        aValueAdjuster.setMaximumSize(new Dimension(view.sidePanelWidth - view.sidePanelWidth / 2, view.windowHeight / 10));
         aValueAdjuster.setEnabled(false);
         aValueAdjuster.addChangeListener(new ChangeListener() {
             @Override
