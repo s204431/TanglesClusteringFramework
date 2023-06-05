@@ -2,6 +2,7 @@ package view;
 
 import smile.plot.swing.*;
 import smile.plot.swing.Canvas;
+import smile.plot.swing.Point;
 import testsets.ClusteringTester;
 import testsets.TestSet;
 
@@ -83,6 +84,8 @@ public class StatisticsPanel extends JPanel {
         Line[][] linesTime = new Line[3][algorithmNames.length];
         Line[][] linesNMI = new Line[3][algorithmNames.length];
         Legend[] legends = new Legend[algorithmNames.length];
+        Point[][] timeScatterPoints = new Point[3][algorithmNames.length];
+        Point[][] nmiScatterPoints = new Point[3][algorithmNames.length];
 
         //Organize the test results.
         for (int algorithm = 0; algorithm < algorithmNames.length; algorithm++) {
@@ -137,14 +140,26 @@ public class StatisticsPanel extends JPanel {
             linesNMI[1][algorithm] = Line.of(nmiDimensions, colors[algorithm]);
             linesNMI[2][algorithm] = Line.of(nmiClusters, colors[algorithm]);
             legends[algorithm] = new Legend(algorithmNames[algorithm], colors[algorithm]);
+
+            //Create scatter points (used for edge case with only 1 test case).
+            timeScatterPoints[0][algorithm] = new Point(timePoints, '#', colors[algorithm]);
+            timeScatterPoints[1][algorithm] = new Point(timeDimensions, '#', colors[algorithm]);
+            timeScatterPoints[2][algorithm] = new Point(timeClusters, '#', colors[algorithm]);
+            nmiScatterPoints[0][algorithm] = new Point(nmiPoints, '#', colors[algorithm]);
+            nmiScatterPoints[1][algorithm] = new Point(nmiDimensions, '#', colors[algorithm]);
+            nmiScatterPoints[2][algorithm] = new Point(nmiClusters, '#', colors[algorithm]);
         }
 
-        //Create the line plots.
+        //Create the plots.
         LinePlot[] timePlots = new LinePlot[3];
         LinePlot[] nmiPlots = new LinePlot[3];
+        ScatterPlot[] timeScatterPlots = new ScatterPlot[3];
+        ScatterPlot[] nmiScatterPlots = new ScatterPlot[3];
         for (int i = 0; i < 3; i++) {
             timePlots[i] = new LinePlot(linesTime[i], legends);
             nmiPlots[i] = new LinePlot(linesNMI[i], legends);
+            timeScatterPlots[i] = new ScatterPlot(timeScatterPoints[i], legends);
+            nmiScatterPlots[i] = new ScatterPlot(nmiScatterPoints[i], legends);
         }
 
         //Find min and max value of test results.
@@ -213,9 +228,16 @@ public class StatisticsPanel extends JPanel {
         int imageHeight = (view.windowHeight - view.topPanelHeight) * 2 / 7;
         Canvas[] canvases = new Canvas[6];
         Image[] images = new Image[6];
+
+
         for (int i = 0; i < 3; i++) {
-            canvases[i] = timePlots[i].canvas();
-            canvases[i+3] = nmiPlots[i].canvas();
+            if (testSet.size() == 1) {  //Edge case with only 1 test case
+                canvases[i] = timeScatterPlots[i].canvas();
+                canvases[i + 3] = nmiScatterPlots[i].canvas();
+            } else {
+                canvases[i] = timePlots[i].canvas();
+                canvases[i + 3] = nmiPlots[i].canvas();
+            }
 
             //Set axis labels
             canvases[i].setAxisLabels(xLabels[i], yLabels[0]);
