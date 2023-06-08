@@ -76,7 +76,7 @@ public class StatisticsTopPanel extends JPanel {
                 testSetPane.add(testCaseTitle);
                 testSetPane.add(Box.createRigidArea(new Dimension(0, 20)));
                 //Error label
-                JLabel testSetErrorLabel = new JLabel("Table values cannot be empty or zero and clusters cannot be 1.");
+                JLabel testSetErrorLabel = new JLabel("Table values cannot be empty or zero.");
                 testSetErrorLabel.setAlignmentX(CENTER_ALIGNMENT);
                 testSetErrorLabel.setFont(errorFont);
                 testSetErrorLabel.setForeground(Color.RED);
@@ -296,7 +296,16 @@ public class StatisticsTopPanel extends JPanel {
                         for (int i = 0; i < tableModel.getRowCount(); i++) {
                             for (int j = 0; j < tableModel.getColumnCount(); j++) {
                                 Object value = table.getValueAt(i,j);
-                                if ((value == null || value.toString().equals("") || value.toString().equals("0")) || (j == 2 && value.toString().equals("1"))) {
+
+                                if (j == 2 && value.toString().equals("1")) {
+                                    testSetErrorLabel.setText("Clusters cannot be 1.");
+                                    testSetErrorLabel.setVisible(true);
+                                    algorithmsErrorLabel.setVisible(false);
+                                    return;
+                                }
+
+                                if (value == null || value.toString().equals("") || value.toString().equals("0")) {
+                                    testSetErrorLabel.setText("Table values cannot be empty or zero.");
                                     testSetErrorLabel.setVisible(true);
                                     algorithmsErrorLabel.setVisible(false);
                                     return;
