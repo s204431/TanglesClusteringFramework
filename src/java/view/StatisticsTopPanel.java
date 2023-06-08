@@ -297,15 +297,15 @@ public class StatisticsTopPanel extends JPanel {
                             for (int j = 0; j < tableModel.getColumnCount(); j++) {
                                 Object value = table.getValueAt(i,j);
 
-                                if (j == 2 && value.toString().equals("1")) {
-                                    testSetErrorLabel.setText("Clusters cannot be 1.");
+                                if (value == null || value.toString().equals("") || value.toString().equals("0")) {
+                                    testSetErrorLabel.setText("Table values cannot be empty or zero.");
                                     testSetErrorLabel.setVisible(true);
                                     algorithmsErrorLabel.setVisible(false);
                                     return;
                                 }
 
-                                if (value == null || value.toString().equals("") || value.toString().equals("0")) {
-                                    testSetErrorLabel.setText("Table values cannot be empty or zero.");
+                                if (j == 2 && value.toString().equals("1")) {
+                                    testSetErrorLabel.setText("Clusters cannot be 1.");
                                     testSetErrorLabel.setVisible(true);
                                     algorithmsErrorLabel.setVisible(false);
                                     return;
