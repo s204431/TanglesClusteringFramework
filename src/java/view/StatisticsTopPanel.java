@@ -76,7 +76,7 @@ public class StatisticsTopPanel extends JPanel {
                 testSetPane.add(testCaseTitle);
                 testSetPane.add(Box.createRigidArea(new Dimension(0, 20)));
                 //Error label
-                JLabel testSetErrorLabel = new JLabel("Table values cannot be empty or zero.");
+                JLabel testSetErrorLabel = new JLabel("Table values cannot be empty or zero and clusters cannot be 1.");
                 testSetErrorLabel.setAlignmentX(CENTER_ALIGNMENT);
                 testSetErrorLabel.setFont(errorFont);
                 testSetErrorLabel.setForeground(Color.RED);
@@ -292,11 +292,11 @@ public class StatisticsTopPanel extends JPanel {
                             return;
                         }
 
-                        //Prevent running of test set if table has 0 values or if no checkboxes are selected.
+                        //Prevent running of test set if table has 0 values, if no checkboxes are selected or if clusters is set to 1.
                         for (int i = 0; i < tableModel.getRowCount(); i++) {
                             for (int j = 0; j < tableModel.getColumnCount(); j++) {
                                 Object value = table.getValueAt(i,j);
-                                if (value == null || value.toString().equals("") || value.toString().equals("0")) {
+                                if ((value == null || value.toString().equals("") || value.toString().equals("0")) || (j == 2 && value.toString().equals("1"))) {
                                     testSetErrorLabel.setVisible(true);
                                     algorithmsErrorLabel.setVisible(false);
                                     return;

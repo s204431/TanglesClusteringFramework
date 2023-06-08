@@ -48,7 +48,7 @@ public class StatisticsPanel extends JPanel {
         add(rightPicturePanel);
 
         Font font = new Font("TimesRoman", Font.BOLD, 25);
-        preRunLabel = new JLabel("Please run a test set");
+        preRunLabel = new JLabel("Please run a test set using the 'Run' button in the top left corner");
         runLabel = new JLabel("Running test set...");
         runLabel.setAlignmentX(CENTER_ALIGNMENT);
         preRunLabel.setAlignmentX(CENTER_ALIGNMENT);
@@ -124,7 +124,7 @@ public class StatisticsPanel extends JPanel {
             mergeSort(nmiClusters);
 
             //Converts the test results into logarithmic scale if logarithmicScale is true.
-            if (logarithmicScale) {
+            if (logarithmicScale && testSet.size() != 1) {
                 for (int test = 0; test < testResults[algorithm].length; test++) {
                     timePoints[test][0] = timePoints[test][0] == 0 ? 0 : Math.log10(timePoints[test][0]);
                     timePoints[test][1] = timePoints[test][1] == 0 ? 0 : Math.log10(timePoints[test][1]);
