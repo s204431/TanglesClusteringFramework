@@ -30,6 +30,7 @@ public class ImageView extends JPanel implements DataVisualizer {
     private double imageWidth;
     private double imageHeight;
 
+    //Constructor receiving view.
     public ImageView(View view) {
         this.view = view;
         setPreferredSize(new Dimension(view.getWindowWidth(), view.getWindowHeight()));

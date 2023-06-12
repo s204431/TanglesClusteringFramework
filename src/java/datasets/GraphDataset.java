@@ -261,33 +261,6 @@ public class GraphDataset extends Dataset {
         return result;
     }
 
-    //Generates a random cut as a BitSet.
-    /*private BitSet getRandomBitSet() {
-        BitSet result = new BitSet(dataPoints.length);
-        int n0 = 0;
-        int n1 = 0;
-        Random random = new Random();
-        for (int i = 0; i < result.size(); i++) {
-            if (n0 - n1 >= result.size() - i) {
-                result.add(i);
-                n1++;
-            }
-            else if (n1 - n0 >= result.size() - i) {
-                n0++;
-            }
-            else {
-                if (random.nextBoolean()) {
-                    result.add(i);
-                    n1++;
-                }
-                else {
-                    n0++;
-                }
-            }
-        }
-        return result;
-    }*/
-
     //Calculates the cost of an edge (0 if there is no edge).
     private int getCost(int node1, int node2, int minWeight, int maxWeight) {
         int weight = getEdgeWeight(node1, node2);

@@ -305,7 +305,7 @@ public class DatasetGenerator {
         return new Tuple<>(result, groundTruth);
     }
 
-    //Generate four clusters with different number of points.
+    //Generate four clusters with different number of points. (Used for experiment)
     public static Tuple<double[][], int[]> generateDifferentSizeClusters(int numOfPoints, int range) {
         int halfNumOfPoints = numOfPoints / 2 - 1;
         if (range > halfNumOfPoints) {
@@ -323,8 +323,6 @@ public class DatasetGenerator {
         int a = -3 * c + numOfPoints;
         int b = -c + numOfPoints / 2;
         int d = 3 * c - numOfPoints / 2;
-
-        System.out.println(a + ", " + b + ", " + c + ", " + d);
 
         double maxDist = numOfPoints * 0.12 * numOfClusters;
         double maxStd = numOfPoints * 0.1;
