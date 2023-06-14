@@ -1,7 +1,6 @@
 # TanglesClusteringFramework
 ## How to install and run:
-- This ZIP file contains an executable JAR file that you can run the program with (recommended).
-- This ZIP file also contains the source code for the program.
+- This contains the source code for the program.
 - The source code was made in the IntelliJ Java IDE.
 - The program was created and tested on Java version 19 and IntelliJ community edition 2022.2.2.
 - The Main.java file should be run when compiling the program.
