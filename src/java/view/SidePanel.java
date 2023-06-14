@@ -147,6 +147,7 @@ public class SidePanel extends JPanel {
         this.softClustering = softClustering;
     }
 
+    //Returns whether the ground truth should be shown.
     protected boolean showGroundTruth() {
         return groundTruthCheckBox != null && groundTruthCheckBox.isSelected();
     }

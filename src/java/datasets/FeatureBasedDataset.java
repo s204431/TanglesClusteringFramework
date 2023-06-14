@@ -227,7 +227,7 @@ public class FeatureBasedDataset extends Dataset {
     //Returns the names of the supported cost functions.
     @Override
     public String[] getCostFunctions() {
-        return new String[] {costFunctionLocalMeans, initialCutsKMeansAdjust, costFunctionDistanceToMean, costFunctionPairwiseDistance, costFunctionPairwiseSquaredDistance};
+        return new String[] {costFunctionLocalMeans, initialCutsKMeansAdjust, costFunctionDistanceToMean, costFunctionPairwiseDistance};
     }
 
     //Generates initial cuts for this dataset using the giving initial cut generator name and returns it as a BitSet array.
@@ -263,9 +263,6 @@ public class FeatureBasedDataset extends Dataset {
         else if (costFunctionName.equals(costFunctionPairwiseDistance)) {
             cutCosts = pairwiseDistanceCostFunction();
         }
-        else if (costFunctionName.equals(costFunctionPairwiseSquaredDistance)) {
-            cutCosts = pairwiseSquaredDistanceCostFunction();
-        }
         else if (costFunctionName.equals(costFunctionKMeansAdjust)) {
             //Do nothing
         }
@@ -298,36 +295,6 @@ public class FeatureBasedDataset extends Dataset {
         return costs;
     }
 
-    //Cost function using pairwise squared distance efficiently.
-    private double[] pairwiseSquaredDistanceCostFunction() {
-        double[] costs = new double[initialCuts.length];
-        double maxRange = getMaxRange();
-        for (int i = 0; i < initialCuts.length; i++) {
-            double[] squaredSums1 = new double[dataPoints[0].length];
-            double[] sums1 = new double[dataPoints[0].length];
-            double[] squaredSums2 = new double[dataPoints[0].length];
-            double[] sums2 = new double[dataPoints[0].length];
-            for (int j = 0; j < dataPoints.length; j++) {
-                for (int k = 0; k < dataPoints[j].length; k++) {
-                    if (initialCuts[i].get(j)) {
-                        sums1[k] += dataPoints[j][k];
-                        squaredSums1[k] += dataPoints[j][k]*dataPoints[j][k];
-                    }
-                    else {
-                        sums2[k] += dataPoints[j][k];
-                        squaredSums2[k] += dataPoints[j][k]*dataPoints[j][k];
-                    }
-                }
-            }
-            for (int j = 0; j < sums1.length; j++) {
-                costs[i] += -sums1[j]*sums2[j] + squaredSums1[j] + squaredSums2[j];
-            }
-            costs[i] *= -2.0;
-        }
-        cutCosts = costs;
-        return costs;
-    }
-
     //Distance to mean cost function, which uses the sum of the distance to the opposite side mean for every point (has linear time complexity).
     private double[] distanceToMeanCostFunction() {
         double[] costs = new double[initialCuts.length];
@@ -354,10 +321,8 @@ public class FeatureBasedDataset extends Dataset {
             //Sum up distances from the means.
             for (int j = 0; j < initialCuts[i].size(); j++) {
                 double[] mean = initialCuts[i].get(j) ? mean2 : mean1;
-                int otherSideSize = initialCuts[i].get(j) ? initialCuts[i].size() - cutCount : cutCount;
-                costs[i] += Math.exp(-(1.0/maxRange)*getDistance(dataPoints[j], mean));//*otherSideSize;
+                costs[i] += Math.exp(-(1.0/maxRange)*getDistance(dataPoints[j], mean));
             }
-            //costs[i] /= initialCuts[i].count()*(initialCuts[i].size() - initialCuts[i].count());
         }
         cutCosts = costs;
         return costs;
@@ -582,7 +547,7 @@ public class FeatureBasedDataset extends Dataset {
                     cuts.add(currentBitSet);
                     costs.add(cost);
                     cost = 0.0;
-                    //Find where to put the cut.F
+                    //Find where to put the cut.
                     double maxRange = -1;
                     for (int k = j+1; k < j+a/precision-1; k++) {
                         if (copy[k+1][i] - copy[k][i] > maxRange) {

@@ -27,6 +27,7 @@ public class BinaryQuestionnaire extends Dataset {
     public static final String initialCutsQuestionCuts = "Question cuts";
     public static final String costFunctionPairwiseDifference = "Pairwise difference";
 
+    //Empty constructor.
     public BinaryQuestionnaire() {
 
     }

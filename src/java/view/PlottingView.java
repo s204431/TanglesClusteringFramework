@@ -52,7 +52,6 @@ public class PlottingView extends JPanel implements DataVisualizer, MouseListene
     private double factor = 1; //Used to expand x- or y-axis to capture largest datapoint.
     private int zoomFactor = 1;
     private int lineGap;
-    private int lines;
 
     protected JLabel coordinates = new JLabel();
 
@@ -66,8 +65,6 @@ public class PlottingView extends JPanel implements DataVisualizer, MouseListene
     protected boolean runningTSNE = false;
     protected boolean showAxes = true;
     protected boolean showGridLines = true;
-
-    private boolean brushing = false;
 
     //Constructor receiving view.
     public PlottingView(View view) {
@@ -88,7 +85,6 @@ public class PlottingView extends JPanel implements DataVisualizer, MouseListene
         addMouseMotionListener(this);
         addMouseWheelListener(this);
         (new Thread(new BoardDragger())).start();
-        (new Thread(new Brusher())).start();
         (new Thread(new ZoomTimer())).start();
     }
 
@@ -136,7 +132,7 @@ public class PlottingView extends JPanel implements DataVisualizer, MouseListene
         if (lineGap == 0) {
             lineGap = windowMax / 30;
         }
-        lines = (windowMax + windowMax * zoomFactor * 4) / lineGap;
+        int lines = (windowMax + windowMax * zoomFactor * 4) / lineGap;
 
         //Draw axes.
         if (showAxes) {
@@ -230,7 +226,6 @@ public class PlottingView extends JPanel implements DataVisualizer, MouseListene
                     g2d.setColor(Color.GRAY);
                 }
                 g2d.fillOval(coor[0], coor[1], POINT_SIZE, POINT_SIZE);
-                //g2d.setColor(Color.BLACK);
                 g2d.setColor(new Color(0,0,0,50));
                 g2d.drawOval(coor[0], coor[1], POINT_SIZE, POINT_SIZE);
             }
@@ -288,7 +283,6 @@ public class PlottingView extends JPanel implements DataVisualizer, MouseListene
                             }
                         }
                         double p = (double)rank/(dataset.cutCosts.length-1);
-                        //double p = (highestCost - lowestCost) == 0 ? 0.5 : (dataset.cutCosts[costIndex] - lowestCost)/(highestCost - lowestCost);
                         g2d.setColor(p <= 0.5 ? new Color((int)(p*2.0*255), 0, 0) : new Color(255, (int)((p-0.5)*2.0*200), (int)((p-0.5)*2.0*200)));
                         if (((FeatureBasedDataset) view.getDataset()).cutsAreAxisParallel) {
                             if (i == 0) {
@@ -391,10 +385,8 @@ public class PlottingView extends JPanel implements DataVisualizer, MouseListene
         else {
             this.points = points;
         }
-        if (!brushing) {
-            double[] bounds = findBounds(points);
-            configureAxes(bounds);
-        }
+        double[] bounds = findBounds(points);
+        configureAxes(bounds);
         repaint();
     }
 
@@ -456,6 +448,8 @@ public class PlottingView extends JPanel implements DataVisualizer, MouseListene
         }).start();
     }
 
+    //Sets the colors array. Uses hard coded colors if there are no more than 7 clusters.
+    //Otherwise, it uses random colors.
     private void setColors(int[] clusters) {
         colors = new Color[] { Color.RED, Color.BLUE, Color.YELLOW, Color.GREEN, Color.ORANGE, Color.PINK, Color.GRAY };
         int amountOfColors = 0;
@@ -651,9 +645,7 @@ public class PlottingView extends JPanel implements DataVisualizer, MouseListene
     }
 
     @Override
-    public void mouseDragged(MouseEvent e) {
-
-    }
+    public void mouseDragged(MouseEvent e) {}
 
     //Updates the coordinate text when the mouse moves.
     @Override
@@ -664,9 +656,7 @@ public class PlottingView extends JPanel implements DataVisualizer, MouseListene
     }
 
     @Override
-    public void mouseClicked(MouseEvent e) {
-
-    }
+    public void mouseClicked(MouseEvent e) {}
 
     //Saves the mouse position and starts dragging when the mouse is pressed.
     @Override
@@ -676,38 +666,30 @@ public class PlottingView extends JPanel implements DataVisualizer, MouseListene
             mouseOrigVector = new int[]{xOrig - mousePos.x, yOrig - mousePos.y};
             dragging = true;
         }
-        else if (mousePos != null && SwingUtilities.isRightMouseButton(e)) {
-            brushing = true;
-        }
     }
 
     //Stops dragging when the mouse is released.
     @Override
     public void mouseReleased(MouseEvent e) {
         dragging = false;
-        brushing = false;
         repaint();
     }
 
     @Override
-    public void mouseEntered(MouseEvent e) {
-
-    }
+    public void mouseEntered(MouseEvent e) {}
 
     @Override
-    public void mouseExited(MouseEvent e) {
-
-    }
+    public void mouseExited(MouseEvent e) {}
 
     //Zooms in/out when scrolling.
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
         int lineGapReset = windowMax / 30;
-        double nZoom = lineGap / (double)50;
+        double nZoom = lineGap / (double) 50;
         double tempFactor = factor;
         double tempLineGap = lineGap;
-        double origWidthDist = ((double)(e.getX() - xOrig) / (double)lineGap);
-        double origHeightDist = ((double)(e.getY() - yOrig) / (double)lineGap);
+        double origWidthDist = ((double) (e.getX() - xOrig) / (double) lineGap);
+        double origHeightDist = ((double) (e.getY() - yOrig) / (double) lineGap);
 
         if (e.getPreciseWheelRotation() > 0.0 && lineGap > lineGapReset / 6) {
             lineGap -= nZoom > 0 ? nZoom : 1;
@@ -727,8 +709,8 @@ public class PlottingView extends JPanel implements DataVisualizer, MouseListene
             }
         }
 
-        xOrig -= (origWidthDist - (e.getX() - xOrig) / (double)lineGap) * (double)lineGap;
-        yOrig -= (origHeightDist - (e.getY() - yOrig) / (double)lineGap) * (double)lineGap;
+        xOrig -= (origWidthDist - (e.getX() - xOrig) / (double) lineGap) * (double) lineGap;
+        yOrig -= (origHeightDist - (e.getY() - yOrig) / (double) lineGap) * (double) lineGap;
 
         if (tempFactor > factor) {
             xOrig -= (origWidthDist) * 4 * (double) lineGap;
@@ -739,50 +721,6 @@ public class PlottingView extends JPanel implements DataVisualizer, MouseListene
         }
         zoomTimer = 200;
         repaint();
-    }
-
-
-    private class Brusher implements Runnable {
-        @Override
-        public void run() {
-            double brushSize = 5;
-            int brushStrength = 20;
-            Random r = new Random();
-            while (!close) {
-                if (brushing && getMousePosition() != null) {
-                    //Generate points.
-                    Point mousePos = getMousePosition();
-                    double[] mousePositionOnScreen = convertScreenPositionToCoordinate(mousePos.x, mousePos.y);
-                    double[][] newPoints = new double[brushStrength][2];
-                    for (int i = 0; i < brushStrength; i++) {
-                        newPoints[i] = new double[] {r.nextGaussian(mousePositionOnScreen[0], brushSize), r.nextGaussian(mousePositionOnScreen[1], brushSize)};
-                    }
-                    double[][] updatedPoints = new double[points.length+newPoints.length][2];
-                    for (int i = 0; i < points.length; i++) {
-                        updatedPoints[i] = points[i];
-                    }
-                    for (int i = 0; i < newPoints.length; i++) {
-                        updatedPoints[i+points.length] = newPoints[i];
-                    }
-                    double[][] copy = new double[updatedPoints.length][2];
-                    for (int i = 0; i < updatedPoints.length; i++) {
-                        for (int j = 0; j < 2; j++) {
-                            copy[i][j] = updatedPoints[i][j];
-                        }
-                    }
-                    clusters = null;
-                    loadPoints(updatedPoints);
-                    view.setDataset(new FeatureBasedDataset(copy));
-                    view.selectedSidePanel.update(points.length);
-                    repaint();
-                }
-                try {
-                    Thread.sleep(50);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
     }
 
     //Concurrent thread that moves the graph when dragging.

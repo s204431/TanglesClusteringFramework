@@ -218,11 +218,8 @@ public class GraphView extends JPanel implements DataVisualizer, MouseListener, 
         return true;
     }
 
-
     @Override
-    public void mouseClicked(MouseEvent e) {
-
-    }
+    public void mouseClicked(MouseEvent e) {}
 
     //Saves the mouse position and starts dragging when the mouse is pressed.
     @Override
@@ -242,14 +239,10 @@ public class GraphView extends JPanel implements DataVisualizer, MouseListener, 
     }
 
     @Override
-    public void mouseEntered(MouseEvent e) {
-
-    }
+    public void mouseEntered(MouseEvent e) {}
 
     @Override
-    public void mouseExited(MouseEvent e) {
-
-    }
+    public void mouseExited(MouseEvent e) {}
 
     //Zooms in and out when the mouse wheel is moved.
     @Override

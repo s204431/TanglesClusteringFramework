@@ -10,6 +10,7 @@ public class ExtendedNumberFormatter extends NumberFormatter {
 
     //This class functions as a NumberFormatter where empty strings are allowed (in case the user wants to delete everything from a text field).
 
+    //Constructor taking a NumberFormat.
     public ExtendedNumberFormatter(NumberFormat f) {
         super(f);
     }

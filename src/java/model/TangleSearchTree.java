@@ -345,13 +345,13 @@ public class TangleSearchTree {
         }
     }
 
-    //Adds an intersection to the hash table.
+    //Adds an intersection to the hash table (not used).
     private void addToHash(long cut1, long cut2, long cut3, boolean side1, boolean side2, boolean side3, int value) {
         long hashKey = getHashKey(cut1, cut2, cut3, side1, side2, side3);
         hashtable.put(hashKey, value);
     }
 
-    //Returns the hashed value of an intersection.
+    //Returns the hashed value of an intersection (not used).
     private int getHashValue(long cut1, long cut2, long cut3, boolean side1, boolean side2, boolean side3) {
         long hashKey = getHashKey(cut1, cut2, cut3, side1, side2, side3);
         Integer hashValue = hashtable.get(hashKey);
@@ -361,7 +361,7 @@ public class TangleSearchTree {
         return -1;
     }
 
-    //Calculates the hash key of an intersection.
+    //Calculates the hash key of an intersection (not used).
     private long getHashKey(long cut1, long cut2, long cut3, boolean side1, boolean side2, boolean side3) {
         long l1 = ((side1 ? 0L : 1L) << ((integerBits+1)*3-1)) | (cut1 << (integerBits+1)*2);
         long l2 = ((side2 ? 0L : 1L) << ((integerBits+1)*2-1)) | (cut2 << (integerBits+1));

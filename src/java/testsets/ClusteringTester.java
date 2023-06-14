@@ -23,15 +23,6 @@ public class ClusteringTester {
 
     //Used to test clustering with tangles on feature based data, binary questionnaires and graph data. Prints results to the console.
     public static void testTangleClusterer() {
-
-        /*TestSet testSet = new TestSet(FeatureBasedDataset.name);
-        for (int i = 100; i <= 1000; i *= 10) {
-            for (int j = 2; j <= 10; j++) {
-                testSet.add(new TestCase(i, 2, j, 1));
-            }
-        }
-        runTest(testSet, new String[] {Model.tangleName, Model.kMeansName, Model.spectralClusteringName, Model.linkageName});*/
-
         System.out.println("Testing tangle clusterer...");
         long time1 = new Date().getTime();
         double[] result1 = testTangleClustererFeatureBased();

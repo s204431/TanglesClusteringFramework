@@ -27,6 +27,7 @@ public class Model {
     private int[] hardClustering;
     private double NMIScore = -1;
 
+    //Empty constructor.
     public Model() {
 
     }
